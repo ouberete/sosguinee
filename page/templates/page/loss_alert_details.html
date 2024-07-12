@@ -1,0 +1,64 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <span class="category-sports">Sports</span>
+          <h1>Some Sport Articles</h1>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
+          <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="details" class="section">
+    <div class="container">
+        <h4>Détails de l'Alerte de Disparition</h4>
+        <div class="card">
+          <div class="card-image">
+            <img src="{{ alerte.principal_image.url }}" alt="Image Principale">
+          </div>
+          <div class="card-content">
+            <span class="card-title">{{ alerte.name }}</span>
+            <p><strong>Type d'Alerte:</strong> {{ alerte.loss_alert_type }}</p>
+            <p><strong>Description:</strong> {{ alerte.description }}</p>
+            <p><strong>Date de l'Alerte:</strong> {{ alerte.date_alert }}</p>
+            <p><strong>Heure de l'Alerte:</strong> {{ alerte.hour_alert }}</p>
+            <p><strong>Commune/Prefecture:</strong> {{ alerte.city }}</p>
+            <p><strong>Quartier:</strong> {{ alerte.quarter }}</p>
+            <p><strong>Adresse de l'Alerte:</strong> {{ alerte.address }}</p>            
+            <p><strong>Téléphone:</strong> {{ alerte.phone }}</p>
+            <p><strong>Email:</strong>
+                 {% if alerte.email %} {{ alerte.email }}</p>
+                {% else %}
+                <p>Aucun</p>
+                {% endif %}
+          </div>
+          <div class="card-action">
+            <h5>Images Facultatives</h5>
+            <div class="row">
+              {% for image in alerte.optional_images.all %}
+                <div class="col s12 m6 l3">
+                  <img src="{{ image.image.url }}" class="responsive-img" alt="Image Facultative">
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+</section>
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}

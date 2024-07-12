@@ -1,0 +1,141 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <span class="category-sports">Sports</span>
+          <h1>Some Sport Articles</h1>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
+          <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="add">
+  <div class="container">
+    <h4>Ajouter une Demande de Financement Sanitaire</h4>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        
+        <div class="input-field col s12">
+          {{ form.beneficiary_name }}
+          <label for="{{ form.beneficiary_name.id_for_label }}">Nom du Bénéficiaire</label>
+          {% if form.beneficiary_name.errors %}
+            <span class="red-text">{{ form.beneficiary_name.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.funding_request_type }}
+          <label for="{{ form.funding_request_type.id_for_label }}">Type de Demande</label>
+          {% if form.funding_request_type.errors %}
+            <span class="red-text">{{ form.funding_request_type.errors }}</span>
+          {% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+          {{ form.funding_amount }}
+          <label for="{{ form.funding_amount.id_for_label }}">Montant Demandé</label>
+          {% if form.funding_amount.errors %}
+            <span class="red-text">{{ form.funding_amount.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      
+      <div class="row">
+        <div class="file-field input-field col s12">
+          <div class="btn">
+            <span>Image Principale</span>
+            {{ form.principal_image }}
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Télécharger une image principale">
+          </div>
+          {% if form.principal_image.errors %}
+            <span class="red-text">{{ form.principal_image.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.city}}
+          <label for="{{ form.city.id_for_label }}">Ville</label>
+          {% if form.city.errors %}
+            <span class="red-text">{{ form.city.errors }}</span>
+          {% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+          {{form.quarter}}
+          <label for="{{ form.quarter.id_for_label }}">Quartier</label>
+          {% if form.quarter.errors %}
+            <span class="red-text">{{ form.quarter.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ form.address}}
+          <label for="{{ form.address.id_for_label }}">Adresse</label>
+          {% if form.address.errors %}
+            <span class="red-text">{{ form.address.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.phone}}
+          <label for="{{ form.phone.id_for_label }}">Telephone</label>
+          {% if form.phone.errors %}
+            <span class="red-text">{{ form.phone.errors }}</span>
+          {% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+          {{ form.email}}
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {% if form.email.errors %}
+            <span class="red-text">{{ form.email.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ form.description_needs }}
+          <label for="{{ form.description_needs.id_for_label }}">Description du Besoin</label>
+          {% if form.description_needs.errors %}
+            <span class="red-text">{{ form.description_needs.errors }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s12">
+          <div class="btn">
+            <span>Images Facultatives</span>
+            <input type="file" name="optional_images" multiple>
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Télécharger jusqu'à 4 images supplémentaires">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn waves-effect waves-light">Ajouter Demande</button>
+    </form>
+    <br>
+  </div>
+</section>
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}

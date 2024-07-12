@@ -1,0 +1,99 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m8 pt">
+        <div class="card-panel m10">
+          <h5 class="center-align">Recentes demande de financement </h5>
+           <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="home-articles" class="section ">
+  <div class="container ">
+    
+    <div class="row card">
+      <div class="col l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+      </div>
+      <div class="col  l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+        
+      </div>
+      <div class="col s12  l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}

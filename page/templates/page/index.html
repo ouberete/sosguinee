@@ -1,0 +1,300 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <h6>Bienvénue sur SOS Guinée</h6>
+          <p>SOS Guinée est un site de gestion des alertes des pertes de vue de biens et de proches, et de financement pour les cas de maladies gâves! </p>
+          <a href="{% url 'contact' %}" class="btn btn-primary">Nous contacter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="home-articles" class="section borderd">
+  <div class="container bordered">
+    <h2 class="center-align">Dernières alertes</h2>
+    <div class="row">
+      <!-- Exemple de card d'alerte pour un proche -->
+      <div class="col s12 m12 l4">
+        <div class="card card-alert">
+          <div class="card-image">
+            <span class="category-sports category">Sports</span>
+            <img src="{% static 'img/articles/img1.avif' %}" alt="Image de Jean Dupont">
+            <span class="card-title">Alerte de Proche</span>
+          </div>
+          <div class="card-content">
+            <p><strong>Nom :</strong> Jean Dupont</p>
+            <p><strong>Type d'alerte :</strong> Urgence Médicale</p>
+            <p><strong>Date :</strong> 08 Juillet 2024</p>
+            <p><strong>Heure :</strong> 14:30</p>
+          </div>
+          <div class="card-action">
+            <a href="#" class="btn red">Voir Détails</a>
+            <a href="#" class="btn blue right">Contacter</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exemple de card d'alerte pour un bien -->
+      <div class="col s12 m12 l4">
+          <div class="card card-alert">
+            <div class="card-image">
+              <img src="{% static 'img/articles/img7.avif' %}" alt="Image de la voiture">
+              <span class="card-title">Alerte de Bien</span>
+            </div>
+            <div class="card-content">
+              <p><strong>Bien :</strong> Voiture - Toyota Corolla</p>
+              <p><strong>Type d'alerte :</strong> Tentative de Vol</p>
+              <p><strong>Date :</strong> 08 Juillet 2024</p>
+              <p><strong>Heure :</strong> 15:45</p>
+            </div>
+            <div class="card-action">
+              <a href="#" class="btn red">Voir Détails</a>
+              <a href="#" class="btn blue right">Contacter</a>
+            </div>
+          </div>
+      </div>
+      <div class="col s12 l12 m12 right-align card-action pb-5">
+        <a href="{% url 'add_loss_alert' %}" class="btn btn-large red"><i class="material-icons left">add</i> Ajouter une alerte</a>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col s12 center-align card-action">
+        <a href="{% url 'loss_alert_list' %}" class="btn">Voir plus...</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="home-articles" class="section ">
+  <div class="container">
+    <h2 class="center-align">Recentes demande de financement </h2>
+    <div class="row card">
+      <div class="col s12 m12 l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m12 l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m12 l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m12 l4">
+        <div class="card">
+          <div class="card-image">
+            <img src="{% static 'img/articles/img7.avif' %}" alt="Description de l'image">
+            <span class="card-title">Amara djourdé</span>
+          </div>
+          <div class="card-content">
+            <p>Gonflement de ventre</p>
+            <p>Montant: <strong>15.000.000 GNF</strong></p>
+            <div class="progress">
+              <div class="determinate" style="width: 50%"></div>
+            </div>
+            <p>50% collecté</p>
+            <p>Temps restant: 10 jours</p>
+          </div>
+          <div class="card-action">
+            <a href="#">PLUS D'INFOS</a>
+            <a href="#" class="right">Partager</a>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 l12 m12 right-align card-action pb-5">
+        <a href="{% url 'add_loss_alert' %}" class="btn btn-large red"><i class="material-icons left">add</i> Ajouter une demande de financement</a>
+    </div>
+      
+    </div>
+    <div class="row">
+      <div class="col s12 center-align card-action">
+        <a href="{% url 'loss_alert_list' %}" class="btn">Voir plus...</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Section add alert link to add alert page-->
+
+
+
+<section id="contact-us" class="section card">
+  <div class="container">
+    <h2 class="center-align">Contact Us</h2>
+    <div class="row">
+     
+      <div class="col s12 m6">  
+        <div class="card-panel">
+          <h1></h1>
+          <h5>besoin d'informations</h5>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, voluptatum.</p> 
+        </div>
+      </div>
+      <div class="col s12 m6">
+        <form>
+          <div class="input-field">
+            <input type="text" id="name">
+            <label for="name">Name</label>
+          </div>
+          <div class="input-field">
+            <input type="email" id="email">
+            <label for="email">Email</label>
+          </div>
+          <div class="input-field">
+            <textarea id="message" class="materialize-textarea"></textarea>
+            <label for="message">Message</label>
+          </div>
+          <button class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% comment %} 
+<section id="how-it-works" class="section">
+  <div class="container">
+    <h2 class="center-align">How it works</h2>
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Step 1</span>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, voluptatum.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Step 2</span>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, voluptatum.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Step 3</span>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, voluptatum.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Step 4</span>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, voluptatum.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ {% endcomment %}
+<!-- Link to donate page -->
+ <section id="donate">
+  <div class="container">
+    <div class="row card ">
+      <div class="col s12 m8 ">
+        <h4>Soutenez notre cause</h4>
+        <p>Faites un don à notre structure, enfin de nous aider à atteindre notre objectif!</p>
+      </div>
+      <div class="col s12 m4">
+        <br class="hide-on-small-only">
+        <div class="valign-wrapper">
+          
+         <div class"right-align text-right">
+        <br class="hide-on-small-only">
+
+          <a href="{% url 'donation' %}" class="btn-large waves-effect waves-light red btn-donate">
+           Faire un don
+          </a>
+         </div>
+        </div>
+       
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large red">
+    <i class="large material-icons">add</i>
+  </a>
+  <ul>
+    <li><a class="btn-floating red" href="{% url 'add_loss_alert' %}"><i class="material-icons">alarm_add</i></a>Perte</li>
+    <li></li>
+    <a class="waves-effect waves-light btn-large"><i class="material-icons right">cloud</i>button</a>
+    <li></li>
+    <li><a class="btn-floating yellow darken-1" href="{% url 'add_funding_request' %}" title="Alert"> <span><i class="material-icons">local_hospital</i></span></a>Finance</li>
+  </ul>
+</div>
+{% include "page/components/footer.html" %}
+
+{% endblock %}

@@ -1,0 +1,37 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <span class="category-sports">Sports</span>
+          <h1>Some Sport Articles</h1>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
+          <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% comment %} <a href="{% url 'donate' %}" class="btn-floating btn-large waves-effect waves-light red btn-donate">
+  <i class="material-icons">donate</i>
+</a> {% endcomment %}
+ 
+
+
+
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}

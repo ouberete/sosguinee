@@ -1,0 +1,61 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Détails de la Demande de Financement{% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
+{% endblock %}
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <h1>Some Sport Articles</h1>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
+          <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="details" class="section">
+  <div class="container">
+    <h4>Détails de la Demande de Financement</h4>
+    <div class="card">
+      <div class="card-image">
+        <img src="{{ financement.principal_image.url }}" alt="Image Principale">
+      </div>
+      <div class="card-content">
+        <span class="card-title">{{ financement.beneficiary_name }}</span>
+        <p><strong>Montant Demandé:</strong> {{ financement.funding_amount }} €</p>
+        <p><strong>Description du Besoin:</strong> {{ financement.description_needs }}</p>
+        <p><strong>Télephone:</strong> {{ financement.phone }}</p>
+        <p><strong>Commune/Prefecture:</strong> {{ financement.city }}</p>
+        <p><strong>Quartier:</strong> {{ financement.quarter }}</p>
+        <p><strong>Adresse:</strong> {{ financement.address }}</p>
+        <p><strong>Email:</strong> {% if financement.email %} {{ financement.email }} {% else %} Aucun {% endif %} </p>
+      </div>
+      <div class="card-action">
+        <h5>Images Facultatives</h5>
+        <div class="row">
+          {% for image in financement.option_images.all %}
+            <div class="col s12 m4 l3">
+              <img src="{{ image.image.url }}" class="responsive-img" alt="Image Facultative">
+            </div>
+          {% endfor %}
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}

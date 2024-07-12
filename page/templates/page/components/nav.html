@@ -1,0 +1,23 @@
+{% load static %}
+
+<nav>
+    <div class="nav-wrapper container">
+      <a href="{% url 'home' %}" class="brand-logo"><img src="{% static 'img/logo.png' %}" alt="logo" class="logo"></a>
+      <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+      <ul class="right hide-on-med-and-down">{% comment %} 
+        <li><a href="{% url 'home' %}" class="current">Home</a></li> {% endcomment %}
+        <li><a href="{% url 'loss_alert_list' %}" class="a-link">Liste Alerte</a></li>
+        <li><a href="{% url 'funding_request_list' %}" class="a-link">Liste Financement</a></li>
+        <li><a href="{% url 'add_loss_alert' %}" class="a-link">Ajout Alerte</a></li>
+        <li><a href="{% url 'add_funding_request' %}" class="a-link">Ajout Financement </a></li>
+        <li><a href="{% url 'contact' %}" class="a-link">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <ul class="sidenav" id="mobile-demo">
+    {% comment %} <li><a href="{% url 'home' %}" class="current">Home</a></li> {% endcomment %}
+    <li><a href="{% url 'loss_alert_list' %}">Alerte Perte</a></li>
+    <li><a href="{% url 'funding_request_list' %}">Financement Maladies</a></li>
+    <li><a href="{% url 'contact' %}">Contact</a></li>
+  </ul>

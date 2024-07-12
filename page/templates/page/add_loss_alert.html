@@ -1,0 +1,124 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+  <div class="container showcase-content">
+    <div class="row">
+      <div class="col s12 m6">
+        <div class="card-panel">
+          <span class="category-sports">Sports</span>
+          <h1>Some Sport Articles</h1>
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
+          <a href="#" class="btn btn-primary">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="add-loss-alert">
+  <div class="container">
+    <h4>Ajouter une Alerte de Disparition</h4>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.loss_alert_type }}
+          <label for="{{ form.loss_alert_type.id_for_label }}">Type d'Alerte</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ form.nom }}
+          <label for="{{ form.nom.id_for_label }}">Nom du Proche/Bien</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.date_alert }}
+          <label for="{{ form.date_alert.id_for_label }}">Date de l'Alerte</label>
+        </div>
+        <div class="input-field col s12 m6">
+          {{ form.hour_alert }}
+          <label for="{{ form.hour_alert.id_for_label }}">Heure de l'Alerte</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.phone}}
+          <label for="{{ form.phone.id_for_label }}">Telephone</label>
+        </div>
+        <div class="input-field col s12 m6">
+          {{ form.email}}
+          <label for="{{ form.email.id_for_label }}">Email</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12 m6">
+          {{ form.city}}
+          <label for="{{ form.city.id_for_label }}">Ville</label>
+        </div>
+        <div class="input-field col s12 m6">
+          {{ form.quarter}}
+          <label for="{{ form.quarter.id_for_label }}">Quartier</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ form.address}}
+          <label for="{{ form.address.id_for_label }}">Adresse</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          {{ form.description }}
+          <label for="{{ form.description.id_for_label }}">Description</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s12">
+          <div class="btn">
+            <span>Image Principale</span>
+            {{ form.principal_image }}
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Télécharger une image principale">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s12">
+          <div class="btn">
+            <span>Akouter d'autres images Facultatives</span>
+            {{ form.optional_images }}
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Télécharger jusqu'à 4 images supplémentaires">
+          </div>
+        </div>
+      </div>
+     
+      <button type="submit" class="btn waves-effect waves-light">Ajouter Alerte</button>
+      <br>
+    </form>
+  </div>
+</section>
+
+
+{% comment %} <a href="{% url 'donate' %}" class="btn-floating btn-large waves-effect waves-light red btn-donate">
+  <i class="material-icons">donate</i>
+</a> {% endcomment %}
+ 
+
+
+
+
+{% include "page/components/footer.html" %}
+
+{% endblock %}
