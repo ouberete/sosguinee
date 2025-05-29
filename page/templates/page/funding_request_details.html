@@ -1,61 +1,93 @@
-
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Détails de la Demande de Financement{% endblock %}
+{% load i18n %}
+{% load custom_filters %}
 
-{% block extracss %}
-<link rel="stylesheet" href="{% static 'css/details.css' %}">
+{% comment %}
+  Template de détails pour les demandes de financement.
+  Inclus dans le projet SOS Guinée.
+  Conçu pour être responsive, optimisé pour le SEO et accessible.
+{% endcomment %}
+<!-- details_templates.html: regroupe les templates de détails avec design responsive, SEO et accessibilité -->
+
+{% comment %} Template de détails pour FundingRequest {% endcomment %}
+{% load static custom_filters %}
+
+{% block title %}Détails Demande {{ funding_request.id }} - SOS Guinée{% endblock %}
+{% block extra_head %}
+  <!-- SEO & OpenGraph -->
+  <meta name="description" content="Détails de la demande N° {{ funding_request.id }} pour {{ funding_request.beneficiary_name }}.">
+  <meta property="og:title" content="Demande {{ funding_request.id }} - {{ funding_request.beneficiary_name }}">
+  <meta property="og:description" content="{{ funding_request.description_needs|truncatechars:100 }}">
+  <meta property="og:image" content="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/og-image.png' %}{% endif %}">
 {% endblock %}
+
 {% block content %}
-{% include "page/components/nav.html" %}
-
-<div class="parallax-container">
-  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
-  <div class="container showcase-content">
-    <div class="row">
-      <div class="col s12 m6">
-        <div class="card-panel">
-          <h1>Some Sport Articles</h1>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
-          <a href="#" class="btn btn-primary">Read More</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<section id="details" class="section">
-  <div class="container">
-    <h4>Détails de la Demande de Financement</h4>
-    <div class="card">
-      <div class="card-image">
-        <img src="{{ financement.principal_image.url }}" alt="Image Principale">
-      </div>
-      <div class="card-content">
-        <span class="card-title">{{ financement.beneficiary_name }}</span>
-        <p><strong>Montant Demandé:</strong> {{ financement.funding_amount }} €</p>
-        <p><strong>Description du Besoin:</strong> {{ financement.description_needs }}</p>
-        <p><strong>Télephone:</strong> {{ financement.phone }}</p>
-        <p><strong>Commune/Prefecture:</strong> {{ financement.city }}</p>
-        <p><strong>Quartier:</strong> {{ financement.quarter }}</p>
-        <p><strong>Adresse:</strong> {{ financement.address }}</p>
-        <p><strong>Email:</strong> {% if financement.email %} {{ financement.email }} {% else %} Aucun {% endif %} </p>
-      </div>
-      <div class="card-action">
-        <h5>Images Facultatives</h5>
-        <div class="row">
-          {% for image in financement.option_images.all %}
-            <div class="col s12 m4 l3">
-              <img src="{{ image.image.url }}" class="responsive-img" alt="Image Facultative">
+  <main role="main">
+    <section class="section container" aria-labelledby="detail-fund-heading">
+      <h1 id="detail-fund-heading" class="center-align">Détails Demande N° {{ funding_request.id }}</h1>
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card hoverable">
+            <div class="card-image">
+              <span class="badge orange white-text">{{ funding_request.funding_request_status }}</span>
+              <img src="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
+                   alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="responsive-img">
             </div>
-          {% endfor %}
+          </div>
         </div>
-        
+        <div class="col s12 m6">
+          <div class="card-panel">
+            <h2 class="truncate">{{ funding_request.title }}</h2>
+            <p><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</p>
+            <p><strong>Montant :</strong> {{ funding_request.funding_amount }} GNF</p>
+            <div class="progress" role="progressbar" aria-valuenow="{{ funding_request.progress }}" aria-valuemin="0" aria-valuemax="100">
+              <div class="determinate" style="width: {{ funding_request.progress }}%"></div>
+            </div>
+            <p>{{ funding_request.progress }}% collecté • {{ funding_request.days_remaining }} jours restants</p>
+            <ul class="collection">
+              <li class="collection-item"><strong>Ville :</strong> {{ funding_request.city }}</li>
+              <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter }}</li>
+              <li class="collection-item"><strong>Adresse :</strong> {{ funding_request.address }}</li>
+              <li class="collection-item"><strong>Téléphone :</strong> {{ funding_request.phone }}</li>
+              <li class="collection-item"><strong>Email :</strong> {{ funding_request.email|default:"Non fourni" }}</li>
+            </ul>
+            <div class="card-action">
+              <a href="{% url 'funding_request_list' %}" class="btn-flat" aria-label="Retour aux demandes">← Retour</a>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-
-{% include "page/components/footer.html" %}
-
+      <div class="row">
+        <div class="col s12">
+          <div class="card-panel">
+            <h2>Description</h2>
+            <p>{{ funding_request.description_needs }}</p>
+          </div>
+        </div>
+      </div>
+      {% if funding_request.optional_docs.exists %}
+      <div class="row">
+        <div class="col s12">
+          <h2>Autres documents</h2>
+          <div class="row">
+            {% for doc in funding_request.optional_docs.all %}
+            <div class="col s12 m6 l4">
+              <div class="card">
+                {% if doc.document_type|startswith:"image" %}
+                  <img src="{{ doc.document.url }}" alt="Document image" class="responsive-img" loading="lazy">
+                {% else %}
+                  <object data="{{ doc.document.url }}" type="application/pdf" width="100%" height="400">
+                    <p>Téléchargez le document : <a href="{{ doc.document.url }}">PDF</a>.</p>
+                  </object>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </section>
+  </main>
 {% endblock %}

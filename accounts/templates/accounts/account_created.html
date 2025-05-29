@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Création de votre compte{% endblock %}
+
+{% block content %}
+  {% comment %} {% include 'page/components/nav.html' %} {% endcomment %}
+
+  <main role="main">
+    <section class="section container" aria-labelledby="account-created-heading">
+      <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+          <div class="card">
+            <div class="card-content center-align">
+              <i class="material-icons large green-text text-darken-2">check_circle</i>
+              <h5 id="account-created-heading" class="green-text text-darken-2">Compte créé avec succès</h5>
+
+              <p class="grey-text text-darken-2">
+                Un lien d'activation vous a été envoyé par courriel.
+              </p>
+              <p class="grey-text text-darken-2">
+                Veuillez cliquer sur le lien pour activer votre compte.
+              </p>
+
+              <div class="section">
+                <a href="{% url 'home' %}" class="btn blue lighten-1 waves-effect waves-light">
+                  <i class="material-icons left">home</i>Aller à l'accueil
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% comment %} {% include 'page/components/footer.html' %} {% endcomment %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'assets/login/js/login.js' %}"></script>
+{% endblock %}

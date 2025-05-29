@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+{% block title %}Inscription - SOS Guinée{% endblock %}
+{% block extra_css %}
+  <!-- Styles spécifiques à la page de connexion -->
+  <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<main class="grey lighten-4 section">
+  <div class="container">
+    <div class="row">
+      <div class="col s12 m8 offset-m2 l6 offset-l3">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title center">Créer un compte</span>
+
+            <form method="post" action="{% url 'register' %}" id="signup-form" novalidate>
+              {% csrf_token %}
+
+              {# Civilité personnalisé #}
+              <div class="input-field">
+                <select id="id_civility" name="civility" class="browser-default" required>
+                  <option value="" disabled selected>Choisir votre civilité</option>
+                  {% for value, label in form.civility.field.choices %}
+                    <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <label for="id_civility" class="active">Civilité</label>
+                {% for error in form.civility.errors %}
+                  <span class="helper-text red-text">{{ error }}</span>
+                {% endfor %}
+              </div>
+
+              {# Boucle sur les autres champs sauf civility #}
+              {% for field in form.visible_fields %}
+                {% if field.name != 'civility' %}
+                  <div class="input-field {% if field.errors %}invalid{% endif %}">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% for error in field.errors %}
+                      <span class="helper-text red-text">{{ error }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+                <p>
+                <label>
+                  <input type="checkbox" id="show-password" />
+                  <span>Afficher le mot de passe</span>
+                </label>
+              </p>
+              <div class="center" style="margin-top:2rem;">
+                <button type="submit" class="btn waves-effect waves-light blue" id="signup-btn">Se connecter</button>
+                <button class="btn waves-effect waves-light blue hide" id="loading-btn" type="button" disabled>
+                  <i class="material-icons left">hourglass_empty</i>Inscription...
+                </button>
+              </div>
+            </form>
+
+            <div class="divider" style="margin:2rem 0;"></div>
+             <div class="center">
+              <p>Ou inscrivez-vous avec :</p>
+              {% providers_media_js %}
+              {% get_providers as providers %}
+              {% for provider in providers %}
+                <a href="{% provider_login_url provider.id process='signup' %}"
+                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="margin-bottom:.5rem; display:block;">
+                  <i class="material-icons left">
+                    {% if provider.id == 'google' %}account_circle
+                    {% elif provider.id == 'facebook' %}facebook
+                    {% elif provider.id == 'apple' %}apple
+                    {% else %}person
+                    {% endif %}
+                  </i>
+                  {{ provider.name }}
+                </a>
+              {% endfor %}
+            </div>
+
+            <div class="card-action center">
+              <p>Déjà membre ? <a href="{% url 'login' %}">Se connecter</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const chk = document.getElementById('show-password');
+    const pwdFields = document.querySelectorAll('#signup-form input[type=password]');
+    const signupBtn = document.getElementById('signup-btn');
+    const loadingBtn = document.getElementById('loading-btn');
+    if (chk) {
+      chk.addEventListener('change', () => {
+        pwdFields.forEach(input => {
+          input.type = chk.checked ? 'text' : 'password';
+        });
+      });
+    }
+    document.getElementById('signup-form').addEventListener('submit', () => {
+      signupBtn.classList.add('hide');
+      loadingBtn.classList.remove('hide');
+    });
+    
+  });
+  
+</script>
+{% endblock %}
+
+

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À propos - SOS Guinée{% endblock %}
+{% block extra_head %}
+  <meta name="description" content="En savoir plus sur la mission, le fonctionnement et l'engagement de SOS Guinée.">
+  <meta property="og:title" content="À propos de SOS Guinée">
+  <meta property="og:description" content="Découvrez comment SOS Guinée facilite la solidarité en Guinée à travers les alertes et financements.">
+  <meta property="og:image" content="{% static 'img/og-image.png' %}">
+{% endblock %}
+
+{% block content %}
+  {% include 'page/components/nav.html' %}
+  <main role="main">
+    <!-- Hero Section -->
+    <section class="parallax-container" role="banner" aria-label="À propos">
+      <div class="parallax">
+        <img src="{% static 'img/articles/img7.avif' %}" alt="À propos de SOS Guinée" class="responsive-img" loading="lazy">
+      </div>
+      <div class="container showcase-content">
+        <div class="row center-align">
+          <div class="col s12 m8 offset-m2">
+            <div class="card-panel teal lighten-5">
+              <h1>À propos de SOS Guinée</h1>
+              <p>Facilitons la solidarité en Guinée : alertes de perte, découvertes de proches ou biens, et financement solidaire.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission -->
+    <section class="section container" aria-labelledby="mission-heading">
+      <h2 id="mission-heading" class="center-align">Notre Mission</h2>
+      <div class="row">
+        <div class="col s12 m10 offset-m1">
+          <p>SOS Guinée a pour vocation de collaborer avec la communauté pour signaler et suivre les alertes de perte de biens ou de proches, permettre la notification des trouvailles, et faciliter le financement des besoins médicaux ou communautaires.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fonctionnement -->
+    <section class="section grey lighten-4" aria-labelledby="how-it-works-heading">
+      <h2 id="how-it-works-heading" class="center-align">Comment ça fonctionne ?</h2>
+      <div class="row">
+        <div class="col s12 m8 offset-m2">
+          <ul class="collection with-header">
+            <li class="collection-header"><h5>Étapes clés</h5></li>
+            <li class="collection-item">1. Signalez la perte de votre bien ou proche et choisissez un statut.</li>
+            <li class="collection-item">2. Partagez les trouvailles pour aider à réunir les proches.</li>
+            <li class="collection-item">3. Ajoutez ou soutenez des demandes de financement pour la santé ou la communauté.</li>
+            <li class="collection-item">4. Validez les dons via une autorité compétente pour lever les fonds ou restituer les biens.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Engagement -->
+    <section class="section container" aria-labelledby="commitment-heading">
+      <h2 id="commitment-heading" class="center-align">Notre engagement</h2>
+      <div class="row">
+        <div class="col s12 m10 offset-m1">
+          <p>Nous garantissons la confidentialité et la sécurité de vos informations personnelles (nom, adresse, email, téléphone). Notre plateforme respecte les meilleures pratiques en matière de protection des données.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Info -->
+    <section class="section grey lighten-4" aria-labelledby="contact-info-heading">
+      <h2 id="contact-info-heading" class="center-align">Contactez-nous</h2>
+      <div class="row center-align">
+        <div class="col s12 m4">
+          <i class="material-icons large">email</i>
+          <p><strong>Email</strong><br>contact@sosguinee.org</p>
+        </div>
+        <div class="col s12 m4">
+          <i class="material-icons large">phone</i>
+          <p><strong>Téléphone</strong><br>+224 123 456 789</p>
+        </div>
+        <div class="col s12 m4">
+          <i class="material-icons large">location_on</i>
+          <p><strong>Adresse</strong><br>Immeuble X, Rue Y, Conakry, Guinée</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% include 'page/components/footer.html' %}
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    M.Parallax.init(document.querySelectorAll('.parallax'));
+  });
+</script>
+{% endblock %}

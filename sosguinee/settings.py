@@ -10,10 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-
 import django_heroku
 import dj_database_url
 from pathlib import Path
+from decouple import config
+# pip install dj-database-url
+# pip install django_heroku
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,14 +25,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-nqbfqt50fhyj158=c)nmfiw6_-8sv9ffzd#l+k=ojy-a=o+hav'
+SECRET_KEY = "django-insecure-nqbfqt50fhyj158=c)nmfiw6_-8sv9ffzd#l+k=ojy-a=o+hav"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STATIC_URL = '/static/'  # URL to use when referring to static files located in STATICFILES_DIRS
+STATIC_URL = (
+    "/static/"  # URL to use when referring to static files located in STATICFILES_DIRS
+)
 
 # Additional locations of static files
 STATICFILES_DIRS = [
@@ -39,47 +44,81 @@ STATICFILES_DIRS = [
 # The directory where collected static files will be stored
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+
+#Media Files
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'account',
-    'page',
+    "jazzmin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "accounts",
+    "page",
+    "social_django",
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.apple',
+    
 ]
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }
+}
+
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware"
 ]
-
-ROOT_URLCONF = 'sosguinee.urls'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+ROOT_URLCONF = "sosguinee.urls"
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'sosguinee.wsgi.application'
+WSGI_APPLICATION = "sosguinee.wsgi.application"
 
 
 # Database
@@ -89,10 +128,34 @@ WSGI_APPLICATION = 'sosguinee.wsgi.application'
 
 
 DATABASES = {
+    
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config("POSTGRES_NAME", cast=str),
+        'USER': config("POSTGRES_USER", cast=str),
+        'PASSWORD': config("POSTGRES_PASSWORD", cast=str),
+        'HOST': config("POSTGRES_HOST", cast=str, default="localhost"),
+        'PORT': config("POSTGRES_PORT", cast=str, default="5432"),
+    },
+    
+    #Sqlite database for local development
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / "db.sqlite3",
+     },
+    
+    # MySQL database for local development
+    
+     
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',
+#             'NAME': 'crowdsily',
+#             'USER': 'ouberete',
+#             'PASSWORD': 'SEREma@2024',
+#             'HOST': 'localhost',  # Par exemple : 'localhost' ou une adresse IP
+#             'PORT': '3308',  # Le port par défaut de MySQL est 3306
+#         } """
+
 }
 
 """ 
@@ -106,33 +169,29 @@ DATABASES = {
         }
     }
 }
-
-
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 HOST = os.getenv("HOST")
 mongoengine.connect(db="djangoTutorial", host=f"mongodb+srv://{HOST}/",
                     username=USERNAME, password=PASSWORD)
-
-
-
 mongoengine.connect(db="sosguinee", host="mongodb://localhost:27017/")
+
 """
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -140,9 +199,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "Fr-fr"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -152,21 +211,186 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+JAZZMIN_SETTINGS = {
+    # Paramètres généraux
+    "site_title": "SOS Guinée",
+    "site_header": "SOS Guinée",
+    "site_brand": "SOS Guinée",
+    "site_logo": "page/img/logo/new_logo.png",  # Mettez à jour ce chemin selon l'emplacement de votre logo
+    "login_logo": None,
+    "login_logo_dark": None,
+    "site_logo_classes": "img-circle",
+    "site_icon": None,
+    "welcome_sign": "Welcome to SOS Guinée",
+    "copyright": "SOS Guinée",
+    "search_model": "page.LossAlert",
+    "user_avatar": None,
 
+    # Top Menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.User"},
+        {"app": "page"},
+    ],
 
-#Paycard configuration
+    # User Menu
+    "usermenu_links": [
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.User"}
+    ],
 
-PAYCARD_API_KEY = 'your_api_key'
-PAYCARD_API_SECRET = 'your_api_secret'
-PAYCARD_ENDPOINT = 'https://api.paycard.com/endpoint'  # Example endpoint
+    # Side Menu
+    "side_menu": [
+        {
+            "app": "page",  # Nom de l'application
+            "label": "Gestion des Alertes",  # Libellé du groupe
+            "models": ["page.LossAlert", "page.LossAlertType", "page.LossAlertStatus"],  # Modèles à inclure
+        },
+        {
+            "app": "page",
+            "label": "Gestion des financements",
+            "models": ["page.FundingType", "page.FundingRequestStatus", "page.FundingRequest"],
+        },
+        {
+            "app": "page",
+            "label": "Gestion des contacts",
+            "models": ["page.MessageContact", "page.Donation", "page.EmailContent"],
+        },
+        {
+            "app": "page",
+            "label": "Gestion des Documents",
+            "models": ["page.OptionalAlertDoc", "page.OptionalFundingDoc"],
+        },
+        
+       ],
+
+    # Icônes pour les modèles
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "page.LossType": "fas fa-user-tie",
+        
+        "page.FundingType": "fas fa-money-bill-wave",
+        "page.LossAlertType": "fas fa-bell",
+        "page.LossAlertStatus": "fas fa-exclamation-triangle",
+        "page.FundingRequestStatus": "fas fa-check-circle",
+        "page.LossAlert": "fas fa-exclamation",
+        "page.FundingRequest": "fas fa-file-invoice-dollar",
+        "page.OptionalAlertDoc": "fas fa-file-alt",
+        "page.OptionalFundingDoc": "fas fa-file-upload",
+    },
+
+    # Autres paramètres
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "page"],  # Mis à jour pour refléter vos apps
+    "custom_links": {
+        "page": [
+            {
+                "name": "Site web",
+                "url": "http://127.0.0.1:8000/",
+                "icon": "fas fa-globe",
+                "permissions": ["auth.view_user"],
+            },
+        ],
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": True,
+    "custom_css": None,
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs"
+    },
+    "language_chooser": True,
+}
+
+LANGUAGE_CODE = 'fr'  # Définit le français comme langue par défaut
+
+LANGUAGES = [
+    ('fr', 'Français'),  # Français (langue par défaut)
+    ('en', 'English'),   # Anglais
+    ('ar', 'العربية'),    # Arabe
+]
+
+# Paycard configuration
+
+PAYCARD_API_KEY = "your_api_key"
+PAYCARD_API_SECRET = "your_api_secret"
+PAYCARD_ENDPOINT = "https://api.paycard.com/endpoint"  # Example endpoint
 
 django_heroku.settings(locals())
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
+
+# Google email configuration
+EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
+EMAIL_HOST = config("EMAIL_HOST", cast=str, default="smtp.gmail.com")
+EMAIL_PORT =config("EMAIL_PORT",cast=int,default=587)
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER =config("EMAIL_HOST_USER", cast=str, default="contactdevsenior@gmail.com")  # Your Gmail address
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default="mjqk xujs higl cxaw")
+
+
+print("Email configuration loaded successfully.")
+print(f"EMAIL_HOST: {EMAIL_HOST}")
+print(f"EMAIL_PORT: {EMAIL_PORT}")
+print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER}")
+print(f"EMAIL_HOST_PASSWORD: {EMAIL_HOST_PASSWORD}")
+print("If you see this message, the email configuration is set up correctly.")
+print("You can now send emails using Django's email backend.")
+print("Make sure to test sending an email to verify everything is working as expected.")
+print("If you encounter any issues, check your email settings and ensure your Gmail account allows less secure apps or use an app password if 2FA is enabled.")
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ]
+}
+
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Paramètres allauth
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_METHODS = ['username', 'email']
+ACCOUNT_SIGNUP_FIELDS = [
+    'email*',     # * signifie “champ obligatoire”
+    'username*',
+    'password1*',
+    'password2*'
+]
+LOGIN_REDIRECT_URL = '/'
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'home'
+
+# Clés Google (à adapter avec les tiennes)
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-google-client-id'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-google-client-secret'

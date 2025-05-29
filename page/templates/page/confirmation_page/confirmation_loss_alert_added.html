@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="parallax-container">
+    <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
+    <div class="container showcase-content">
+        <div class="row">
+            <div class="col">
+                <div class="card-panel mgt-10">
+                    <div class="center-align">
+                        {% if request %}
+                        <h3 class="green-text">Alerte ajoutée avec succes !</h3>
+                        <p> Un message de confirmation vous a été envoyé par courriel.</p>
+                        {% else %}
+                        <!--Redirect to home-->
+                        <h1 class="red-text">Ajout d'Alerte Impossible. </h1>
+                        {% endif %}
+                        <p><a href="{% url 'home' %}">Retourner à l'accueil</a></p>
+                    <div class="center-align">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

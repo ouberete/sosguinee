@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock title %}
+
+{% block extra_css %}
+<!-- Extra CSS specific to home page can go here -->
+<link rel="stylesheet" href="{% static 'assets/css/login.css' %}"/>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="custom-cursor__cursor"></div>
+    <div class="custom-cursor__cursor-two"></div>
+
+    <div class="preloader">
+        <div class="preloader__image"></div>
+    </div>
+    <!-- /.preloader -->
+
+<div class="page-wrapper">
+    <div class="bg-dark text-white">
+        {% include 'pages/components/header.html' %}
+    </div>
+   
+    <div class="stricky-header stricked-menu main-menu">
+        <div class="sticky-header__content"></div><!-- /.sticky-header__content -->
+    </div><!-- /.stricky-header -->
+
+    <div class="form">
+               
+        <div id="login">   
+            <h1>Connexion</h1>
+            
+            <form action="/" method="post">
+            
+              <div class="field-wrap" >
+              <label for="email">
+                Email Address<span class="req">*</span>
+              </label>
+              <input type="email" name="email" required autocomplete="off"/>
+            </div>
+            
+            <div class="field-wrap">
+              <label for="password">
+                Password<span class="req">*</span>
+              </label>
+              <input type="password" name="password" required autocomplete="off"/>
+            </div>
+            
+            <p class="forgot"><a href="#">Forgot Password?</a></p>
+            
+            <button class="button button-block"/>SE CONNECTER</button>
+            <br>
+            <p ><a href="#">Créer son compte</a></p>
+            
+            </form>
+  
+          </div><!-- tab-content -->
+        
+  </div>
+
+   
+                                                                                                      
+
+    <!--Footer-->
+    {% include 'pages/components/footer.html' %}
+
+</div><!-- /.page-wrapper -->
+
+
+{% endblock content %}
+   
+{% block extra_js %}
+<!-- Extra JavaScript specific to home page can go here -->
+ <script src="{% static 'assets/js/login.js' %}"></script>
+{% endblock extra_js %}

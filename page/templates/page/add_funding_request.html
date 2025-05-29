@@ -1,174 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Ajouter une Demande de Financement{% endblock %}
+
+{% block title %}Ajouter une Demande de Financement - SOS Guinée{% endblock %}
+{% block extra_head %}
+  <meta name="description" content="Soumettez une nouvelle demande de financement sur SOS Guinée pour des soins médicaux, une campagne religieuse ou communautaire.">
+{% endblock %}
 
 {% block content %}
-{% include "page/components/nav.html" %}
-
-<div class="parallax-container">
-  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}"></div>
-  <div class="container showcase-content">
-    <div class="row">
-      <div class="col s12 m6">
-        <div class="card-panel">
-          <span class="category-sports">Sports</span>
-          <h1>Some Sport Articles</h1>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. In accusantium quos minima, sapiente ipsa, consequuntur, saepe non eveniet exercitationem nisi quod natus atque expedita quo. Voluptatibus, est? Voluptate, iure harum?</p>
-          <a href="#" class="btn btn-primary">Read More</a>
-        </div>
+  <main role="main">
+    <!-- Hero -->
+    <section class="parallax-container" role="banner" aria-label="Ajout de demande de financement">
+      <div class="parallax">
+        <img src="{% static 'img/articles/img7.avif' %}" alt="Ajout de financement" class="responsive-img" loading="lazy">
       </div>
-    </div>
-  </div>
-</div>
-
-<section id="add">
-  <div class="container  ">
-    <br>
-    <form method="post" enctype="multipart/form-data" class="bordered m-2">
-      <h3 class="center-align m-2">Ajout d'une demande de financement sanitaire</h3>
-      <p class="center-align m-2">Veuillez renseigner les champs ci-dessous</p>
-   
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-      <div class="row">
-        <div class="col s12">
-          <div class="card-panel red lighten-2">
-            {{ form.non_field_errors }}
+      <div class="container showcase-content">
+        <div class="row">
+          <div class="col s12">
+            <div class="card-panel blue lighten-5">
+              <h1>Ajouter une Demande de Financement</h1>
+              <p>Besoin d'une aide pour des soins médicaux, une campagne religieuse ou communautaire ? Remplissez le formulaire ci-dessous.</p>
+            </div>
           </div>
         </div>
       </div>
-      {% endif %}
-      <div class="row">
-        <div class="input-field col s12">
-          {{ form.beneficiary_name }}
-          <label for="{{ form.beneficiary_name.id_for_label }}">Nom du Bénéficiaire</label>
-          {% if form.beneficiary_name.errors %}
-            <span class="red-text">{{ form.beneficiary_name.errors }}</span>
+    </section>
+
+    <!-- Formulaire d'ajout -->
+    <section class="section container" aria-labelledby="add-fund-heading">
+      <h2 id="add-fund-heading" class="center-align">Formulaire de Demande</h2>
+      <form method="post" enctype="multipart/form-data" class="row" novalidate>
+        {% csrf_token %}
+        {# Champs standards sauf fichiers #}
+        {% for field in form.visible_fields %}
+          {% if field.field.widget.input_type != 'file' %}
+            <div class="input-field col s12 m6">
+              {{ field }}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.help_text %}
+                <span class="helper-text">{{ field.help_text }}</span>
+              {% endif %}
+              {% for error in field.errors %}
+                <span class="red-text">{{ error }}</span>
+              {% endfor %}
+            </div>
           {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12 m6">
-          {{ form.funding_request_type }}
-          <label for="{{ form.funding_request_type.id_for_label }}">Type de Demande</label>
-          {% if form.funding_request_type.errors %}
-            <span class="red-text">{{ form.funding_request_type.errors }}</span>
-          {% endif %}
-        </div>
-        <div class="input-field col s12 m6">
-          {{ form.funding_amount }}
-          <label for="{{ form.funding_amount.id_for_label }}">Montant Demandé</label>
-          {% if form.funding_amount.errors %}
-            <span class="red-text">{{ form.funding_amount.errors }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="file-field input-field col s12">
+        {% endfor %}
+
+        {# Champ image principale #}
+        <div class="file-field input-field col s12 m6">
           <div class="btn">
             <span>Image Principale</span>
             {{ form.principal_image }}
           </div>
           <div class="file-path-wrapper">
-            <input class="file-path validate" type="text" placeholder="Télécharger une image principale">
+            <input class="file-path validate" type="text" placeholder="Aucune image sélectionnée">
           </div>
-          {% if form.principal_image.errors %}
-            <span class="red-text">{{ form.principal_image.errors }}</span>
-          {% endif %}
+          {% for error in form.principal_image.errors %}
+            <span class="red-text">{{ error }}</span>
+          {% endfor %}
         </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12 m6">
-          {{ form.city }}
-          <label for="{{ form.city.id_for_label }}">Ville</label>
-          {% if form.city.errors %}
-            <span class="red-text">{{ form.city.errors }}</span>
-          {% endif %}
-        </div>
-        <div class="input-field col s12 m6">
-          {{ form.quarter }}
-          <label for="{{ form.quarter.id_for_label }}">Quartier</label>
-          {% if form.quarter.errors %}
-            <span class="red-text">{{ form.quarter.errors }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          {{ form.address }}
-          <label for="{{ form.address.id_for_label }}">Adresse</label>
-          {% if form.address.errors %}
-            <span class="red-text">{{ form.address.errors }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12 m6">
-          {{ form.phone }}
-          <label for="{{ form.phone.id_for_label }}">Téléphone</label>
-          {% if form.phone.errors %}
-            <span class="red-text">{{ form.phone.errors }}</span>
-          {% endif %}
-        </div>
-        <div class="input-field col s12 m6">
-          {{ form.email }}
-          <label for="{{ form.email.id_for_label }}">Email</label>
-          {% if form.email.errors %}
-            <span class="red-text">{{ form.email.errors }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          {{ form.description_needs }}
-          <label for="{{ form.description_needs.id_for_label }}">Description du Besoin</label>
-          {% if form.description_needs.errors %}
-            <span class="red-text">{{ form.description_needs.errors }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="file-field input-field col s12">
+
+        {# Champ documents optionnels #}
+        <div class="file-field input-field col s12 m6">
           <div class="btn">
-            <span>Images Facultatives</span>
-            <input type="file" name="optional_images" multiple>
+            <span>Documents supplémentaires</span>
+            {{ form.optional_docs }}
           </div>
           <div class="file-path-wrapper">
-            <input class="file-path validate" type="text" placeholder="Télécharger jusqu'à 4 images supplémentaires">
+            <input class="file-path validate" type="text" placeholder="Aucun fichier sélectionné">
           </div>
-          {% if form.optional_images.errors %}
-            <span class="red-text">{{ form.optional_images.errors }}</span>
-          {% endif %}
+          {% for error in form.optional_docs.errors %}
+            <span class="red-text">{{ error }}</span>
+          {% endfor %}
         </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12 right-align">
-          <button type="submit" class="btn waves-effect red waves-light">Ajouter Demande</button>
-        </div>
-      </div>
-     
-      
-      {% if errors %}
-      <br>
-      Errors
-      <br>
-      <div class="row">
-        <div class="col s12">
-          <div class="card-panel red lighten-2">
-            {{ errors }}
-          </div>
-        </div>
-      </div>
-      {% endif %}
-    </form>
-    <br>
-  </div>
-</section>
 
-{% include "page/components/footer.html" %}
+        <!-- Submit -->
+        <div class="col s12 center-align">
+          <button type="submit" class="btn-large green waves-effect waves-light" aria-label="Soumettre la demande">Ajouter Demande</button>
+        </div>
+      </form>
+    </section>
+  </main>
 
 {% endblock %}
 
 {% block extrajs %}
-<script src="{% static 'js/script.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    M.FormSelect.init(document.querySelectorAll('select'));
+  });
+</script>
 {% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Merci pour votre don - SOS Guinée{% endblock %}
+
+{% block content %}
+
+<div class="section center-align m-5">
+    <div class="container">
+        <h4>🙏 Merci pour votre générosité !</h4>
+        <p>Votre don nous aidera à apporter un soutien vital à ceux qui en ont besoin.</p>
+        <br>
+        <a href="{% url 'home' %}" class="btn waves-effect waves-light">
+            Retour à l'accueil
+            <i class="material-icons right">home</i>
+        </a>
+    </div>
+</div>
+<br>
+<br>
+{% endblock %}

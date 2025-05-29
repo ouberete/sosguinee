@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Activation{% endblock %}
+
+{% block content %}
+  {% comment %} {% include 'page/components/nav.html' %} {% endcomment %}
+
+  <main role="main">
+    <section class="section container" aria-labelledby="activation-status-heading">
+      <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+          <div class="card">
+            <div class="card-content center-align">
+
+              {% if success %}
+                <i class="material-icons large green-text text-darken-2">check_circle</i>
+                <h5 id="activation-status-heading" class="green-text text-darken-2">
+                  Compte activé avec succès
+                </h5>
+
+                <p class="grey-text text-darken-2">Vous pouvez maintenant vous connecter.</p>
+
+                <div class="section">
+                  <a href="{% url 'login' %}" class="btn green lighten-1 waves-effect waves-light">
+                    <i class="material-icons left">login</i>Se connecter
+                  </a>
+                </div>
+
+              {% else %}
+                <i class="material-icons large red-text text-darken-2">error</i>
+                <h5 id="activation-status-heading" class="red-text text-darken-2">
+                  Activation échouée
+                </h5>
+
+                <p class="grey-text text-darken-2">{{ error }}</p>
+
+                {% if error == "Votre compte est déjà activé." %}
+                  <div class="section">
+                    <a href="{% url 'login' %}" class="btn orange lighten-1 waves-effect waves-light">
+                      <i class="material-icons left">login</i>Se connecter
+                    </a>
+                  </div>
+                {% endif %}
+              {% endif %}
+
+              <div class="section">
+                <a href="{% url 'home' %}" class="btn blue lighten-1 waves-effect waves-light">
+                  <i class="material-icons left">home</i>Aller à l'accueil
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% comment %} {% include 'page/components/footer.html' %} {% endcomment %}
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'assets/login/js/login.js' %}"></script>
+{% endblock %}

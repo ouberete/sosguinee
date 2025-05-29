@@ -1,23 +1,26 @@
+<!-- nav.html -->
 {% load static %}
-
-<nav>
-    <div class="nav-wrapper container">
-      <a href="{% url 'home' %}" class="brand-logo"><img src="{% static 'img/logo.png' %}" alt="logo" class="logo"></a>
-      <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-      <ul class="right hide-on-med-and-down">{% comment %} 
-        <li><a href="{% url 'home' %}" class="current">Home</a></li> {% endcomment %}
-        <li><a href="{% url 'loss_alert_list' %}" class="a-link">Liste Alerte</a></li>
-        <li><a href="{% url 'funding_request_list' %}" class="a-link">Liste Financement</a></li>
-        <li><a href="{% url 'add_loss_alert' %}" class="a-link">Ajout Alerte</a></li>
-        <li><a href="{% url 'add_funding_request' %}" class="a-link">Ajout Financement </a></li>
-        <li><a href="{% url 'contact' %}" class="a-link">Contact</a></li>
-      </ul>
-    </div>
-  </nav>
-  
-  <ul class="sidenav" id="mobile-demo">
-    {% comment %} <li><a href="{% url 'home' %}" class="current">Home</a></li> {% endcomment %}
-    <li><a href="{% url 'loss_alert_list' %}">Alerte Perte</a></li>
-    <li><a href="{% url 'funding_request_list' %}">Financement Maladies</a></li>
-    <li><a href="{% url 'contact' %}">Contact</a></li>
-  </ul>
+<nav class="blue darken-3" role="navigation" aria-label="Main navigation">
+  <div class="nav-wrapper container">
+    <a href="{% url 'home' %}" class="brand-logo">
+      <img src="{% static 'img/mylogo.png' %}" alt="SOS Guinée logo" class="responsive-img" style="height:48px; margin-top:8px;">
+    </a>
+    <a href="#" data-target="mobile-menu" class="sidenav-trigger" aria-label="Menu mobile"><i class="material-icons">menu</i></a>
+    <ul class="right hide-on-med-and-down">
+      {% if user.is_authenticated %}
+        <li class="nav-user">Bonjour, <strong>{{ user.get_full_name|default:user.username }}</strong></li>
+      {% endif %}
+      <li class="{% if request.resolver_match.url_name == 'loss_alert_list' %}active{% endif %}"><a href="{% url 'loss_alert_list' %}">Alertes</a></li>
+      <li class="{% if request.resolver_match.url_name == 'funding_request_list' %}active{% endif %}"><a href="{% url 'funding_request_list' %}">Financements</a></li>
+      <li class="{% if request.resolver_match.url_name == 'add_loss_alert' %}active{% endif %}"><a href="{% url 'add_loss_alert' %}">Nouvelle Alerte</a></li>
+      <li class="{% if request.resolver_match.url_name == 'add_funding_request' %}active{% endif %}"><a href="{% url 'add_funding_request' %}">Nouveau Financement</a></li>
+      <li class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}"><a href="{% url 'about_us' %}">À propos</a></li>
+      <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+      {% else %}
+        <li class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}"><a href="{% url 'login' %}">Connexion</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
