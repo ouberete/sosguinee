@@ -1,0 +1,44 @@
+<!-- templates/socialaccount/login.html -->
+{% extends "base.html" %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}Redirection Sociale - SOS Guinée{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<main class="grey lighten-4 section">
+  <div class="container">
+    <div class="row">
+      <div class="col s12 m6 offset-m3">
+        <div class="card z-depth-2">
+          <div class="card-content center">
+            <span class="card-title">Redirection vers {{ sociallogin.account.provider|capfirst }}…</span>
+            <p>Chargement en cours, merci de patienter.</p>
+            {# Fallback meta-refresh #}
+            <noscript>
+              <meta http-equiv="refresh" content="0;url={{ sociallogin.get_redirect_url }}" />
+            </noscript>
+            {# Form auto-submit script pour OAuth #}
+            <form id="social-login-form" action="{{ sociallogin.get_redirect_url }}" method="post">
+              {% csrf_token %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('social-login-form');
+    if (form) form.submit();
+  });
+</script>
+{% endblock %}

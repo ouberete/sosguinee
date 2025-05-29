@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function(event) {
     const radios = document.querySelectorAll('input[name="amount"]');
     const autreMontantInput = document.getElementById('other_amount');
     console.log(autreMontantInput);

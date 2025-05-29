@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Connexion - SOS Guinée{% endblock %}
+{% block extra_css %}
+  <!-- Styles spécifiques à la page de connexion -->
+  <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+  {% include 'page/components/nav.html' %}
+
+  <main role="main">
+    <section class="section container" aria-labelledby="login-heading">
+        <h3 class="center-align">Connexion avec un code OTP</h3>
+        <p class="center-align">Fonctionnalité en cours de développement...</p>
+    </section>
+  </main>
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}

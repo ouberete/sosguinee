@@ -1,0 +1,48 @@
+{% load static %}
+{% comment %}
+Partial pour affichage d'alerte ou de demande de financement.
+Params: item, is_funding (bool)
+{% endcomment %}
+<div class="col s12 m6 l4">
+  <article class="card hoverable" style="height:100%; display:flex; flex-direction:column;" role="group"
+           aria-label="{% if is_funding %}{{ item.title }}{% else %}{{ item.name }}{% endif %}">
+    <div class="card-image">
+      <span class="badge {% if is_funding %}orange{% else %}yellow darken-2{% endif %} white-text"
+            aria-label="Statut : {% if is_funding %}{{ item.funding_request_status }}{% else %}{{ item.status_alert_name }}{% endif %}">
+        {% if is_funding %}{{ item.funding_request_status }}{% else %}{{ item.status_alert_name }}{% endif %}
+      </span>
+      <img src="{% if item.principal_image and item.principal_image.url %}{{ item.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
+           alt="{% if is_funding %}Image de {{ item.beneficiary_name }}{% else %}Image de {{ item.name }}{% endif %}"
+           class="responsive-img" loading="lazy">
+    </div>
+    <div class="card-content" style="flex:1;">
+      {% if is_funding %}
+        <h3 class="card-title truncate">{{ item.title }}</h3>
+        <p><strong>Bénéficiaire :</strong> {{ item.beneficiary_name }}</p>
+        <p><strong>Montant :</strong> {{ item.funding_amount }} GNF</p>
+        <div class="progress" role="progressbar" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="determinate" style="width: {{ item.progress }}%"></div>
+        </div>
+        <p>{{ item.progress }}% collecté - {{ item.days_remaining }} jours restants</p>
+      {% else %}
+        <h3 class="card-title truncate">{{ item.name }}</h3>
+        <p><strong>Type :</strong> {{ item.type_alert_name }}</p>
+        <p><strong>Date :</strong> {{ item.date_alert|date:"d F Y" }}</p>
+        <p><strong>Heure :</strong> {{ item.hour_alert }}</p>
+      {% endif %}
+    </div>
+    <div class="card-action">
+      {% if is_funding %}
+        <a href="{% url 'funding_request_details' item.id %}" class="btn-small" role="button"
+           aria-label="Plus d'informations sur {{ item.title }}">PLUS D'INFOS</a>
+        <a href="#" class="right" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="right" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+      {% else %}
+        <a href="{% url 'loss_alert_detail' item.id %}" class="btn-small red" role="button"
+           aria-label="Voir détails de {{ item.name }}">Voir détails</a>
+        <a href="#" class="btn-small blue right" role="button"
+           aria-label="Contacter pour {{ item.name }}">Contacter</a>
+      {% endif %}
+    </div>
+  </article>
+</div>

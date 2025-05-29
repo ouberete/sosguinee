@@ -5,25 +5,54 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Django Project{% endblock %}</title>
+    <title>{% block title %}SOS Guinée{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
      <!--Import materialize.css-->
      <link type="text/css" rel="stylesheet" href="{% static 'materialize/css/materialize.min.css' %}"  media="screen,projection"/>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    {% block extracss %}{% endblock %}
     {% block extra_head %}{% endblock %}
+     <!-- jquery link -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .main-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-    {% block content %}{% endblock %}
+<div class="main-wrapper">
+    {% include 'page/components/nav.html' %}
 
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'page/components/footer.html' %}
+</div>
+  
     <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         M.AutoInit();
       });
     </script>
-    {% block extra_scripts %}{% endblock %}
+      {% block extrajs %}
+    {% endblock %}
     
 </body>
 </html>

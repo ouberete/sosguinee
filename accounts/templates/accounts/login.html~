@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+{% block title %}Connexion - SOS Guinée{% endblock %}
+{% block extra_css %}
+  <!-- Styles spécifiques à la page de connexion -->
+  <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+  {% include 'page/components/nav.html' %}
+
+<main class="grey lighten-4 section">
+  <div class="container">
+    <div class="row">
+      <div class="col s12 m6 offset-m3">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title center">Se connecter</span>
+
+            <form method="post" action="{% url 'login' %}" id="login-form" novalidate>
+              {% csrf_token %}
+
+              {% if form.non_field_errors %}
+                <div class="card-panel red lighten-4 red-text text-darken-4">
+                  {% for err in form.non_field_errors %}
+                    <p>{{ err }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {% for field in form.visible_fields %}
+                <div class="input-field {% if field.errors %}invalid{% endif %}">
+                  {{ field.label_tag }}
+                  {{ field }}
+                  {% for error in field.errors %}
+                    <span class="helper-text red-text">{{ error }}</span>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+
+              <p>
+                <label>
+                  <input type="checkbox" id="show-password" />
+                  <span>Afficher le mot de passe</span>
+                </label>
+              </p>
+
+              <div class="center" style="margin-top:2rem;">
+                <button type="submit" class="btn waves-effect waves-light blue" id="login-btn">Se connecter</button>
+                <button class="btn waves-effect waves-light blue hide" id="loading-btn" type="button" disabled>
+                  <i class="material-icons left">hourglass_empty</i>Connexion...
+                </button>
+              </div>
+            </form>
+
+            <div class="divider" style="margin:2rem 0;"></div>
+           <div class="center">
+              <p>Ou connectez-vous avec :</p>
+              {% providers_media_js %}
+              {% get_providers as providers %}
+              {% for provider in providers %}
+                <a href="{% provider_login_url provider.id process='login' %}"
+                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="margin-bottom:.5rem; display:block;">
+                  <i class="material-icons left">
+                    {% if provider.id == 'google' %}account_circle
+                    {% elif provider.id == 'facebook' %}facebook
+                    {% elif provider.id == 'apple' %}apple
+                    {% else %}person
+                    {% endif %}
+                  </i>
+                  {{ provider.name }}
+                </a>
+              {% endfor %}
+            </div>
+
+            <div class="card-action center">
+              <a href="{% url 'reset-password' %}">Mot de passe oublié ?</a> |
+              <a href="{% url 'register' %}">Pas encore de compte ? Inscription</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% include 'page/components/footer.html' %}
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const chk = document.getElementById('show-password');
+    const pwd = document.querySelector('#login-form input[type=password]');
+    const loginBtn = document.getElementById('login-btn');
+    const loadingBtn = document.getElementById('loading-btn');
+    if (chk && pwd) {
+      chk.addEventListener('change', () => { pwd.type = chk.checked ? 'text' : 'password'; });
+    }
+    document.getElementById('login-form').addEventListener('submit', () => {
+      loginBtn.classList.add('hide');
+      loadingBtn.classList.remove('hide');
+    });
+  });
+</script>
+{% endblock %}
+
+

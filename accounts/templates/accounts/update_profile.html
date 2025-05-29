@@ -1,0 +1,93 @@
+<!--User profil with picture-->
+{% extends 'base.html' %} {% load static %} 
+{% block title %}Profile{% endblock title %}
+{% block extra_css %}
+{% load crispy_forms_tags %}
+<link rel="stylesheet" href="{% static 'assets/profil/profil.css' %}" />
+{% endblock extra_css %} {% block content %}
+<!-- USer informations profil -->
+
+<div class="custom-cursor__cursor"></div>
+<div class="custom-cursor__cursor-two"></div>
+
+<div class="preloader">
+  <div class="preloader__image"></div>
+</div>
+<!-- /.preloader -->
+
+<div class="page-wrapper">
+    <!-- Div with espace at left and right-->
+
+    <div class="p-3 m-2" >
+        <div class="file-upload">
+            <div class="row">
+                <div class="col-6 text-start">
+                        <a href="{% url 'accueil' %}" class="link-info"><i><i class="fa fa-home"></i></i>&nbsp;Aller à l'accueil</a>
+               
+                </div>
+                <div class="col-6 text-end">
+                    <a href="{% url 'accueil' %}" class="link-info"><i><i class="fa fa-home"></i></i>&nbsp;Aller à l'accueil</a>
+                      
+                </div>
+            </div>
+            <hr>
+            <div class="row gx-5">
+                <div class="col-xxl-4">
+                    <div class="card elevation-2">
+                        <div class="card-body">
+                          <h6> Information utiles concernant le financement participatif:</h6>
+                          <br>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-8">
+                    <div class="card">
+                        <div class="card-body">
+                          <h6>Modification du profil {{ step }}</h6>
+                          <hr>
+                          <br>
+                          <form method="post" class="wizard-form" enctype="multipart/form-data">
+                              {% csrf_token %}
+                              {{ wizard.management_form }}
+                              {% if form.errors %}
+                                 {% comment %}  {% for field in form %}
+                                      {% for error in field.errors %}
+                                          <div class="alert alert-danger text-warning">
+                                              <strong>{{ error|escape }} 1</strong>
+                                          </div>
+                                      {% endfor %}
+                                  {% endfor %} {% endcomment %}
+                                  {% for error in form.non_field_errors %}
+                                      <div class="alert alert-danger text-warning">
+                                          <strong>{{ error|escape }} 2</strong>
+                                      </div>
+                                  {% endfor %}
+                              {% endif %}
+                              {% if wizard.steps.current %}
+                                  {% comment %} <h5 class="bg-default">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</h5> {% endcomment %}
+                                  {{ wizard.form | crispy }}
+                              {% endif %}
+                          <br>
+                             <div class="row">
+                              {% if wizard.steps.prev %}
+                                 <div class="col-md-6 text-start"> <button type="submit" class="btn btn-secondary" name="wizard_goto_step" value="{{ wizard.steps.prev }}">Précédent</button></div>
+                                {% else %}
+                                <div class="col-md-6"></div>
+                              {% endif %}
+                              <div class="col-md-6 text-end">{% if wizard.steps.next %}<input type="submit" class="btn btn-outline-success" value="Suivant">{% else %} <input type="submit" class="btn btn-outline-success" value="Enregistrer"> {% endif %}</div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+ 
+</div>
+
+{% endblock content %} {% block extra_js %}
+<script src="{% static 'assets/profil/profil.js' %}"></script>
+{% endblock extra_js %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aide & Support{% endblock title %}
+{% block extra_head %}
+    <meta name="description" content="Trouvez des réponses aux questions fréquentes sur l'utilisation de la plateforme SOS Guinée. Apprenez comment signaler une alerte, une trouvaille ou effectuer un don.">
+    <meta name="keywords" content="SOS Guinée, alerte de perte, trouvaille, demande de financement, dons, aide, support, FAQ">
+    <meta name="author" content="SOS Guinée">
+    <meta name="robots" content="index, follow">
+
+    <!-- Métadonnées Open Graph pour Facebook et LinkedIn -->
+    <meta property="og:title" content="Aide & Support – SOS Guinée">
+    <meta property="og:description" content="Besoin d'aide pour utiliser SOS Guinée ? Consultez notre guide pas à pas.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.sosguinee.org/aide-support">
+    <meta property="og:image" content="https://www.sosguinee.org/static/images/help-support-cover.png">
+{% endblock extra_head %}
+{% block content %}
+{% include "page/components/nav.html" %}
+
+<div class="container my-5">
+    <div class="card p-4 shadow">
+        <h2 class="center-align blue-text text-darken-2">Aide & Support</h2>
+        <p class="flow-text">Retrouvez ci-dessous les réponses aux questions fréquemment posées sur l’utilisation de la plateforme <strong>SOS Guinée</strong>.</p>
+        <div class="divider"></div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">📌 Comment signaler une alerte de perte de bien ou de proche ?</h5>
+            <ol class="browser-default">
+                <li>Connectez-vous à votre compte SOS Guinée.</li>
+                <li>Cliquez sur <strong>"Signaler une perte"</strong>.</li>
+                <li>Remplissez le formulaire avec les détails requis (description, date et lieu).</li>
+                <li>Soumettez l'alerte.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">📍 Comment suivre une alerte de perte ?</h5>
+            <ol class="browser-default">
+                <li>Connectez-vous à votre compte.</li>
+                <li>Accédez à la section <strong>"Mes alertes"</strong>.</li>
+                <li>Consultez l’état actuel de chaque alerte.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">🔎 Comment signaler une trouvaille de bien ou de proche ?</h5>
+            <ol class="browser-default">
+                <li>Connectez-vous à votre compte SOS Guinée.</li>
+                <li>Cliquez sur <strong>"Signaler une trouvaille"</strong>.</li>
+                <li>Remplissez les informations nécessaires.</li>
+                <li>Soumettez le formulaire.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">💰 Comment ajouter une demande de financement ?</h5>
+            <ol class="browser-default">
+                <li>Connectez-vous à votre compte.</li>
+                <li>Sélectionnez <strong>"Ajouter une demande de financement"</strong>.</li>
+                <li>Indiquez le montant souhaité et la raison de votre demande.</li>
+                <li>Envoyez votre demande.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">🤝 Comment financer une demande ?</h5>
+            <ol class="browser-default">
+                <li>Connectez-vous à votre compte SOS Guinée.</li>
+                <li>Allez sur <strong>"Financer une demande"</strong>.</li>
+                <li>Choisissez la demande à soutenir.</li>
+                <li>Effectuez votre don en suivant les instructions.</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h5 class="blue-text text-darken-1">⚖️ Arbitrage et retrait des dons</h5>
+            <p>Le retrait des dons ou des biens/proches retrouvés nécessite l’intervention d’une autorité compétente (l’État). Pour toute question ou assistance concernant cette procédure, contactez-nous via les coordonnées ci-dessous.</p>
+        </div>
+
+        <div class="section">
+            {% include "page/components/address_contact.html" %}
+        </div>
+    </div>
+</div>
+
+{% include "page/components/footer.html" %}
+{% endblock %}

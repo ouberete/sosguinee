@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Politique de Confidentialité – SOS Guinée{% endblock %}
+{% block content %}
+{% include "page/components/nav.html" %}
+<div class="container">
+    <div class="card p-4 my-3">
+        <h2 class="mb-4">Politique de Confidentialité</h2>
+        <p>Chez <strong>SOS Guinée</strong>, nous attachons une grande importance à la protection de votre vie privée et à la sécurité de vos données personnelles. Cette politique de confidentialité vous informe sur la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre plateforme.</p>
+
+        <div class="section my-3">
+            <h5>1. Collecte des informations</h5>
+            <p>Nous collectons différents types d’informations lors de votre utilisation de SOS Guinée, notamment :</p>
+            <ul>
+                <li><strong>Informations personnelles :</strong> nom, prénom, adresse e-mail, numéro de téléphone, etc. Ces données peuvent être accessibles aux personnes cherchant à apporter des solutions pour les alertes et les financements.</li>
+                <li><strong>Informations de compte :</strong> identifiants de connexion, historique de vos actions sur la plateforme.</li>
+            </ul>
+        </div>
+
+        <div class="section my-3">
+            <h5>2. Utilisation des informations</h5>
+            <p>Vos données sont utilisées pour :</p>
+            <ul>
+                <li><strong>Fournir nos services :</strong> traitement et suivi des alertes, gestion des demandes de financement.</li>
+                <li><strong>Communications :</strong> envoi de notifications importantes relatives à votre compte et nos services.</li>
+                <li><strong>Amélioration continue :</strong> analyse de l’utilisation pour optimiser l’expérience utilisateur.</li>
+            </ul>
+        </div>
+
+        <div class="section my-3">
+            <h5>3. Partage des informations</h5>
+            <p>Nous ne partageons vos informations personnelles avec des tiers que dans les cas suivants :</p>
+            <ul>
+                <li><strong>Avec votre consentement explicite.</strong></li>
+                <li><strong>Conformément à la loi :</strong> obligations légales ou judiciaires.</li>
+                <li><strong>Avec les autorités compétentes :</strong> notamment pour l’arbitrage concernant les dons et les biens/proches retrouvés.</li>
+            </ul>
+        </div>
+
+        <div class="section my-3">
+            <h5>4. Sécurité des informations</h5>
+            <p>Nous mettons en œuvre des mesures techniques et organisationnelles rigoureuses pour assurer la sécurité et la confidentialité de vos données contre tout accès non autorisé, perte ou altération.</p>
+        </div>
+
+        <div class="section my-3">
+            <h5>5. Vos droits</h5>
+            <p>Conformément à la réglementation en vigueur (notamment le RGPD), vous disposez des droits suivants :</p>
+            <ul>
+                <li><strong>Droit d’accès :</strong> vous pouvez obtenir une copie des données personnelles que nous détenons.</li>
+                <li><strong>Droit de rectification :</strong> modification des informations inexactes ou incomplètes.</li>
+                <li><strong>Droit à l’effacement :</strong> demande de suppression de vos données, sous réserve des obligations légales.</li>
+                <li><strong>Droit de limitation et d’opposition :</strong> vous pouvez demander la limitation du traitement ou vous opposer à certaines utilisations.</li>
+                <li><strong>Droit à la portabilité :</strong> possibilité de recevoir vos données dans un format structuré.</li>
+            </ul>
+            <p>Pour exercer vos droits, veuillez nous contacter via les coordonnées ci-dessous.</p>
+        </div>
+
+        <div class="section my-3">
+            <h5>6. Modifications de la politique de confidentialité</h5>
+            <p>Nous nous réservons le droit de modifier cette politique à tout moment. Les changements seront publiés sur cette page, et vous serez informé par e-mail si les modifications sont significatives.</p>
+        </div>
+
+        {% include "page/components/address_contact.html" %}
+    </div>
+</div>
+{% include "page/components/footer.html" %}
+{% endblock %}

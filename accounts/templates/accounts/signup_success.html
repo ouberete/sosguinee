@@ -1,0 +1,40 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+        <div class="container">
+            <!-- Codrops top bar -->
+            <!--<div class="codrops-top">
+                <a href="{% url 'home' %}">
+                    Aller à <strong>&laquo; Accueil</strong>
+                </a>
+                <span class="right">
+                    <a href="{% url 'home' %}">
+                        Aller à <strong>Accueil</strong>
+                    </a>
+                </span>
+                <div class="clr"></div>
+            </div>/ Codrops top bar -->
+           
+            <section>				
+                <div id="container_demo" >
+                    <!-- hidden anchor to stop jump http://www.css3create.com/Astuce-Empecher-le-scroll-avec-l-utilisation-de-target#wrap4  -->
+                    <a class="hiddenanchor" id="toregister"></a>
+                    <a class="hiddenanchor" id="tologin"></a>
+                    <br>
+                    <div id="wrapper">
+                        <div id="login" class="animate form">
+                            <h5>Votre compte a bien été crée. </h5> 
+                            <h1 class="confirmation">Un lien d'activation vous a été envoyé par courriel. </h1>                          
+                        </div>
+						
+                    </div>
+                </div>  
+            </section>
+        </div>
+  {% endblock content %}
+  {% block extra_js %}
+  <script src="{% static 'assets/login/js/login.js' %}"></script>
+  {% endblock extra_js %}
