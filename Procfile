@@ -1,1 +1,2 @@
-web gunicorn sosguinee.wsgi:application --log-file 
+web: gunicorn sosguinee.wsgi:application --log-file -
+
