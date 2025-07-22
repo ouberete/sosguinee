@@ -1,0 +1,291 @@
+/* Styles pour la section Hero */
+.hero-section {
+    min-height: 600px; /* Hauteur minimale pour le parallax */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Assure que le contenu ne déborde pas */
+}
+
+.hero-content {
+    z-index: 10; /* Assure que le texte est au-dessus de l'image parallax */
+    position: relative;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4); /* Overlay sombre pour la lisibilité du texte */
+    border-radius: 8px;
+}
+
+.hero-content h1,.hero-content h5 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.hero-content.btn-large {
+    margin: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Styles pour les sections d'alertes et de financement */
+.section {
+    padding: 40px 0; /* Espacement vertical pour toutes les sections */
+}
+
+.section h4.light {
+    font-weight: 300; /* Utilise la police légère de Materialize */
+    margin-bottom: 30px;
+}
+
+/* Cartes d'alertes et de financement */
+.alert-card,.funding-card {
+    height: 100%; /* Assure que toutes les cartes ont la même hauteur */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribue l'espace verticalement */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* CORRECTION: Sélecteurs pour les conteneurs d'images - Simplifié */
+.alert-card.card-image,
+.funding-card.card-image {
+    position: relative;
+    height: 200px; /* Hauteur fixe pour le conteneur d'image */
+    overflow: hidden; /* Assure que le contenu de l'image en dehors de cette hauteur est coupé */
+    /* Removed display: flex, align-items, justify-content for better object-fit behavior */
+}
+
+/* CORRECTION: Sélecteurs pour les images elles-mêmes */
+.alert-card.card-image img,
+.funding-card.card-image img {
+    width: 100%;
+    height: 100%; /* L'image remplit le conteneur */
+    object-fit: cover; /* Recadre l'image pour s'adapter tout en conservant le rapport d'aspect */
+    display: block; /* Supprime l'espace supplémentaire sous l'image */
+    transition: transform 0.3s ease; /* Effet de zoom au survol */
+}
+
+.alert-card.badge,.funding-card.badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    z-index: 5;
+}
+
+.alert-card.card-content,.funding-card.card-content {
+    flex-grow: 1; /* Permet au contenu de prendre l'espace disponible */
+    padding-bottom: 10px; /* Réduit l'espace en bas du contenu */
+}
+
+.alert-card.card-title,.funding-card.card-title {
+    font-size: 1.4em;
+    line-height: 1.2em;
+    margin-bottom: 10px;
+}
+
+.alert-card.card-action,.funding-card.card-action {
+    padding-top: 10px;
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+.alert-card.card-action.btn-small,.funding-card.card-action.btn-small {
+    margin-right: 5px;
+}
+
+.funding-card.progress {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    height: 8px;
+    background-color: #e0e0e0;
+}
+
+.funding-card.progress.determinate {
+    background-color: #ff9800; /* Couleur orange pour la barre de progression */
+}
+
+.funding-card.social-icon {
+    margin-left: 10px;
+    color: #333; /* Couleur par défaut pour les icônes sociales */
+    transition: color 0.3s ease;
+}
+
+.funding-card.social-icon:hover {
+    color: #007bff; /* Exemple de couleur au survol */
+}
+
+/* Section Impact Stats */
+#impact-stats.card-panel {
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#impact-stats.card-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+#impact-stats.material-icons.large {
+    font-size: 4rem; /* Taille des icônes */
+    margin-bottom: 10px;
+}
+
+#impact-stats h5.count-up {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+#impact-stats p.flow-text {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+/* Section Comment ça Marche */
+#how-it-works.icon-block {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#how-it-works.icon-block h2 {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+#how-it-works.icon-block h5 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Section Témoignages */
+#testimonials.carousel {
+    height: 350px; /* Hauteur du carousel */
+    margin-top: 30px;
+}
+
+#testimonials.carousel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+}
+
+.testimonial-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.testimonial-avatar {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid white;
+}
+
+#testimonials.carousel-item p.flow-text {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+#testimonials.carousel-item h5.light {
+    font-weight: 300;
+    font-size: 1.5rem;
+}
+
+.carousel-fixed-item {
+    bottom: 20px!important; /* Ajuste la position des contrôles */
+    left: 50%!important;
+    transform: translateX(-50%)!important;
+    width: auto!important;
+    display: flex;
+    gap: 10px; /* Espace entre les boutons */
+}
+
+.carousel-fixed-item.btn {
+    background-color: rgba(255, 255, 255, 0.8)!important;
+    color: #333!important;
+}
+
+/* Section Donate */
+#donate {
+    padding: 60px 0;
+}
+
+#donate h5.light {
+    font-weight: 300;
+}
+
+#donate.btn-large {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .hero-section {
+        min-height: 500px;
+    }
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    .hero-content h5 {
+        font-size: 1.5rem;
+    }
+    #impact-stats.material-icons.large {
+        font-size: 3rem;
+    }
+    #impact-stats h5.count-up {
+        font-size: 2rem;
+    }
+    #how-it-works.icon-block h2 {
+        font-size: 3rem;
+    }
+    #testimonials.carousel {
+        height: 300px;
+    }
+    #testimonials.carousel-item p.flow-text {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-section {
+        min-height: 400px;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    .hero-content h5 {
+        font-size: 1.2rem;
+    }
+    .hero-content.btn-large {
+        width: 100%;
+        margin: 5px 0;
+    }
+    #impact-stats.col.s12.m4 {
+        margin-bottom: 20px;
+    }
+    #testimonials.carousel {
+        height: 280px;
+    }
+    #testimonials.carousel-item p.flow-text {
+        font-size: 1rem;
+    }
+    .testimonial-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: sosguinee_web_prod
+    # La commande utilise Gunicorn pour un serveur de production
+    command: gunicorn sosguinee.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      # Volumes pour les fichiers statiques et media
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    expose:
+      # Expose le port 8000 uniquement aux autres services du réseau Docker (comme Nginx)
+      - 8000
+    environment:
+      # Variables d'environnement pour la connexion à la base de données
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=db  # Le nom du service de la base de données
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DEBUG=0 # Mettre DEBUG à 0 pour la production
+    # Dépend du service 'db', 'web' ne démarrera qu'après 'db'
+    depends_on:
+      - db
+
+  db:
+    # Utilise l'image officielle de PostgreSQL
+    image: postgres:13
+    container_name: sosguinee_db_prod
+    volumes:
+      # Monte un volume pour que les données de la BDD persistent
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      # Ces variables sont utilisées par l'image PostgreSQL pour initialiser la BDD
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+# Définition des volumes nommés
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

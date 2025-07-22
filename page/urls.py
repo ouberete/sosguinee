@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from page import views
+from page.views import add_comment
 
 urlpatterns = [
     path('', views.index, name='home'),
@@ -22,4 +23,13 @@ urlpatterns = [
     path('policy-privacy/', views.policy_privacy, name='policy_privacy'),
     path('about-us', views.about, name='about_us'),
     path('api/', include('page.api_urls')),
+    path('funding/<int:pk>/paycard/', views.paycard_funding, name='paycard_funding'),
+    path('paycard_funding_payment/<int:funding_id>/paycard/', views.start_paycard_funding_payment, name='funding_paycard_payment'),
+    path('paycard/callback/<int:payment_id>/<str:type>/', views.paycard_payment_callback, name='paycard_payment_callback'),
+    #path('comment/<str:model_name>/<int:object_id>/add/', add_comment, name='add_comment'),
+    path('comment/add/<str:model_name>/<int:object_id>/', views.add_comment, name='add_comment'),
+    path('comment/edit/<int:comment_id>/', views.edit_comment, name='edit_comment'),
+    path('comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
+    path('comment/report/<int:comment_id>/', views.report_comment, name='report_comment'),
+
 ]

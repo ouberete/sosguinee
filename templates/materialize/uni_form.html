@@ -1,0 +1,31 @@
+{% load crispy_forms_tags %}
+<form method="{{ form_method|default:"post" }}" {% if form_action %} action="{{ form_action }}"{% endif %} {% if form_enctype %} enctype="{{ form_enctype }}"{% endif %} class="form-materialize">
+{% csrf_token %}
+{% if form.non_field_errors %}
+<div class="card-panel red lighten-4 red-text text-darken-4">
+    {% for error in form.non_field_errors %}
+    <p>{{ error }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if form.non_field_errors %}
+<div class="red-text">{{ form.non_field_errors }}</div>
+{% endif %}
+
+{% for field in form.visible_fields %}
+{% include "materialize/field.html" with field=field %}
+{% endfor %}
+
+{% if form.hidden_fields %}
+{% for hidden in form.hidden_fields %}
+{{ hidden }}
+{% endfor %}
+{% endif %}
+
+{% if form_submit_button %}
+<div class="form-actions">
+    <button type="submit" class="btn blue">{{ form_submit_button }}</button>
+</div>
+{% endif %}
+</form>

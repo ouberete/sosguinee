@@ -1,0 +1,11 @@
+{% load crispy_forms_field %}
+<div class="input-field {% if field.errors %}invalid{% endif %}">
+    {{ field.label_tag }}
+    {% crispy_field field %}
+    {% if field.help_text %}
+    <span class="helper-text">{{ field.help_text }}</span>
+    {% endif %}
+    {% for error in field.errors %}
+    <span class="helper-text red-text">{{ error }}</span>
+    {% endfor %}
+</div>

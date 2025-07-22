@@ -1,12 +1,16 @@
 from base64 import urlsafe_b64decode
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from smtplib import SMTPException
 from page.models import UserDetails
 from sosguinee import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import LoginForm, ProfileForm, RegisterForm, UserDocumentForm, UserInfosForm, UserLinkForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -15,7 +19,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from django.views.generic.edit import FormView
-#from formtools.wizard.views import SessionWizardView
+from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 
 
@@ -59,34 +63,34 @@ def register(request):
 
 
 
-def reset(request):
+def reset_password(request):
     return render(request, 'accounts/reset-password.html')
 
-""" def user_profile(request):
-    
+def user_profile(request):
+
     print(request.user)
     if request.user.is_authenticated:
         print("user authenticated")
         # Récupérer l'objet UserDetails associé à l'utilisateur connecté
         try:
             profile = UserDetails.objects.get(user=request.user)
-         
+
             user_details = ProfileForm(instance=profile)
-            
+
             countries = dict(UserDetails.COUNTRY_CHOICES)
             country = countries.get(profile.birth_country, 'Non renseigne')
-            
+
             nationality =  countries.get(profile.nationality, 'Non renseigne')
-            
+
             civilities = dict(UserDetails.CIVILITY_CHOICES)
             civility = civilities.get(profile.civility, 'Non renseigne')
-            
+
             professions = dict(UserDetails.PROFESSION_CHOICES)
             profession = professions.get(profile.profession, 'Non renseigne')
-            
+
             categories = dict(UserDetails.USER_CATEGORY_CHOICES)
             category = categories.get(profile.user_category, 'Non renseigne')
-           
+
             return render(request, 'accounts/profil.html', {'profile': profile, 'country': country, 'civility': civility, 'profession': profession,
                 'nationality': nationality, 'category': category})
         except UserDetails.DoesNotExist:
@@ -94,11 +98,10 @@ def reset(request):
             return redirect('login')
     else:
         # Gérer le cas où l'utilisateur n'est pas connecté
-        return redirect('accueil')
-   """ 
+        return redirect('home')
+
 def activate(request, uidb64, token):
     try:
-        
        # uid = int(urlsafe_base64_decode(uidb64).decode())
         user = User.objects.get(pk=uidb64)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):     
@@ -125,7 +128,7 @@ def acount_created(request):
     return render(request, 'accounts/account_created.html')
 
 
-""" class UserInfosView(FormView):
+class UserInfosView(FormView):
     template_name = 'accounts/user_infos.html'
     form_class = UserInfosForm
     success_url = 'user-document'
@@ -152,86 +155,50 @@ class UserLinkView(FormView):
         # Traitement de la troisième étape
         return super().form_valid(form)
 
+FORMS = [
+    ("user_infos", UserInfosForm),
+    ("user_document", UserDocumentForm),
+    ("user_link", UserLinkForm),
+]
+
+TEMPLATES = {
+    "user_infos": "accounts/user_infos.html",
+    "user_document": "accounts/user_document.html",
+    "user_link": "accounts/user_link.html",
+}
+
 class UpdateUserProfileWizard(SessionWizardView):
-    # Définissez les formulaires et les étapes
-    template_name = 'accounts/update_profile.html'  # Template global pour le wizard
+    form_list = FORMS
     file_storage = FileSystemStorage(location='/tmp')
-    # Étapes du wizard
-    
-    
-    
-    def get_form(self, step=None, **kwargs):
-        
-        if self.request.user.is_authenticated:
-            print("user authenticated")
-            # Récupérer l'objet UserDetails associé à l'utilisateur connecté
+    def post(self, *args, **kwargs):
+        print(f"[DEBUG POST] Étape actuelle : {self.steps.current}")
+        return super().post(*args, **kwargs)
+
+    def get_template_names(self):
+        step = self.steps.current
+        if step in TEMPLATES:
+            return [TEMPLATES[step]]
+        raise Exception(f"Template non défini pour l'étape {step}")
+
+    def get_form_instance(self, step):
+        """Pré-remplir avec les données existantes de l'utilisateur."""
+        if not hasattr(self, 'user_details'):
             try:
-                profile = UserDetails.objects.get(user=self.request.user)
-                print("got profile", profile)
-                user_details = ProfileForm(instance=profile)
-                # Utiliser user_details dans votre logique de vue
-                #return render(request, 'accounts/profil.html', {'profile': profile})
-                print("got infos 1", self.request.POST)
-                if step == 'user-infos':
-                    print("got infos", self.request.POST)
-                    return UserInfosForm(data=profile or None, **kwargs)
-                elif step == 'user-document':
-                    return UserDocumentForm(data=self.request.POST or None, **kwargs)
-                elif step == 'user-link':
-                    return UserLinkForm(data=self.request.POST or None, **kwargs)
-                return super().get_form(step, **kwargs)
-            
+                self.user_details = UserDetails.objects.get(user=self.request.user)
             except UserDetails.DoesNotExist:
-                # Gérer le cas où UserDetails n'existe pas pour cet utilisateur
-                return redirect('login')
-        else:
-            # Gérer le cas où l'utilisateur n'est pas connecté
-            return redirect('accueil')
-       
+                self.user_details = UserDetails(user=self.request.user)
+        return self.user_details
 
-    # Fonction de validation de chaque étape
     def done(self, form_list, **kwargs):
-       # Récupérer les données soumises dans chaque étape du formulaire
-        data = {k: v for form in form_list for k, v in form.cleaned_data.items()}
-        userDetails =  UserDetails()
-        userDetails.first_name = data['first_name']
-        userDetails.last_name = data['last_name']
-        userDetails.birth_date = data['birth_date']
-        userDetails.birth_city = data['birth_city']
-        userDetails.nationality = data['nationality']
-        userDetails.is_actual_country_as_birth_country = data['is_actual_country_as_birth_country']
-        userDetails.actual_city = data['actual_city']
-        userDetails.actual_country = data['actual_country']
-        userDetails.zip_code = data['zip_code']
-        userDetails.address = data['address']
-        userDetails.phone = data['phone']
-        userDetails.profession_situation = data['profession_situation']
-        userDetails.activity_sector = data['activity_sector']
-        userDetails.profession = data['profession']
-        userDetails.high_education = data['high_education']
-        userDetails.person_contact = data['person_contact']
-        userDetails.user_category = data['user_category']
-        userDetails.civility = data['civility']
-        userDetails.bio = data['bio']
-        userDetails.photo = data['photo']
-        userDetails.id_card = data['id_card']
-        userDetails.id_card_country = data['id_card_country']
-        userDetails.birth_piece = data['birth_piece']
-        userDetails.birth_piece_country = data['birth_piece_country']
-        userDetails.facebook = data['facebook']
-        userDetails.twitter = data['twitter']
-        userDetails.linkedin = data['linkedin']
-        userDetails.instagram = data['instagram']
-        userDetails.save()
-        
-        # Vous pouvez accéder aux données de chaque formulaire via form_list
-        # Effectuez ici le traitement final ou la sauvegarde des données
-        return HttpResponseRedirect('/profile/')
-    
-    
+        user_details, _ = UserDetails.objects.get_or_create(user=self.request.user)
 
- """
- 
+        for form in form_list:
+            for key, value in form.cleaned_data.items():
+                setattr(user_details, key, value)
+
+        user_details.save()
+        return redirect('/profile')
+
 class UserInfosView(FormView):
     template_name = 'accounts/user_infos.html'
     form_class = UserInfosForm
@@ -360,8 +327,7 @@ def password_reset_confirm(request):
 def password_reset_complete(request):
     return render(request, 'accounts/password_reset_complete.html')
 
-def password_change(request):
-    return render(request, 'accounts/password_change.html')
+
 
 def password_change_done(request):
     return render(request, 'accounts/password_change_done.html')
@@ -379,6 +345,9 @@ def email_change_confirm_done(request):
     return render(request, 'accounts/email_change_confirm_done.html')
     
 """
+
+def change_password(request):
+    return render(request, 'accounts/password_change.html')
 
 def otp_login_view(request):
     return render(request, 'accounts/otp_login.html')

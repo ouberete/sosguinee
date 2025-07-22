@@ -1,143 +1,307 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load i18n %}
+{% load custom_filters %}
 {% block title %}Accueil{% endblock %}
-
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
 {% block content %}
 
-  <!-- Hero Section -->
-  <div class="parallax-container">
-    <div class="parallax">
-      <img src="{% static 'img/articles/img7.avif' %}" alt="Hero image">
+<div class="parallax-container valign-wrapper hero-section">
+  <div class="parallax">
+    <img src="{% static 'img/articles/img7.avif' %}" alt="Image de fond inspirante pour SOS Guinée">
+  </div>
+  <div class="container center-align white-text hero-content">
+    <div class="row">
+      <div class="col s12">
+        <h1 class="header light text-shadow">SOS Guinée : Ensemble, bâtissons l'espoir</h1>
+        <h5 class="light text-shadow">Votre plateforme pour les alertes de perte et le soutien aux maladies graves.</h5>
+        <br>
+        <a href="{% url 'add_loss_alert' %}" class="btn-large waves-effect waves-light red darken-2 pulse">
+          <i class="material-icons left">add_alert</i> Signaler une Alerte
+        </a>
+        <a href="{% url 'add_funding_request' %}" class="btn-large waves-effect waves-light orange darken-2">
+          <i class="material-icons left">volunteer_activism</i> Demander un Financement
+        </a>
+      </div>
     </div>
-    <div class="container showcase-content">
-      <div class="row">
-        <div class="col s12 m12 l8">
-          <div class="card-panel ">
-            <h5>Bienvenue sur SOS Guinée</h5>
-            <p>SOS Guinée est une plateforme de gestion des alertes de perte de vue de biens et de proches, et de financement pour les cas de maladies graves.</p>
-            <a href="{% url 'contact' %}" class="btn blue darken-2 waves-effect waves-light">Nous contacter</a>
-          </div>
+  </div>
+</div>
+
+<section id="impact-stats" class="section grey lighten-3 center-align">
+  <div class="container">
+    <h4 class="light">Notre Impact en Chiffres</h4>
+    <div class="row">
+      <div class="col s12 m4">
+        <div class="card-panel z-depth-1 hoverable">
+          <i class="material-icons large blue-text text-darken-2">people</i>
+          <h5 class="count-up" data-target="1500">0</h5>
+          <p class="flow-text">Vies Impactées</p>
+        </div>
+      </div>
+      <div class="col s12 m4">
+        <div class="card-panel z-depth-1 hoverable">
+          <i class="material-icons large red-text text-darken-2">warning</i>
+          <h5 class="count-up" data-target="850">0</h5>
+          <p class="flow-text">Alertes Traitées</p>
+        </div>
+      </div>
+      <div class="col s12 m4">
+        <div class="card-panel z-depth-1 hoverable">
+          <i class="material-icons large orange-text text-darken-2">local_hospital</i>
+          <h5 class="count-up" data-target="200">0</h5>
+          <p class="flow-text">Cas Financés</p>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- Alerts Section -->
-  <section id="home-alerts" class="section">
-    <div class="container">
-      {% if loss_alerts and loss_alerts.count > 0 %}
-        <h4 class="center-align">Dernières alertes</h4>
-        <div class="row">
-          {% for alert in loss_alerts %}
-          <div class="col s12 m6 l4">
-            <div class="card hoverable" style="height:100%; display:flex; flex-direction:column;">
-              <div class="card-image">
-                <span class="badge yellow darken-2 white-text">{{ alert.status_alert_name }}</span>
-                <img class="responsive-img" src="{% if alert.principal_image and alert.principal_image != '' %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ alert.name }}">
-              </div>
-              <div class="card-content" style="flex:1;">
-                <span class="card-title truncate">{{ alert.name }}</span>
-                <p><strong>Type :</strong> {{ alert.type_alert_name }}</p>
-                <p><strong>Date :</strong> {{ alert.date_alert }}</p>
-                <p><strong>Heure :</strong> {{ alert.hour_alert }}</p>
-              </div>
-              <div class="card-action">
-                <a href="{% url 'loss_alert_detail' alert.id %}" class="btn-small red">Voir Détails</a>
-                <a href="#" class="btn-small blue right">Contacter</a>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
+<section id="how-it-works" class="section scrollspy">
+  <div class="container">
+    <h4 class="center-align light">Comment ça Marche?</h4>
+    <div class="row">
+      <div class="col s12 m4">
+        <div class="icon-block center-align">
+          <h2 class="material-icons light-blue-text text-darken-4">create</h2>
+          <h5>1. Créez une Demande</h5>
+          <p class="light">Signalez une alerte de perte ou soumettez une demande de financement en quelques étapes simples et sécurisées.</p>
         </div>
-        <div class="center-align">
-          <a href="{% url 'loss_alert_list' %}" class="btn-flat">Voir toutes les alertes</a>
+      </div>
+      <div class="col s12 m4">
+        <div class="icon-block center-align">
+          <h2 class="material-icons light-blue-text text-darken-4">share</h2>
+          <h5>2. Partagez et Mobilisez</h5>
+          <p class="light">Votre demande est publiée sur la plateforme, atteignant une large communauté prête à aider et à partager.</p>
         </div>
-      {% else %}
-        <div class="card-panel center-align">
-          <h5>Aucune alerte pour le moment</h5>
-          <p>Cliquez sur <strong>Ajouter une alerte</strong> pour en créer une nouvelle.</p>
-          <a href="{% url 'add_loss_alert' %}" class="btn red waves-effect waves-light"><i class="material-icons left">add</i>Ajouter une alerte</a>
-        </div>
-      {% endif %}
-    </div>
-  </section>
-
-  <!-- Funding Section -->
-  <section id="home-funding" class="section grey lighten-4">
-    <div class="container">
-      {% if funding_requests and funding_requests.count > 0 %}
-        <h4 class="center-align">Demandes de financement récentes</h4>
-        <div class="row">
-          {% for req in funding_requests %}
-          <div class="col s12 m6 l4">
-            <div class="card hoverable" style="height:100%; display:flex; flex-direction:column;">
-              <div class="card-image">
-                <span class="badge orange white-text">{{ req.funding_request_status }}</span>
-                <img class="responsive-img" src="{% if req.principal_image and req.principal_image != '' %}{{ req.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ req.beneficiary_name }}">
-              </div>
-              <div class="card-content" style="flex:1;">
-                <span class="card-title truncate">{{ req.title }}</span>
-                <p><strong>Bénéficiaire :</strong> {{ req.beneficiary_name }}</p>
-                <p><strong>Montant:</strong> {{ req.funding_amount }} GNF</p>
-                <div class="progress">
-                  <div class="determinate" style="width: {{ req.progress }}%"></div>
-                </div>
-                <p>{{ req.progress }}% collecté - {{ req.days_remaining }} jours restants</p>
-              </div>
-              <div class="card-action">
-                <a href="{% url 'funding_request_details' req.id %}">PLUS D'INFOS</a>
-                <a href="#" class="right"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="right"><i class="fab fa-twitter"></i></a>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        <div class="center-align">
-          <a href="{% url 'funding_request_list' %}" class="btn-flat">Voir toutes les demandes</a>
-        </div>
-      {% else %}
-        <div class="card-panel center-align">
-          <h5>Aucune demande de financement pour le moment</h5>
-          <p>Cliquez sur <strong>Ajouter une demande</strong> pour en créer une nouvelle.</p>
-          <a href="{% url 'add_funding_request' %}" class="btn orange waves-effect waves-light"><i class="material-icons left">add</i>Ajouter une demande</a>
-        </div>
-      {% endif %}
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  {% include 'page/components/contact_form.html' %}
-
-  <!-- Donate Section -->
-  <section id="donate" class="section">
-    <div class="container">
-      <div class="row valign-wrapper">
-        <div class="col s12 m8">
-          <h5>Soutenez notre cause</h5>
-          <p>Faites un don pour nous aider à atteindre nos objectifs.</p>
-        </div>
-        <div class="col s12 m4 right-align">
-          <a href="{% url 'donation' %}" class="btn-large blue darken-3 waves-effect waves-light">Faire un don</a>
+      </div>
+      <div class="col s12 m4">
+        <div class="icon-block center-align">
+          <h2 class="material-icons light-blue-text text-darken-4">handshake</h2>
+          <h5>3. Recevez de l'Aide</h5>
+          <p class="light">Bénéficiez du soutien de la communauté, que ce soit pour retrouver un proche ou obtenir un financement vital.</p>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Floating Actions -->
-  <div class="fixed-action-btn">
-    <a class="btn-floating btn-large red">
-      <i class="large material-icons">add</i>
-    </a>
-    <ul>
-      <li><a class="btn-floating red" href="{% url 'add_loss_alert' %}" title="Alerte de perte"><i class="material-icons">alarm_add</i></a></li>
-      <li><a class="btn-floating orange" href="{% url 'add_funding_request' %}" title="Demande de financement"><i class="material-icons">local_hospital</i></a></li>
-    </ul>
+    <div class="center-align">
+      <a href="{% url 'contact' %}" class="btn blue darken-2 waves-effect waves-light">En savoir plus</a>
+    </div>
   </div>
+</section>
 
-  {% block extrajs %}
-    <script src="{% static 'js/index.js' %}"></script>
-  {% endblock %}
+<section id="home-alerts" class="section grey lighten-4">
+  <div class="container">
+    {% if loss_alerts and loss_alerts.count > 0 %}
+    <h4 class="center-align light">Dernières Alertes de Perte</h4>
+    <div class="row">
+      {% for alert in loss_alerts %}
+      <div class="col s12 m6 l4">
+        <div class="card hoverable alert-card">
+          <div class="card-image">
+            <span class="badge yellow darken-2 white-text">{{ alert.status_alert_name }}</span>
+            <img src="{% if alert.principal_image and alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ alert.name }}" class="materialboxed">
+          </div>
+          <div class="card-content">
+            <span class="card-title truncate">{{ alert.name }}</span>
+            <p><strong>Type :</strong> {{ alert.type_alert_name }}</p>
+            <p><strong>Date :</strong> {{ alert.date_alert }}</p>
+            <p><strong>Heure :</strong> {{ alert.hour_alert }}</p>
+          </div>
+          <div class="card-action">
+            <a href="{% url 'loss_alert_detail' alert.id %}" class="btn-small red waves-effect waves-light">Voir Détails</a>
+            <a href="#" class="btn-small blue right waves-effect waves-light">Contacter</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="center-align">
+      <a href="{% url 'loss_alert_list' %}" class="btn-flat waves-effect waves-light blue-text text-darken-2">Voir toutes les alertes <i class="material-icons right">arrow_forward</i></a>
+    </div>
+    {% else %}
+    <div class="card-panel center-align">
+      <h5>Aucune alerte pour le moment</h5>
+      <p>Cliquez sur <strong>Ajouter une alerte</strong> pour en créer une nouvelle.</p>
+      <a href="{% url 'add_loss_alert' %}" class="btn red waves-effect waves-light"><i class="material-icons left">add</i>Ajouter une alerte</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="home-funding" class="section">
+  <div class="container">
+    {% if funding_requests and funding_requests.count > 0 %}
+    <h4 class="center-align light">Demandes de Financement Récentes</h4>
+    <div class="row">
+      {% for req in funding_requests %}
+      <div class="col s12 m6 l4">
+        <div class="card hoverable funding-card">
+          <div class="card-image">
+            <span class="badge orange white-text">{{ req.funding_request_status }}</span>
+            <img src="{% if req.principal_image and req.principal_image %}{{ req.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ req.beneficiary_name }}" class="materialboxed">
+          </div>
+          <div class="card-content">
+            <span class="card-title truncate">{{ req.title }}</span>
+            <p><strong>Bénéficiaire :</strong> {{ req.beneficiary_name }}</p>
+            <p><strong>Montant:</strong> {{ req.funding_amount | format_fr}} GNF</p>
+            <div class="progress">
+              <div class="determinate" style="width: {{ req.progress }}%"></div>
+            </div>
+            <p>{{ req.progress }}% collecté - {{ req.days_remaining }} jours restants</p>
+          </div>
+          <div class="card-action">
+            <a href="{% url 'funding_request_details' req.id %}" class="blue-text text-darken-2">PLUS D'INFOS</a>
+            <a href="#" class="right social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="right social-icon"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="center-align">
+      <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2">Voir toutes les demandes <i class="material-icons right">arrow_forward</i></a>
+    </div>
+    {% else %}
+    <div class="card-panel center-align">
+      <h5>Aucune demande de financement pour le moment</h5>
+      <p>Cliquez sur <strong>Ajouter une demande</strong> pour en créer une nouvelle.</p>
+      <a href="{% url 'add_funding_request' %}" class="btn orange waves-effect waves-light"><i class="material-icons left">add</i>Ajouter une demande</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="testimonials" class="section grey lighten-3">
+  <div class="container">
+    <h4 class="center-align light">Ce qu'ils disent de nous</h4>
+    <div class="carousel carousel-slider center" data-indicators="true">
+      <div class="carousel-fixed-item center">
+        <a class="btn waves-effect white grey-text darken-text-2 next-carousel">
+          <i class="material-icons">chevron_right</i>
+        </a>
+        <a class="btn waves-effect white grey-text darken-text-2 prev-carousel">
+          <i class="material-icons">chevron_left</i>
+        </a>
+      </div>
+      <div class="carousel-item blue white-text" href="#one!">
+        <div class="testimonial-content">
+          <img src="{% static 'img/avatar/avatar1.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
+          <p class="flow-text">"Grâce à SOS Guinée, j'ai pu retrouver mon enfant disparu en un temps record. Une plateforme indispensable pour notre communauté!"</p>
+          <h5 class="light">- Mariam Diallo</h5>
+        </div>
+      </div>
+      <div class="carousel-item orange white-text" href="#two!">
+        <div class="testimonial-content">
+          <img src="{% static 'img/avatar/avatar2.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
+          <p class="flow-text">"Le soutien financier reçu via SOS Guinée a été vital pour le traitement de ma sœur. Un immense merci à tous les donateurs!"</p>
+          <h5 class="light">- Alpha Barry</h5>
+        </div>
+      </div>
+      <div class="carousel-item red white-text" href="#three!">
+        <div class="testimonial-content">
+          <img src="{% static 'img/avatar/avatar3.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
+          <p class="flow-text">"Je suis bénévole et je suis fier de faire partie de cette initiative qui apporte un réel changement dans la vie des Guinéens."</p>
+          <h5 class="light">- Fatoumata Camara</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include 'page/components/contact_form.html' %}
+
+<section id="donate" class="section blue darken-4 white-text">
+  <div class="container">
+    <div class="row valign-wrapper">
+      <div class="col s12 m8">
+        <h5 class="light">Soutenez notre cause</h5>
+        <p class="flow-text">Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée.</p>
+      </div>
+      <div class="col s12 m4 right-align">
+        <a href="{% url 'donation' %}" class="btn-large white blue-text text-darken-4 waves-effect waves-light">Faire un don</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large red">
+    <i class="large material-icons">add</i>
+  </a>
+  <ul>
+    <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="Alerte de perte" href="{% url 'add_loss_alert' %}"><i class="material-icons">alarm_add</i></a></li>
+    <li><a class="btn-floating orange tooltipped" data-position="left" data-tooltip="Demande de financement" href="{% url 'add_funding_request' %}"><i class="material-icons">local_hospital</i></a></li>
+  </ul>
+</div>
+
+{% block extrajs %}
+<script src="{% static 'js/index.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation du Parallax
+    var elemsParallax = document.querySelectorAll('.parallax');
+    M.Parallax.init(elemsParallax);
+
+    // Initialisation du Carousel pour les témoignages
+    var elemsCarousel = document.querySelectorAll('.carousel.carousel-slider');
+    var instancesCarousel = M.Carousel.init(elemsCarousel, {
+      fullWidth: true,
+      indicators: true,
+      onCycleTo: function(item) {
+        // Optionnel: ajouter des animations ou des changements de style lors du cycle
+      }
+    });
+
+    // Contrôles de navigation du carousel
+    document.querySelector('.next-carousel').addEventListener('click', function() {
+      instancesCarousel.next();
+    });
+    document.querySelector('.prev-carousel').addEventListener('click', function() {
+      instancesCarousel.prev();
+    });
+
+    // Initialisation des Materialboxed images
+    var elemsMaterialboxed = document.querySelectorAll('.materialboxed');
+    M.Materialbox.init(elemsMaterialboxed);
+
+    // Initialisation des Tooltips pour les FAB
+    var elemsTooltipped = document.querySelectorAll('.tooltipped');
+    M.Tooltip.init(elemsTooltipped);
+
+    // Animation des chiffres d'impact (Count-up)
+    const countUpElements = document.querySelectorAll('.count-up');
+    const options = {
+      threshold: 0.5 // Déclenche quand 50% de l'élément est visible
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = parseInt(entry.target.dataset.target);
+          let current = 0;
+          const increment = target / 100; // Ajustez la vitesse de l'animation ici
+
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              current = target;
+              clearInterval(timer);
+            }
+            entry.target.textContent = Math.floor(current);
+          }, 20); // Vitesse de l'intervalle
+
+          observer.unobserve(entry.target); // Arrête d'observer une fois l'animation lancée
+        }
+      });
+    }, options);
+
+    countUpElements.forEach(el => {
+      observer.observe(el);
+    });
+  });
+</script>
+{% endblock %}
 
 {% endblock %}
+

@@ -5,12 +5,14 @@
 {% block extra_head %}
   <meta name="description" content="Contactez SOS Guinée pour toute question ou suggestion via notre formulaire de contact.">
 {% endblock %}
-
+{% block extracss %}
+  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 {% block content %}
 
   <main role="main">
     <!-- Hero / Contact Intro -->
-    <section class="parallax-container" role="banner" aria-label="Contactez-nous">
+    <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner" aria-label="Contactez-nous">
       <div class="parallax">
         <img src="{% static 'img/articles/img7.avif' %}" alt="Contact SOS Guinée" class="responsive-img" loading="lazy">
       </div>

@@ -1,14 +1,74 @@
 from datetime import datetime
+from email.policy import default
+from random import choices
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.contenttypes.fields import GenericForeignKey
+
+from page.middleware import get_current_user
+
 
 class BaseEntity(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     #id = models.UUIDField(primary_key=True, )
+    isDeleted = models.BooleanField(blank=True, null=True, default=False)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_%(class)s_set'
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='updated_%(class)s_set'
+    )
+    deleted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='deleted_%(class)s_set'
+    )
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        current_user = get_current_user()
+        if not self.pk:  # Si c'est une création
+            self.created_by = current_user
+        else:  # Sinon, c'est une mise à jour
+            self.updated_by = current_user
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        current_user = get_current_user()
+        self.isDeleted = True
+        self.deleted_by = current_user
+        self.save()
+
+class BaseManager(models.Manager):
+    """
+    Manager de base qui exclut les objets marqués comme supprimés.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(isDeleted=False)
+
+
+class AllObjectsManager(models.Manager):
+    """
+    Manager alternatif pour inclure les objets supprimés.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset()
 
 Gender = (
     ('Male', 'Masculin'),
@@ -18,6 +78,8 @@ Gender = (
 class FundingType(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Type Financement', unique=True)
     description = models.TextField(verbose_name='Description Type Financement')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
     class Meta:
         verbose_name = 'Type Financement'
         verbose_name_plural = 'Types Financements'
@@ -29,7 +91,8 @@ class FundingType(BaseEntity):
 class LossAlertType(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Type alerte perte', unique=True)
     description = models.TextField(verbose_name='Description Type alerte perte')
-            
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
     class Meta:
         verbose_name = 'Type alerte perte'
         verbose_name_plural = 'Types alerte perte'
@@ -42,7 +105,8 @@ class LossAlertType(BaseEntity):
 class LossAlertStatus(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Statut alerte perte', unique=True)
     description = models.TextField(verbose_name='Description Statut alerte perte')
-       
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
     class Meta:
         verbose_name = 'Statut alerte perte'
         verbose_name_plural = 'Statuts alerte perte'
@@ -54,7 +118,8 @@ class LossAlertStatus(BaseEntity):
 class FundingRequestStatus(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Statut Financement', unique=True)
     description = models.TextField(verbose_name='Description Statut Financement')
-    
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
         
     class Meta:
         verbose_name = 'Statut Financement'
@@ -95,7 +160,7 @@ class OptionalAlertDoc(BaseEntity):
         db_table = 'optional_alert_doc'
 
 class LossAlert(BaseEntity):
-    name = models.CharField(max_length=255, verbose_name='Nom')
+    name = models.CharField(max_length=255, verbose_name='Nom du sujet concerné')
     loss_alert_type = models.ForeignKey(LossAlertType, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Type alerte perte')
     loss_alert_status = models.ForeignKey(LossAlertStatus, on_delete=models.PROTECT, blank=True, null=True)
     description = models.TextField(verbose_name='Description')
@@ -108,7 +173,9 @@ class LossAlert(BaseEntity):
     address = models.CharField(max_length=255, verbose_name='Adresse')
     date_alert = models.DateField(verbose_name='Date alerte perte')
     hour_alert = models.TimeField(blank=True, null=True, verbose_name='Heure alerte perte')
-    optional_docs = models.ManyToManyField(OptionalAlertDoc, blank=True, related_name='loss_alert')
+    optional_docs = models.ManyToManyField(OptionalAlertDoc, verbose_name='Autres documents', blank=True, related_name='loss_alert')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
 
     @property
     def type_alert_name(self):
@@ -169,7 +236,9 @@ class FundingRequest(BaseEntity):
     address = models.CharField(max_length=255, verbose_name='Adresse', blank=True, null=True)
     end_date = models.DateField(verbose_name='Date Fin Financement', blank=True, null=True)
     start_date = models.DateField(verbose_name='Date Debut Demande', default=timezone.now, blank=True, null=True)
-    
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
     @property
     def progress(self):
         if self.funding_amount > 0:
@@ -205,7 +274,7 @@ class FundingRequest(BaseEntity):
         verbose_name_plural = 'Demandes Financements'
         db_table = 'funding_request'
         
-    def add_docs(self, docs):
+    def add_funding_docs(self, docs):
         for doc in docs:
             # Create a new OptionalAlertDoc instance
             dc = OptionalFundingDoc()
@@ -216,6 +285,9 @@ class FundingRequest(BaseEntity):
             dc.save()
             self.optional_docs.add(dc)
 
+    @property
+    def remaining_amount(self):
+        return max(self.funding_amount - self.amount_received, 0)
 
 #USer details
 class UserDetails(BaseEntity):
@@ -227,7 +299,7 @@ class UserDetails(BaseEntity):
         ('PMORALE', 'Morale'),
     ]
     COUNTRY_CHOICES = [
-        ('', 'Choisir Pays'),
+        ('GN', 'Guinée'),
         ('FR', 'France'),
         ('US', 'États-Unis d\'Amérique'),
         ('ES', 'Espagne'),
@@ -245,7 +317,6 @@ class UserDetails(BaseEntity):
         ('AR', 'Argentine'),
         ('IE', 'Irlande'),
         ('RU', 'Russie'),
-        ('GN', 'Guinée'),
         ('SN', 'Sénégal'),
         ('ML', 'Mali'),
         ('ZA', 'Afrique du Sud'),
@@ -366,6 +437,7 @@ class MessageContact(BaseEntity):
         
 class Donation(BaseEntity):
     PAYMENT_METHODS = (
+        ('paycard', 'PayCard'),
         ('stripe', 'Stripe'),
         ('orange_money', 'Orange Money'),
         ('paypal', 'PayPal'),
@@ -377,13 +449,25 @@ class Donation(BaseEntity):
         ('réussi', 'Réussi'),
         ('échoué', 'Échoué'),
     )
+    donor_first_name = models.CharField(max_length=255, verbose_name='Nom Donateur', blank=True, null=True)
+    donor_last_name = models.CharField(max_length=255, verbose_name='Nom Donateur', blank=True, null=True)
+    donor_phone = models.CharField(max_length=20, verbose_name='Téléphone Donateur', blank=True, null=True)
+    donor_country = models.CharField(choices=UserDetails.COUNTRY_CHOICES,max_length=255, verbose_name='Pays Donateur', blank=True, null=True)
+    donor_city = models.CharField(max_length=255, verbose_name='Ville Donateur', blank=True, null=True)
+    donor_quarter = models.CharField(max_length=255, verbose_name='Quartier Donateur', blank=True, null=True)
+    donor_email = models.EmailField(verbose_name='Email Donateur', blank=True, null=True)
+    donor_address = models.CharField(max_length=255, verbose_name='Adresse Donateur', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='donations', blank=True, null=True, verbose_name='Donateur')
     amount = models.DecimalField(max_digits=10, decimal_places=0, verbose_name='Montant')
     description = models.TextField(blank=True, null=True, verbose_name='Description')
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='paypal', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
-    reference = models.CharField(max_length=100, unique=True)
-    date_donation = models.DateTimeField(default=timezone.now, verbose_name='Date Don', blank=True, null=True)
+    transaction_id = models.CharField(max_length=255, verbose_name='ID Transaction', blank=True, null=True)
+    reference = models.CharField(max_length=100, unique=True, verbose_name='Référence de don', help_text='Référence unique pour le don', blank=True, null=True)
+    donation_date = models.DateTimeField(default=timezone.now, verbose_name='Date Don', blank=True, null=True)
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
     class Meta:
         verbose_name = 'Don'
         verbose_name_plural = 'Dons'
@@ -400,9 +484,118 @@ class EmailContent(BaseEntity):
     html_message = models.TextField(blank=True, null=True, verbose_name='Message Html')
     is_sent = models.BooleanField(default=False)
     date_sent = models.DateTimeField(blank=True, null=True)
-    
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
     class Meta:
         verbose_name = 'Email'
         verbose_name_plural = 'Emails'
         db_table = 'email_content'
-    
+
+
+class FundingRequestNotification(BaseEntity):
+    funding_request = models.ForeignKey(FundingRequest, on_delete=models.CASCADE, related_name='notifications', verbose_name='Demande de financement')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='funding_notifications', verbose_name='Utilisateur')
+    message = models.TextField(verbose_name='Message de notification')
+    is_read = models.BooleanField(default=False, verbose_name='Lu')
+    date_notification = models.DateTimeField(default=timezone.now, verbose_name='Date de notification')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Notification de demande de financement'
+        verbose_name_plural = 'Notifications de demandes de financement'
+        db_table = 'funding_request_notification'
+
+    def __str__(self):
+        return f"Notification for {self.user.username} - {self.funding_request.title} - {self.date_notification.strftime('%Y-%m-%d %H:%M:%S')}"
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
+    def mark_as_unread(self):
+        self.is_read = False
+        self.save()
+
+class LossAlertNotification(BaseEntity):
+    loss_alert = models.ForeignKey(LossAlert, on_delete=models.CASCADE, related_name='notifications', verbose_name='Alerte de perte')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='loss_notifications', verbose_name='Utilisateur')
+    message = models.TextField(verbose_name='Message de notification')
+    is_read = models.BooleanField(default=False, verbose_name='Lu')
+    date_notification = models.DateTimeField(default=timezone.now, verbose_name='Date de notification')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Notification d\'alerte de perte'
+        verbose_name_plural = 'Notifications d\'alertes de perte'
+        db_table = 'loss_alert_notification'
+
+    def __str__(self):
+        return f"Notification for {self.user.username} - {self.loss_alert.title} - {self.date_notification.strftime('%Y-%m-%d %H:%M:%S')}"
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
+    def mark_as_unread(self):
+        self.is_read = False
+        self.save()
+class FundPayment(BaseEntity):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='fund_payments', verbose_name='Utilisateur')
+    donor_first_name = models.CharField(max_length=255, verbose_name='Prenom Donateur', blank=True, null=True)
+    donor_last_name = models.CharField(max_length=255, verbose_name='Nom Donateur', blank=True, null=True)
+    donor_phone = models.CharField(max_length=20, verbose_name='Téléphone Donateur', blank=True, null=True)
+    donor_country = models.CharField(choices=UserDetails.COUNTRY_CHOICES,max_length=255, verbose_name='Pays Donateur', blank=True, null=True)
+    donor_city = models.CharField(max_length=255, verbose_name='Ville Donateur', blank=True, null=True)
+    donor_quarter = models.CharField(max_length=255, verbose_name='Quartier Donateur', blank=True, null=True)
+    donor_email = models.EmailField(verbose_name='Email Donateur', blank=True, null=True)
+    donor_address = models.CharField(max_length=255, verbose_name='Adresse Donateur', blank=True, null=True)
+    transaction_id = models.CharField(max_length=255, verbose_name='ID Transaction', blank=True, null=True)
+    funding_request = models.ForeignKey(FundingRequest, on_delete=models.CASCADE, related_name='payments', verbose_name='Demande de financement')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Montant')
+    payment_method = models.CharField(max_length=20, choices=Donation.PAYMENT_METHODS, default='PayCard', verbose_name='Méthode de paiement')
+    status = models.CharField(max_length=20, choices=Donation.STATUS_CHOICES, default='en_attente', verbose_name='Statut')
+    reference = models.CharField(max_length=100, unique=True, verbose_name='Référence de paiement', help_text='Référence unique pour le paiement', blank=True, null=True)
+    payment_date = models.DateTimeField(default=timezone.now, verbose_name='Date de paiement')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Paiement de financement'
+        verbose_name_plural = 'Paiements de financements'
+        db_table = 'fund_payment'
+
+    def __str__(self):
+        return f"{self.amount} GNF via {self.payment_method} - {self.status} - {self.funding_request.title}"
+
+
+class Comment(BaseEntity):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    rating = models.DecimalField(null=True, blank=True, default=0.0, decimal_places=0, max_digits=5)
+    text = models.TextField("Commentaire", max_length=1000)
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Commentaire'
+        verbose_name_plural = 'Commentaires'
+        ordering = ['-created_at']
+        db_table = 'Commentaire'
+
+
+class Report(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='reports')
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
+    reason = models.TextField(verbose_name="Raison du signalement", max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'signalement'
+        unique_together = ('comment', 'reporter')  # Pour éviter plusieurs signalements par le même utilisateur
+        verbose_name = "Signalement"
+        verbose_name_plural = "Signalements"
+
+    def __str__(self):
+        return f"Signalement par {self.reporter.username} sur {self.comment.id}"
