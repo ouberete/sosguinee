@@ -8,21 +8,21 @@
   <meta property="og:description" content="Découvrez comment SOS Guinée facilite la solidarité en Guinée à travers les alertes et financements.">
   <meta property="og:image" content="{% static 'img/og-image.png' %}">
 {% endblock %}
-
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 {% block content %}
   <main role="main">
     <!-- Hero Section -->
-    <section class="parallax-container" role="banner" aria-label="À propos">
+    <section class="parallax-container valign-wrapper hero-section hero-details-page" role="banner" aria-label="À propos">
       <div class="parallax">
         <img src="{% static 'img/articles/img7.avif' %}" alt="À propos de SOS Guinée" class="responsive-img" loading="lazy">
       </div>
       <div class="container showcase-content">
-        <div class="row center-align">
-          <div class="col s12 m8 offset-m2">
-            <div class="card-panel teal lighten-5">
-              <h1>À propos de SOS Guinée</h1>
+        <div class="row center-align container center-align white-text hero-content">
+          <div class="col s12">
+              <h3>À propos de SOS Guinée</h3>
               <p>Facilitons la solidarité en Guinée : alertes de perte, découvertes de proches ou biens, et financement solidaire.</p>
-            </div>
           </div>
         </div>
       </div>
@@ -74,11 +74,11 @@
         </div>
         <div class="col s12 m4">
           <i class="material-icons large">phone</i>
-          <p><strong>Téléphone</strong><br>+224 123 456 789</p>
+          <p><strong>Téléphone</strong><br>+224 655 368 588</p>
         </div>
         <div class="col s12 m4">
           <i class="material-icons large">location_on</i>
-          <p><strong>Adresse</strong><br>Immeuble X, Rue Y, Conakry, Guinée</p>
+          <p><strong>Adresse</strong><br>Lambanyi, Immeuble SHERBROOKE, Conakry, Guinée</p>
         </div>
       </div>
     </section>
