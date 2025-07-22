@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    # Construit l'image à partir du Dockerfile dans le répertoire courant
+    build: .
+    # Nom du conteneur
+    container_name: sosguinee_web_sqlite
+    # Commande pour lancer le serveur de développement Django.
+    # Ceci surcharge le CMD du Dockerfile.
+    command: python manage.py runserver 0.0.0.0:8000
+    # Lie le répertoire courant du projet au répertoire /app dans le conteneur.
+    # Permet le rechargement à chaud (hot-reloading) lors des modifications de code.
+    volumes:
+      - .:/app
+      # Volume pour la base de données SQLite pour qu'elle persiste
+      - sqlite_data:/app
+    # Mappe le port 8000 du conteneur au port 8000 de votre machine hôte.
+    ports:
+      - "8000:8000"
+    # Nom de la base de données SQLite
+    environment:
+      - SQLITE_DATABASE=db.sqlite3
+
+# Définit un volume nommé pour stocker la base de données
+volumes:
+  sqlite_data:

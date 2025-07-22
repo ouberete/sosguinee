@@ -70,10 +70,14 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.apple',
+    'formtools',
+    'crispy_forms',
     
 ]
 
 SITE_ID = 1
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["materialize"]
+CRISPY_TEMPLATE_PACK = "materialize"
 
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -199,7 +203,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "Fr-fr"
+LANGUAGE_CODE = "fr"
 
 TIME_ZONE = "UTC"
 
@@ -330,9 +334,9 @@ LANGUAGES = [
 
 # Paycard configuration
 
-PAYCARD_API_KEY = "your_api_key"
-PAYCARD_API_SECRET = "your_api_secret"
-PAYCARD_ENDPOINT = "https://api.paycard.com/endpoint"  # Example endpoint
+PAYCARD_API_KEY = config("PAYCARD_API_KEY", cast=str, default="your_api_key")
+PAYCARD_API_SECRET = config("PAYCARD_API_SECRET", cast=str, default="your_api_secret")
+PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.paycard.com")
 
 django_heroku.settings(locals())
 

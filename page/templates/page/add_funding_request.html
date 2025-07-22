@@ -5,11 +5,13 @@
 {% block extra_head %}
   <meta name="description" content="Soumettez une nouvelle demande de financement sur SOS Guinée pour des soins médicaux, une campagne religieuse ou communautaire.">
 {% endblock %}
-
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 {% block content %}
   <main role="main">
     <!-- Hero -->
-    <section class="parallax-container" role="banner" aria-label="Ajout de demande de financement">
+   <!-- <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner" aria-label="Ajout de demande de financement">
       <div class="parallax">
         <img src="{% static 'img/articles/img7.avif' %}" alt="Ajout de financement" class="responsive-img" loading="lazy">
       </div>
@@ -17,23 +19,23 @@
         <div class="row">
           <div class="col s12">
             <div class="card-panel blue lighten-5">
-              <h1>Ajouter une Demande de Financement</h1>
+              <h4>Ajouter une Demande de Financement</h4>
               <p>Besoin d'une aide pour des soins médicaux, une campagne religieuse ou communautaire ? Remplissez le formulaire ci-dessous.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
-
+-->
     <!-- Formulaire d'ajout -->
     <section class="section container" aria-labelledby="add-fund-heading">
-      <h2 id="add-fund-heading" class="center-align">Formulaire de Demande</h2>
+      <h5 id="add-fund-heading" class="center-align">Formulaire d'ajout de demande de Financement</h5>
       <form method="post" enctype="multipart/form-data" class="row" novalidate>
         {% csrf_token %}
         {# Champs standards sauf fichiers #}
         {% for field in form.visible_fields %}
           {% if field.field.widget.input_type != 'file' %}
-            <div class="input-field col s12 m6">
+            <div class="input-field col s12 {% if field.name == 'description' or field.name == 'title'  or field.name == 'beneficiary_name' or field.name == 'description_needs' or field.name == 'address' %}m12{% else %}m6{% endif %}">
               {{ field }}
               <label for="{{ field.id_for_label }}">{{ field.label }}</label>
               {% if field.help_text %}

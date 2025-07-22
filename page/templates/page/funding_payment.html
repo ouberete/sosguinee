@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Financer via PayCard - {{ funding_request.title }}{% endblock %}
+{% block content %}
+{% if messages %}
+<div class="container">
+
+</div>
+{% endif %}
+<div class="container section">
+    <h4 class="center-align">Paiement via PayCard</h4>
+    {% for message in messages %}
+    <div class="card-panel {{ message.tags }} lighten-4">
+        <span class="{{ message.tags }}-text red-text ">{{ message }}</span>
+    </div>
+    {% endfor %}
+    <div class="card-panel">
+        <p><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</p>
+        <p><strong>Description :</strong> {{ funding_request.title }}</p>
+        <p><strong>Montant Cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</p>
+        <br>
+        <form action="{% url 'funding_paycard_payment' funding_request.id %}" method="post" class="paycard-form">
+            {% csrf_token %}
+            <!-- Informations du donateur -->
+            {% if request.user.is_authenticated %}
+            <div class="input-field col">
+                <input id="amount" name="amount" type="text" class="validate" required>
+                <label for="amount">Montant à financer</label>
+            </div>
+            {% endif %}
+
+            {% if not request.user.is_authenticated %}
+            <h5 class="center-align">Informations du Donateur</h5>
+            <div class="row">
+                {% for field in form.visible_fields %}
+                <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' %}m12{% else %}m6{% endif %}">
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+                    {% if field.help_text %}
+                    <span class="helper-text">{{ field.help_text }}</span>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                    <span class="red-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="center-align">
+                <button type="submit" class="btn green darken-2 waves-effect waves-light">
+                    <i class="material-icons left">payments</i> Financer avec PayCard
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+
+
+{% endblock %}

@@ -1,26 +1,79 @@
-<!-- nav.html -->
 {% load static %}
+<!-- Navbar -->
 <nav class="blue darken-3" role="navigation" aria-label="Main navigation">
   <div class="nav-wrapper container">
     <a href="{% url 'home' %}" class="brand-logo">
       <img src="{% static 'img/mylogo.png' %}" alt="SOS Guinée logo" class="responsive-img" style="height:48px; margin-top:8px;">
     </a>
     <a href="#" data-target="mobile-menu" class="sidenav-trigger" aria-label="Menu mobile"><i class="material-icons">menu</i></a>
+
     <ul class="right hide-on-med-and-down">
-      {% if user.is_authenticated %}
-        <li class="nav-user">Bonjour, <strong>{{ user.get_full_name|default:user.username }}</strong></li>
-      {% endif %}
       <li class="{% if request.resolver_match.url_name == 'loss_alert_list' %}active{% endif %}"><a href="{% url 'loss_alert_list' %}">Alertes</a></li>
       <li class="{% if request.resolver_match.url_name == 'funding_request_list' %}active{% endif %}"><a href="{% url 'funding_request_list' %}">Financements</a></li>
-      <li class="{% if request.resolver_match.url_name == 'add_loss_alert' %}active{% endif %}"><a href="{% url 'add_loss_alert' %}">Nouvelle Alerte</a></li>
-      <li class="{% if request.resolver_match.url_name == 'add_funding_request' %}active{% endif %}"><a href="{% url 'add_funding_request' %}">Nouveau Financement</a></li>
+
+      <!-- Dropdown Soumettre -->
+      <li>
+        <a class="dropdown-trigger" href="#!" data-target="soumettre-dropdown">Soumettre <i class="material-icons right">arrow_drop_down</i></a>
+      </li>
+
       <li class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}"><a href="{% url 'about_us' %}">À propos</a></li>
       <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+
       {% if user.is_authenticated %}
-        <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+      <!-- Avatar et Dropdown utilisateur -->
+      <li>
+        <a class="dropdown-trigger" href="#!" data-target="user-dropdown" aria-label="Menu utilisateur">
+          <img src="{% static 'img/avatar/avatar1.png' %}" alt="Profil" class="circle responsive-img" style="height:32px; vertical-align: middle; margin-right:8px;">
+          <i class="material-icons right">arrow_drop_down</i>
+        </a>
+      </li>
       {% else %}
-        <li class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}"><a href="{% url 'login' %}">Connexion</a></li>
+      <li class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}"><a href="{% url 'login' %}">Connexion</a></li>
       {% endif %}
     </ul>
   </div>
 </nav>
+
+<!-- Dropdown Structures -->
+<ul id="soumettre-dropdown" class="dropdown-content">
+  <li><a href="{% url 'add_loss_alert' %}">Nouvelle Alerte</a></li>
+  <li><a href="{% url 'add_funding_request' %}">Nouveau Financement</a></li>
+</ul>
+
+{% if user.is_authenticated %}
+<ul id="user-dropdown" class="dropdown-content">
+  <li><a href="{% url 'profile' %}">Profil</a></li>
+  <li><a href="{% url 'change_password' %}">Modifier le mot de passe</a></li>
+  <li class="divider" tabindex="-1"></li>
+  <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+</ul>
+{% endif %}
+
+<!-- Mobile sidenav -->
+<ul class="sidenav" id="mobile-menu">
+  <li><a href="{% url 'home' %}">Accueil</a></li>
+  <li><a href="{% url 'loss_alert_list' %}">Alertes</a></li>
+  <li><a href="{% url 'funding_request_list' %}">Financements</a></li>
+  <li><a href="{% url 'add_loss_alert' %}">Nouvelle Alerte</a></li>
+  <li><a href="{% url 'add_funding_request' %}">Nouveau Financement</a></li>
+  <li><a href="{% url 'about_us' %}">À propos</a></li>
+  <li><a href="{% url 'contact' %}">Contact</a></li>
+  {% if user.is_authenticated %}
+  <li><a href="{% url 'profile' %}">Profil</a></li>
+  <li><a href="{% url 'change_password' %}">Modifier le mot de passe</a></li>
+  <li><a href="{% url 'logout' %}">Déconnexion</a></li>
+  {% else %}
+  <li><a href="{% url 'login' %}">Connexion</a></li>
+  {% endif %}
+</ul>
+
+<!-- JS init -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var elemsDropdown = document.querySelectorAll('.dropdown-trigger');
+    M.Dropdown.init(elemsDropdown, { constrainWidth: false, coverTrigger: false });
+
+    var elemsSidenav = document.querySelectorAll('.sidenav');
+    M.Sidenav.init(elemsSidenav);
+  });
+</script>

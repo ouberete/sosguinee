@@ -1,130 +1,132 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
+{% load custom_filters %}
 
 {% block title %}Demandes de financement - SOS Guinée{% endblock %}
 {% block extra_head %}
-  <meta name="description" content="Consultez et filtrez les demandes de financement solidaires sur SOS Guinée. Découvrez les bénéficiaires, montants et statuts en un coup d'œil.">
-  <meta property="og:title" content="Demandes de financement - SOS Guinée">
-  <meta property="og:description" content="Filtrez les demandes de financement par bénéficiaire, montant, date, statut et type.">
+<meta name="description" content="Consultez et filtrez les demandes de financement solidaires sur SOS Guinée. Découvrez les bénéficiaires, montants et statuts en un coup d'œil.">
+<meta property="og:title" content="Demandes de financement - SOS Guinée">
+<meta property="og:description" content="Filtrez les demandes de financement par bénéficiaire, montant, date, statut et type.">
 {% endblock %}
-
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 {% block content %}
 
-  <main role="main">
-    <!-- Hero / Title -->
-    <section class="parallax-container" role="banner" aria-label="Bannière financement">
-      <div class="parallax">
-        <img src="{% static 'img/articles/img7.avif' %}" alt="Solidarité Guinée" class="responsive-img" loading="lazy">
-      </div>
-      <div class="container showcase-content">
-        <div class="row">
-          <div class="col s12 m8">
-            <div class="card-panel blue lighten-5">
-              <h1>Demandes de financement</h1>
-              <p>Filtrez et explorez les demandes de solidarité médicale et communautaire.</p>
-            </div>
-          </div>
+<main role="main">
+  <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner" aria-label="Bannière financement">
+    <div class="parallax">
+      <img src="{% static 'img/articles/img7.avif' %}" alt="Solidarité Guinée" loading="lazy">
+    </div>
+    <div class="container center-align white-text hero-content">
+      <div class="row">
+        <div class="col s12">
+          <h1 class="header light text-shadow">Demandes de Financement</h1>
+          <h5 class="light text-shadow">Filtrez et explorez les demandes de solidarité médicale et communautaire.</h5>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Filter Form -->
-    <section class="section container" aria-labelledby="filter-heading">
-      <h2 id="filter-heading" class="center-align">Filtrer les demandes</h2>
-      <form id="filterForm" method="get" action="" class="row">
-        <div class="input-field col s12 m6 l4">
-          <input id="beneficiary_name" type="text" name="beneficiary_name" value="{{ request.GET.beneficiary_name }}">
-          <label for="beneficiary_name">Bénéficiaire</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="min_amount" type="number" name="min_amount" step="0.01" value="{{ request.GET.min_amount }}">
-          <label for="min_amount">Montant min (GNF)</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="max_amount" type="number" name="max_amount" step="0.01" value="{{ request.GET.max_amount }}">
-          <label for="max_amount">Montant max (GNF)</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="start_date" type="date" name="start_date" value="{{ request.GET.start_date }}">
-          <label for="start_date">Date début</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="end_date" type="date" name="end_date" value="{{ request.GET.end_date }}">
-          <label for="end_date">Date fin</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <select id="status" name="status">
-            <option value="" disabled {% if not request.GET.status %}selected{% endif %}>Statut</option>
-            {% for s in funding_request_statuses %}
-              <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %}>{{ s.name }}</option>
-            {% endfor %}
-          </select>
-          <label for="status">Statut</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <select id="funding_type" name="funding_type">
-            <option value="" disabled {% if not request.GET.funding_type %}selected{% endif %}>Type</option>
-            {% for t in funding_request_types %}
-              <option value="{{ t.name }}" {% if request.GET.funding_type == t.name %}selected{% endif %}>{{ t.name }}</option>
-            {% endfor %}
-          </select>
-          <label for="funding_type">Type financement</label>
-        </div>
-        <div class="col s12 m6 l4">
-          <button type="submit" class="btn large waves-effect waves-light full-width">Appliquer</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Results Listing -->
-    <section class="section container" aria-labelledby="results-heading">
-      <h2 id="results-heading" class="center-align">Résultats</h2>
-      <!-- Loader -->
-      <div id="loader" class="center-align" style="display: none;">
-        <div class="preloader-wrapper big active">
-          <div class="spinner-layer spinner-blue-only">
-            <div class="circle-clipper left"><div class="circle"></div></div>
-            <div class="gap-patch"><div class="circle"></div></div>
-            <div class="circle-clipper right"><div class="circle"></div></div>
-          </div>
-        </div>
+  <section class="section container" aria-labelledby="filter-heading">
+    <h2 id="filter-heading" class="center-align light">Filtrer les demandes</h2>
+    <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1">
+      <div class="input-field col s12 m6 l4">
+        <input id="beneficiary_name" type="text" name="beneficiary_name" value="{{ request.GET.beneficiary_name }}">
+        <label for="beneficiary_name">Bénéficiaire</label>
       </div>
-      <!-- Cards -->
-      <div id="fundings-container" class="row">
-        {% for req in funding_requests %}
-          {% include 'page/components/alert_card.html' with item=req is_funding=True %}
-        {% empty %}
-          <p class="center-align">Aucune demande ne correspond aux critères.</p>
-        {% endfor %}
+      <div class="input-field col s12 m6 l4">
+        <input id="min_amount" type="number" name="min_amount" step="0.01" value="{{ request.GET.min_amount }}">
+        <label for="min_amount">Montant min (GNF)</label>
       </div>
-      <!-- Pagination -->
-      <div class="center-align">
-        <ul class="pagination">
-          {% if page_obj.has_previous %}
-            <li class="waves-effect"><a href="?{% querystring page=page_obj.previous_page_number %}"><i class="material-icons">chevron_left</i></a></li>
-          {% else %}
-            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-          {% endif %}
-          {% for num in page_obj.paginator.page_range %}
-            <li class="{% if page_obj.number == num %}active{% else %}waves-effect{% endif %}"><a href="?{% querystring page=num %}">{{ num }}</a></li>
+      <div class="input-field col s12 m6 l4">
+        <input id="max_amount" type="number" name="max_amount" step="0.01" value="{{ request.GET.max_amount }}">
+        <label for="max_amount">Montant max (GNF)</label>
+      </div>
+      <div class="input-field col s12 m6 l4">
+        <input id="start_date" type="text" class="datepicker" name="start_date" value="{{ request.GET.start_date }}"> {# Changed type to text and added datepicker class #}
+        <label for="start_date">Date début</label>
+      </div>
+      <div class="input-field col s12 m6 l4">
+        <input id="end_date" type="text" class="datepicker" name="end_date" value="{{ request.GET.end_date }}"> {# Changed type to text and added datepicker class #}
+        <label for="end_date">Date fin</label>
+      </div>
+      <div class="input-field col s12 m6 l4">
+        <select id="status" name="status">
+          <option value="" {% if not request.GET.status %}selected{% endif %}>Tous les statuts</option> {# Changed disabled to allow selecting "all" #}
+          {% for s in funding_request_statuses %}
+          <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %}>{{ s.name }}</option>
           {% endfor %}
-          {% if page_obj.has_next %}
-            <li class="waves-effect"><a href="?{% querystring page=page_obj.next_page_number %}"><i class="material-icons">chevron_right</i></a></li>
-          {% else %}
-            <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
-          {% endif %}
-        </ul>
+        </select>
+        <label for="status">Statut</label>
       </div>
-    </section>
-  </main>
+      <div class="input-field col s12 m6 l4">
+        <select id="funding_type" name="funding_type">
+          <option value="" {% if not request.GET.funding_type %}selected{% endif %}>Tous les types</option> {# Changed disabled to allow selecting "all" #}
+          {% for t in funding_request_types %}
+          <option value="{{ t.name }}" {% if request.GET.funding_type == t.name %}selected{% endif %}>{{ t.name }}</option>
+          {% endfor %}
+        </select>
+        <label for="funding_type">Type financement</label>
+      </div>
+      <div class="col s12 m6 l4 center-align filter-buttons">
+        <button type="submit" class="btn large waves-effect waves-light blue darken-2 full-width">
+          <i class="material-icons left">search</i> Appliquer
+        </button>
+        <a href="{% url 'funding_request_list' %}" class="btn-flat large waves-effect waves-light red-text text-darken-2 full-width reset-button">
+          <i class="material-icons left">clear</i> Réinitialiser
+        </a>
+      </div>
+    </form>
+  </section>
+
+
+
+  <section class="section container" aria-labelledby="results-heading">
+    <h2 id="results-heading" class="center-align light">Demandes de Financement</h2>
+    <div id="loader" class="center-align" style="display: none;">
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left"><div class="circle"></div></div>
+          <div class="gap-patch"><div class="circle"></div></div>
+          <div class="circle-clipper right"><div class="circle"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="fundings-container" class="row">
+
+    </div>
+    <div class="center-align">
+      <div id="pagination">
+
+      </div>
+    </div>
+  </section>
+</main>
 
 {% endblock %}
 
 {% block extrajs %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var elems = document.querySelectorAll('select'); M.FormSelect.init(elems);
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.Datepicker.init(document.querySelectorAll('.datepicker'), {
+      format: 'dd-mm-yyyy', // Ensure format matches Django's date input
+      i18n: {
+        cancel: 'Annuler',
+        clear: 'Effacer',
+        done: 'Ok',
+        months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+        monthsShort: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'],
+        weekdays: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+        weekdaysShort: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
+        weekdaysAbbrev: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+      }
     });
-  </script>
-  <script src="{% static 'js/funding_requests.js' %}"></script>
+    M.Parallax.init(document.querySelectorAll('.parallax'));
+    M.Materialbox.init(document.querySelectorAll('.materialboxed')); // For cards if they use materialboxed
+  });
+</script>
+<script src="{% static 'js/funding_requests.js' %}"></script>
 {% endblock %}

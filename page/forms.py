@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import FundingRequest, Gender, LossAlert, MessageContact, Donation
+from .models import FundingRequest, Gender, LossAlert, MessageContact, Donation, UserDetails, FundPayment, Comment
 from django.contrib.auth.models import User
 
 
@@ -78,9 +78,8 @@ class FundingRequestForm(forms.ModelForm):
     class Meta:
         model = FundingRequest
         fields = [
-            'beneficiary_name', 'description_needs', 'country', 'city',
-            'quarter', 'address', 'funding_request_type',
-            'funding_amount', 'email', 'phone', 'start_date','end_date', 'title', 'principal_image'
+            'beneficiary_name','funding_request_type', 'funding_amount','title','description_needs',  'city',
+            'quarter', 'address', 'email', 'phone', 'start_date','end_date',  'principal_image'
         ] 
     
     #throw errors if start date is greater than end date
@@ -98,11 +97,11 @@ class FundingRequestForm(forms.ModelForm):
 class LossAlertForm(forms.ModelForm):
     hour_alert = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}), required=False, label="Heure d'alerte")
     date_alert = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Date d'alerte")
-    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class': 'materialize-textarea'}), label="Description")
-    optional_docs = MultipleFileField()
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class': 'materialize-textarea col s12 m12'}), label="Description")
+    optional_docs = MultipleFileField(required=False)
     class Meta:
         model = LossAlert
-        fields = ['name', 'loss_alert_type', 'description',  'email', 'phone', 'country', 'city', 'quarter', 'address', 'date_alert', 'hour_alert','principal_image','optional_docs']
+        fields = ['name', 'loss_alert_type', 'description',  'email', 'phone', 'city', 'quarter', 'address', 'date_alert', 'hour_alert','principal_image']
 
 class MessageContactForm(forms.ModelForm):
     
@@ -114,12 +113,74 @@ class MessageContactForm(forms.ModelForm):
         fields = ['name', 'email', 'message']
         
         
-        
+
 class DonationForm(forms.ModelForm):
-    amount = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre montant.'}, label="Montant")
-    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class': 'materialize-textarea'}), label="Description", required=False)
+    donor_first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre prénom.'}, label="Prénom du donateur")
+    donor_last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre nom.'}, label="Nom du donateur")
+    donor_phone = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre numéro de téléphone.'}, label="Téléphone du donateur")
+    donor_email = forms.EmailField(widget=forms.EmailInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre email.'}, label="Email du donateur")
+    donor_address = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre adresse.'}, label="Adresse du donateur")
+    donor_city = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre ville.'}, label="Ville du donateur")
+    #Country field should be a dropdown list with countries from userdetails countries model
+    amount = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate col s12 col m12', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1000'}), error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'}, label="Montant (En GNF) à donner")
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class':'materialize-textarea col s12 col m12'}), label="Description", required=False)
 
     class Meta:
         model = Donation
-        fields = ['amount', 'description']
+        fields = ['amount', 'donor_first_name', 'donor_last_name',  'donor_country','donor_city','donor_phone', 'donor_email', 'donor_address', 'description']
 
+class FundingPaymentForm(forms.ModelForm):
+    amount = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1'}),
+        error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'},
+        label="Montant (En GNF) à financer"
+    )
+    donor_first_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre prénom.'},
+        label="Prénom du donateur"
+    )
+    donor_last_name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre nom.'},
+        label="Nom du donateur"
+    )
+    donor_phone = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre numéro de téléphone.'},
+        label="Téléphone du donateur"
+    )
+    donor_email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'validate', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre email.'},
+        label="Email du donateur"
+    )
+    donor_address = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre adresse.'},
+        label="Adresse du donateur"
+    )
+    donor_city = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'validate col s12 col m6', 'required': 'required'}),
+        error_messages={'required': 'Veuillez renseigner votre ville.'},
+        label="Ville du donateur"
+    )
+
+    class Meta:
+        model = FundPayment
+        fields = ['amount', 'donor_first_name', 'donor_last_name','donor_country','donor_city', 'donor_phone', 'donor_email', 'donor_address',  ]
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': "Ajoutez un commentaire...",
+                'class': 'materialize-textarea'
+            })
+        }
+        labels = {
+            'text': ''
+        }

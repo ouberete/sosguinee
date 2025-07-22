@@ -1,267 +1,88 @@
-<!--User profil with picture-->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Profil Utilisateur - SOS Guinée{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'assets/profil/profil.css' %}"/>
-{% endblock extra_css %}
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 
 {% block content %}
-<!-- USer informations profil -->
-
-<div class="custom-cursor__cursor"></div>
-    <div class="custom-cursor__cursor-two"></div>
-
-    <div class="preloader">
-        <div class="preloader__image"></div>
-    </div>
-    <!-- /.preloader -->
-
-<div class="page-wrapper">
-    
-
-  <section>
-    <div class="profil-content">
-        <div class="container">
-            <div class="row">
-            <div class="col-12">
-            
-            <div class="my-3">
-                <div class="row">
-                    <div class="col-6 text-start">
-                            <a href="{% url 'accueil' %}" class="link-info"><i><i class="fa fa-home"></i></i>&nbsp;Aller à l'accueil</a>
-                   
-                    </div>
-                    <div class="col-6 text-end">
-                            <a href="{% url 'update-profile' %}" class="link-secondary"><i class="fa fa-edit"></i>&nbsp; Modifier le profil</a>
-                     
-                    </div>
-                </div>
-                
-            <hr>
-            </div>
-            
-            <div class="file-upload">
-            <div class="row mb-5 gx-3">
-                <div class="col-xxl-8 mb-5 mb-xxl-0">
-                    <div class="bg-secondary-soft px-3 py-3 rounded card ">
-                        <div class="row g-3 card-body">
-                            <h4 class="mb-4 mt-0">Information Personnelles</h4>
-                            <div class="col-md-6">
-                                <label class="form-label">Catégorie</label>
-                                <input type="text" class="form-control" disabled aria-label="Categorie" value="{% if profile.user_category %}{{ category | safe }}{% endif %}">
+<main role="main">
+    <section class="section container">
+        <div class="row">
+            <div class="col s12">
+                <h6 class="center-align">Mon Profil</h6>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="col s12 m4 center-align">
+                                {% if profile.photo %}
+                                <img src="{{ profile.photo.url }}" alt="Photo de profil" class="circle responsive-img z-depth-2" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                <i class="material-icons large grey-text">account_circle</i>
+                                {% endif %}
+                                <h5 class="mt-2">{{ user.get_full_name }}</h5>
+                                <p class="grey-text">@{{ user.username }}</p>
                             </div>
-                            <div class="col-md-6">
-                                <label for="id_civility" class="form-label">Civilité</label>
-                                <input type="text" class="form-control" disabled  aria-label="Civilité" value="{{ civility|safe }}">
+                            <div class="col s12 m8">
+                                <ul class="collection with-header">
+                                    <li class="collection-header"><h5>Informations Personnelles</h5></li>
+                                    <li class="collection-item"><strong>Email:</strong> {{ user.email }}</li>
+                                    <li class="collection-item"><strong>Téléphone:</strong> {{ profile.phone|default:"Non renseigné" }}</li>
+                                    <li class="collection-item"><strong>Date de naissance:</strong> {{ profile.birth_date|default:"Non renseignée" }}</li>
+<!--                                    <li class="collection-item"><strong>Pays de naissance:</strong> {{ country }}</li>-->
+                                    <li class="collection-item"><strong>Ville de naissance:</strong> {{ profile.birth_city }}</li>
+                                    <li class="collection-item"><strong>Nationalité:</strong> {{ nationality }}</li>
+                                    <li class="collection-item"><strong>Adresse actuelle:</strong> {{ profile.address }}</li>
+<!--                                    <li class="collection-item"><strong>Pays actuel:</strong> {{ profile.actual_country }}</li>-->
+                                    <li class="collection-item"><strong>Ville actuelle:</strong> {{ profile.actual_city }}</li>
+                                    <li class="collection-item"><strong>Code Postal:</strong> {{ profile.zip_code }}</li>
+                                    <li class="collection-item"><strong>Diplôme le plus récent:</strong> {{ profile.high_education }}</li>
+                                    <li class="collection-item"><strong>Secteur d'activité:</strong> {{ profile.activity_sector }}</li>
+                                    <li class="collection-item"><strong>Profession:</strong> {{ profile.profession }}</li>
+                                    <li class="collection-item"><strong>Personne à contacter en cas de succession:</strong> {{ profile.person_contact }}</li>
+                                </ul>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Prénom(s)</label>
-                                <input type="text" class="form-control" disabled  aria-label="First name" value="{{ user.first_name }}">
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h5 class="mt-4">Biographie</h5>
+                                <p>{{ profile.bio|default:"Non renseignée" }}</p>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Nom</label>
-                                <input type="text" class="form-control" disabled   aria-label="Last name" value="{{ user.last_name }}">
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h5 class="mt-4">Réseaux Sociaux</h5>
+                                <ul class="collection">
+                                    <li class="collection-item"><strong>Facebook:</strong> {{ profile.facebook|default:"Non renseigné" }}</li>
+                                    <li class="collection-item"><strong>Twitter:</strong> {{ profile.twitter|default:"Non renseigné" }}</li>
+                                    <li class="collection-item"><strong>Linkedin:</strong> {{ profile.linkedin|default:"Non renseigné" }}</li>
+                                    <li class="collection-item"><strong>Instagram:</strong> {{ profile.instagram|default:"Non renseigné" }}</li>
+                                </ul>
                             </div>
-                            {% if profile.phone %}
-                            <div class="col-md-6">
-                                <label class="form-label">Téléphone</label>
-                                <input type="text" class="form-control" disabled  aria-label="Phone number" value="{{ profile.phone }}">
-                            </div>
-                            {% endif %}
-                            
-                            <div class="col-md-6">
-                                <label for="inputEmail4" class="form-label">Email </label>
-                                <input type="email" class="form-control" disabled id="inputEmail4" value="{% if user.email %}{{ user.email }}{% endif %}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Nom d'utilisateur</label>
-                                <input type="text" class="form-control" disabled  aria-label="Phone number" value="{% if user.username %}{{ user.username }}{% endif %}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date de naissance</label>
-                                <input type="text" class="form-control" disabled  aria-label="Date de naissance" value="{% if profile.birth_date %}{{ profile.birth_date }}{% endif %}">
-                            </div>
-                            {% comment %} <div class="col-md-6">
-                                <label class="form-label">Lieu de naissance</label>
-                                <input type="text" class="form-control" disabled  aria-label="Lieu de naissance" value="{% if profile.birth_place %}{{ profile.birth_place }}{% endif %}">
-                            </div> {% endcomment %}
-                            
-                            <div class="col-md-6">
-                                <label class="form-label">Pays de naissance</label>
-                                <input type="text" class="form-control" disabled  aria-label="Pays de naissance" value="{% if profile.birth_country %}{{ country }}{% endif %}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Ville de naissance</label>
-                                <input type="text" class="form-control" disabled  aria-label="Ville de naissance" value="{% if profile.birth_city %}{{ profile.birth_city }}{% endif %}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Nationalité</label>
-                                <input type="text" class="form-control" disabled  aria-label="Nationalité" value="{% if profile.nationality %}{{ nationality }}{% endif %}">
-                            </div>
-                            
-                        </div> 
-                    </div>
-                    <br>
-                </div>
-                <div class="col-xxl-4">
-                        <div class="bg-secondary-soft px-4 py-5 rounded card">
-                           <div class="row g-3 card-body">
-                               <h4 class="mb-4 mt-0">Photo</h4>
-                               <div class="text-center">
-                                
-                                   <div class="square position-relative display-2 mb-3">
-                                       {% if profile.photo %}
-                                           <img src="{{ profile.photo.url }}" style="height: 100%" alt="Photo de profil">
-                                       {% else %}
-                                       <i class="fas fa-fw fa-user position-absolute top-50 start-50 translate-middle text-secondary"></i>
-   
-                                       {% endif %}
-                                   </div>
-                           
-                                   <!--<input type="file" id="customFile" name="file" hidden>
-                                   <label class="btn btn-success-soft btn-block" for="customFile">Upload</label>
-                                   <button type="button" class="btn btn-danger-soft">Remove</button>
-                               
-                                   <p class="text-muted mt-3 mb-0"><span class="me-1">Note:</span>Minimum size 300px x 300px</p>-->
-                               </div>
-                           </div>
-                       </div>
-                    </div>
-                   </div>
-               </div> 
-            </div>
-            <div class="row mb-5 gx-5">
-                <div class="col-xxl-8 mb-5 mb-xxl-0">
-                    <div class="bg-secondary-soft px-3 py-3 rounded card ">
-                        <div class="row g-3 card-body">
-                            <h4 class="mb-4 mt-0">Information Complémentaires</h4>
-                           
-                            <div class="col-md-12">
-                                <label class="form-label">Adresse actuelle</label>
-                                <input type="text" class="form-control" disabled  aria-label="Adresse" value="{% if profile.address %}{{ profile.address }}{% endif %}">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Pays Actuel</label>
-                                <input type="text" class="form-control" disabled  aria-label="Pays" value="{% if profile.actual_country %}{{ profile.actual_country }}{% endif %}">
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label">Ville Actuel</label>
-                                <input type="text" disabled class="form-control"  aria-label="Ville" value="{% if profile.actual_city %}{{ profile.actual_city }}{% endif %}">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Code Postal</label>
-                                <input type="text" class="form-control" disabled aria-label="Code Postal" value="{% if profile.zip_code %}{{ profile.zip_code }}{% endif %}">
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label">Diplome le plus recent</label>
-                                <input type="text" class="form-control" disabled  aria-label="Dernier diplome" value="{% if profile.high_education %}{{ profile.high_education }}{% endif %}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Secteur d'activité</label>
-                                <input type="text" class="form-control" disabled  aria-label="Secteur d'activité" value="{% if profile.activity_sector %}{{ profile.activity_sector }}{% endif %}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Profession</label>
-                                <input type="text" class="form-control" disabled aria-label="Profession" value="{% if profile.profession %}{{ profile.profession }}{% endif %}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Personne a contacter en cas de succession</label>
-                                <input type="text" class="form-control" disabled  aria-label="Personne a contacter" value="{% if profile.person_contact %}{{ profile.person_contact }}{% endif %}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Biographie </label>
-                                <textarea class="form-control" disabled aria-label="Biographie" >{% if profile.bio %}{{ profile.bio }}{% endif %}</textarea>
-                            </div>  
-                        </div> 
-                    </div>
-
-                </div>
-            
-                <div class="col-xxl-4 mb-5 mb-xxl-0">
-                    <div class="bg-secondary-soft px-3 py-3 rounded card">
-                        <div class="row g-3 card-body">
-                            <h4 class="mb-4 mt-0">Lien réseaux sociaux</h4>
-                    
-                            <div class="col-md-12">
-                            <label class="form-label"><i class="fab fa-fw fa-facebook me-2 text-facebook"></i>Facebook </label>
-                            <input type="text" class="form-control" disabled aria-label="Facebook" value="{% if profile.facebook %}{{ profile.facebook }}{% endif %}">
-                            </div>
-                    
-                            <div class="col-md-12">
-                            <label class="form-label"><i class="fab fa-fw fa-twitter text-twitter me-2"></i>Twitter *</label>
-                            <input type="text" class="form-control" disabled aria-label="Twitter" value="{% if profile.twitter %}{{ profile.twitter }}{% endif %}">
-                            </div>
-                    
-                            <div class="col-md-12">
-                            <label class="form-label"><i class="fab fa-fw fa-linkedin-in text-linkedin me-2"></i>Linkedin</label>
-                            <input type="text" class="form-control" disabled aria-label="Linkedin" value="{% if profile.linkedin %}{{ profile.linkedin }}{% endif %}">
-                            </div>
-                    
-                            <div class="col-md-12">
-                            <label class="form-label"><i class="fab fa-fw fa-instagram text-instagram me-2"></i>Instagram</label>
-                            <input type="text" class="form-control" disabled aria-label="Instragram" value="{% if profile.instagram %}{{ profile.instagram }}{% endif %}">
-                            </div>
-                    
-                        </div> 
-                    </div>
-                </div>
-                <div class="col-xxl-12 mb-5 mb-xxl-0">
-                    <br>
-                    <div class="bg-secondary-soft px-3 py-3 rounded card">
-                        <div class="row g-3 card-body">
-                            <h4 class="mb-4 mt-0">Documents</h4>
-                            <div class="text-center">
-                                <div class="col-md-4">
-                                    <label class="form-label"><i class="fab fa-fw fa-facebook me-2 text-facebook"></i>Pièce d'identité </label>
-                             
-                                <div class="square position-relative display-2 mb-3">
-                                        {% if profile.id_card %}
-                                        <embed type="image/jpg" src="{{profile.id_card.url}}" width="60%" height="50%">
-
-                                    {% endif %}
+                        </div>
+                        {% if profile.id_card %}
+                        <div class="row">
+                            <div class="col s12">
+                                <h5 class="mt-4">Pièce d'identité</h5>
+                                <div class="card-panel center-align">
+                                    <embed type="application/pdf" src="{{ profile.id_card.url }}" width="100%" height="400px">
                                 </div>
-                        </div>  
-                                <!--<input type="file" id="customFile" name="file" hidden>
-                                <label class="btn btn-success-soft btn-block" for="customFile">Upload</label>
-                                <button type="button" class="btn btn-danger-soft">Remove</button>
-                            
-                                <p class="text-muted mt-3 mb-0"><span class="me-1">Note:</span>Minimum size 300px x 300px</p>-->
                             </div>
-                    
-                        </div> 
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-action right-align">
+                        <a href="{% url 'update_profile' %}" class="btn orange"><i class="material-icons left">edit</i>Modifier le profil</a>
                     </div>
                 </div>
             </div>
-               <hr>
-               <div class="row">
-                <div class="col-6 text-start">
-                        <a href="{% url 'accueil' %}" class="link-info"><i><i class="fa fa-home"></i></i>&nbsp;Aller à l'accueil</a>
-               
-                </div>
-                <div class="col-6 text-end">
-                        <a href="{% url 'update-profile' %}" class="link-secondary"><i class="fa fa-edit"></i>&nbsp;Modifier le profil</a>
-                 
-                </div>
-            </div>
-            </div>
-            </div>
-            </div>
-    </div>
-  </section>
+        </div>
+    </section>
+</main>
+{% endblock %}
 
-    
-
-    
-
-</div>
-
-
-{% endblock content %}
-
-{% block extra_js %}
-<script src="{% static 'assets/profil/profil.js' %}"></script>
-{% endblock extra_js %}
+{% block extrajs %}
+<script src="{% static 'profil/profil.js' %}"></script>
+{% endblock %}

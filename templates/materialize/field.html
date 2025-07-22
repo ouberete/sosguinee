@@ -1,0 +1,35 @@
+{% load crispy_forms_field %}
+
+{% if field|is_checkbox %}
+<p>
+    <label>
+        {% crispy_field field %} {{ field.label }}
+    </label>
+</p>
+{% for error in field.errors %}
+<div class="red-text">{{ error }}</div>
+{% endfor %}
+{% elif field|is_select %}
+<div class="input-field">
+    {% crispy_field field %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+    {% if field.help_text %}
+    <small class="helper-text">{{ field.help_text }}</small>
+    {% endif %}
+    {% for error in field.errors %}
+    <div class="red-text">{{ error }}</div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="input-field">
+    {{ field.label_tag }}
+    {% crispy_field field %}
+    {% if field.help_text %}
+    <small class="helper-text">{{ field.help_text }}</small>
+    {% endif %}
+    {% for error in field.errors %}
+    <div class="red-text">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endif %}

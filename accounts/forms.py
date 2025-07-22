@@ -17,6 +17,7 @@ from django.utils.html import strip_tags
 from smtplib import SMTPException
 from sosguinee import settings
 import logging
+from crispy_forms.helper import FormHelper
 
 from sosguinee.utils.utilities import Utilities
 User = get_user_model()
@@ -196,35 +197,39 @@ class UserInfosForm(forms.ModelForm):
     last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Veuillez renseigner votre Nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     birth_date = forms.DateField(widget=forms.DateInput(format="%Y-%m-%d",attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Veuillez renseigner votre date de naissance.'})
     birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    is_actual_country_as_birth_country = forms.BooleanField(label="Definir le pays actuel et la ville", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    #is_actual_country_as_birth_country = forms.BooleanField(label="Definir le pays actuel et la ville", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     actual_city = forms.CharField(max_length=100, label="Ville actuelle", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,required=False, label="Pays actuel", widget=forms.Select(attrs={'class': 'form-control'}))
+    #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,required=False, label="Pays actuel", widget=forms.Select(attrs={'class': 'form-control'}))
     zip_code = forms.CharField(max_length=10, label="Code postal", widget=forms.TextInput(attrs={'class': 'form-control'}))
     address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Veuillez renseigner votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     phone = forms.CharField(max_length=100, label="Telephone", error_messages={'required': 'Veuillez renseigner votre telephone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     profession_situation = forms.ChoiceField(label="Situation professionnelle", error_messages={'required': 'Veuillez renseigner votre situation professionnelle.'}, widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
     activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Veuillez renseigner votre secteur d\'activité.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, label="Profession", error_messages={'required': 'Veuillez renseigner votre profession.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    high_education = forms.ChoiceField(choices=UserDetails.HIGH_EDUCATION_CHOICES, label="Niveau d'etudes", error_messages={'required': 'Veuillez renseigner votre niveau d\'etudes.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    person_contact  = forms.CharField(max_length=100, label="Personne à contacter", error_messages={'required': 'Veuillez renseigner votre personne à contacter.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-   
+
     class Meta:
-        model = UserDetails
-        fields = ['user_category', 'civility','first_name','last_name', 'birth_date','birth_city','birth_country',  'nationality', 'is_actual_country_as_birth_country', 'actual_city', 'actual_country', 'zip_code', 'address', 'phone', 'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact']
+            model = UserDetails
+            fields = ['user_category', 'civility','first_name','last_name', 'birth_date','birth_city', 'nationality', 'actual_city', 'zip_code', 'address', 'phone', 'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        is_actual_country_as_birth_country = cleaned_data.get('is_actual_country_as_birth_country')
-        actual_city = cleaned_data.get('actual_city')
-        actual_country = cleaned_data.get('actual_country')
+    def __init__(self, *args, **kwargs):
+        super(UserInfosForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_show_errors = True
+        self.helper.error_text_inline = True  # très important
 
-        if not is_actual_country_as_birth_country:
-            if not actual_city:
-                self.add_error('actual_city', 'Veuillez renseigner votre ville.')
-            if not actual_country:
-                self.add_error('actual_country', 'Veuillez renseigner votre pays.')
+    # def clean(self):
+    #         cleaned_data = super().clean()
+    #         is_actual_country_as_birth_country = cleaned_data.get('is_actual_country_as_birth_country')
+    #         actual_city = cleaned_data.get('actual_city')
+    #         actual_country = cleaned_data.get('actual_country')
+    #
+    #         if not is_actual_country_as_birth_country:
+    #             if not actual_city:
+    #                 self.add_error('actual_city', 'Veuillez renseigner votre ville.')
+    #             if not actual_country:
+    #                 self.add_error('actual_country', 'Veuillez renseigner votre pays.')
 
 class UserDocumentForm(forms.ModelForm):
     bio = forms.CharField(max_length=100, required=False, label="Biographie", widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -257,18 +262,18 @@ class ProfileForm(forms.ModelForm):
     last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Veuillez renseigner votre nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     birth_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Veuillez renseigner votre date de naissance.'})
     birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     is_actual_country_as_birth_country = forms.BooleanField(label="Ville actuelle = Ville de naissance", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-control'}))
     actual_city = forms.CharField(max_length=100, label="Ville actuelle", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays actuel", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays actuel", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     zip_code = forms.CharField(max_length=10, label="Code postal", error_messages={'required': 'Veuillez renseigner votre code postal.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Veuillez renseigner votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     phone = forms.CharField(max_length=100, label="Telephone", error_messages={'required': 'Veuillez renseigner votre telephone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     profession_situation = forms.ChoiceField(label="Situation professionnelle", widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
     activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Veuillez renseigner votre secteur d\'activité.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    profession = forms.Select(choices=UserDetails.PROFESSION_CHOICES, attrs={'class': 'form-control'})
-    high_education = forms.Select(choices=UserDetails.HIGH_EDUCATION_CHOICES, attrs={'class': 'form-control', 'placeholder': 'Ecole', } )
+    profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    high_education = forms.ChoiceField(choices=UserDetails.HIGH_EDUCATION_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
     person_contact  = forms.CharField(max_length=100, label="Personne à contacter", widget=forms.TextInput(attrs={'class': 'form-control'}))
    
     bio = forms.CharField(max_length=100, label="Biographie", widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -285,7 +290,7 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = UserDetails
-        fields = ['user_category', 'civility', 'birth_date', 'birth_city','birth_country', 'nationality', 'actual_city', 'actual_country', 'zip_code', 'address', 'phone',
+        fields = ['user_category', 'civility', 'birth_date', 'birth_city','nationality', 'actual_city','zip_code', 'address', 'phone',
                   'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact', 'bio', 'photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country',
                   'facebook', 'twitter', 'instagram', 'linkedin'] 
     def __init__(self, *args, **kwargs):

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Mise à jour du profil - SOS Guinée{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <h5 class="center-align">Mise à jour de votre profil</h5>
+                    <p class="center flow-text">Étape actuelle : {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</p>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% csrf_token %}
+                        {{ wizard.management_form }}
+                        {% for field in wizard.form.visible_fields %}
+                        <div class="input-field">
+                            {{ field }}
+                            {{ field.label_tag }}
+                            {% if field.errors %}
+                            <span class="red-text">{{ field.errors|join:", " }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="row">
+                            <div class="col s6 left-align">
+                                {% if wizard.steps.prev %}
+                                <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn grey">
+                                    <i class="material-icons left">chevron_left</i>Précédent
+                                </button>
+                                {% endif %}
+                            </div>
+                            <div class="col s6 right-align">
+                                {% if wizard.steps.next %}
+                                <button type="submit" class="btn green">
+                                    Suivant<i class="material-icons right">chevron_right</i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn green">
+                                    Enregistrer<i class="material-icons right">check</i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'home' %}" class="btn-flat">
+                        <i class="material-icons left">home</i> Accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

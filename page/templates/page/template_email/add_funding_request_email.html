@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -13,7 +14,7 @@
     <p>Nom: {{name}}</p>
     <p>Email: {{email}}</p>
     <p>Télephone: {{phone}}</p>
-    <p>Montant: {{amount}}</p>
+    <p>Montant: {{amount|format_fr}}</p>
     <br>
     <p>Merci pour votre demande.</p>
 </body>

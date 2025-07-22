@@ -1,16 +1,28 @@
 import uuid
 from smtplib import SMTPException
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views import View
 from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_POST
+
 from page.models import FundingRequest, LossAlert, FundingType, LossAlertType, LossAlertStatus, FundingRequestStatus, \
-    Donation
-from page.forms import  DonationForm, FundingRequestForm, LossAlertForm, MessageContactForm
+    Donation, FundPayment, Comment
+from page.forms import DonationForm, FundingRequestForm, LossAlertForm, MessageContactForm, FundingPaymentForm, \
+    CommentForm
 from django.core.paginator import Paginator
 from page.models import UserDetails
 from sosguinee.utils.sending_email import Utilities
-
+from django.views.decorators.csrf import csrf_protect
+from django.conf import settings
+from django.contrib import messages
+import requests
+from requests.exceptions import RequestException
 User = get_user_model()
 #Add new user
 def index(request):
@@ -40,8 +52,9 @@ def add_funding_request(request):
             print("add_funding_request valid")
             fundingRequest = form.save()
             docs = request.FILES.getlist('optional_docs')
-            fundingRequest.add_docs(docs)
-            fundingRequest.funding_request_status_id = 1
+            fundingRequest.add_funding_docs(docs)
+            funding_request_status = FundingRequestStatus.objects.filter(name="En cours").first()
+            fundingRequest.funding_request_status_id = funding_request_status.id if funding_request_status else None
             fundingRequest.save()
             
             #'beneficiary_name', 'description_needs', 'country', 'city',
@@ -96,7 +109,10 @@ def add_loss_alert(request):
             lossAlert = form.save()
             docs = request.FILES.getlist('optional_docs')
             lossAlert.add_docs(docs)
-            lossAlert.loss_alert_status_id = 1
+            #Get first lost alert status
+
+            lost_alert_status = LossAlertStatus.objects.filter(name="En cours").first()
+            lossAlert.loss_alert_status_id = lost_alert_status.id if lost_alert_status else None
             lossAlert.save()   
             
             email_template ='page/template_email/add_loss_alert_email.html'
@@ -138,23 +154,47 @@ def add_loss_alert(request):
     return render(request, 'page/add_loss_alert.html', {'form': form})
 
 def funding_request_detail(request, pk):
-    funding_request = FundingRequest.objects.get(pk=pk)
-    
-    return render(request, 'page/funding_request_details.html', {'funding_request': funding_request})
+    funding_request = get_object_or_404(FundingRequest, pk=pk)
+
+    # Obtenir tous les commentaires liés à cet objet
+    content_type = ContentType.objects.get_for_model(FundingRequest)
+    comments = Comment.objects.filter(content_type=content_type, object_id=funding_request.id).select_related('user')
+
+    comment_form = CommentForm()
+
+    return render(request, 'page/funding_request_details.html', {
+        'funding_request': funding_request,
+        'comments': comments,  # 🔴 Important !
+        'comment_form': comment_form,
+        'model_name': 'fundingrequest',
+        'object_id': funding_request.id
+    })
 
 def loss_alert_detail(request, pk):
-    alert = LossAlert.objects.get(pk=pk)
     #alert = LossAlert()
-    return render(request, 'page/loss_alert_details.html', {'alert': alert})
+    alert = get_object_or_404(LossAlert, pk=pk)
+
+    # Obtenir tous les commentaires liés à cet objet
+    content_type = ContentType.objects.get_for_model(LossAlert)
+    comments = Comment.objects.filter(content_type=content_type, object_id=alert.id, isDeleted=False).select_related('user')
+
+    comment_form = CommentForm()
+
+    return render(request, 'page/loss_alert_details.html', {
+        'alert': alert,
+        'comments': comments,  # 🔴 Important !
+        'comment_form': comment_form,
+        'model_name': 'lossalert',
+        'object_id': alert.id
+    })
 
 def contact(request):
-    contact = MessageContactForm()
+    contact = MessageContactForm(request.POST or None)
     if request.method == 'POST':
         print(request.POST)
         name = request.POST.get('name') 
         email = request.POST.get('email')
         message = request.POST.get('message')
-        contact = MessageContactForm(request.POST)
         if contact.is_valid():
             contact.save()
             #Send Message contact email
@@ -165,11 +205,11 @@ def contact(request):
             }
             
             template_email = 'page/template_email/contact_form_email.html'
-            to_email = "komoro@gyopmail.com"
+            to_email = [email,]
             mail_subject = "Message de contact"
             try:
                 print("sending email")
-                Utilities.sending_email([to_email, email], mail_subject, template_email, context)
+                Utilities.sending_email(to_email, mail_subject, template_email, context)
                 print("email sent")
             except SMTPException as e:
                 print("email not sent", e)
@@ -185,56 +225,94 @@ def thanks(request):
 
 
 def donation(request):
+    form = DonationForm(request.POST or None)
     if request.method == 'POST':
-        amount = request.POST.get('amount')
-        method = request.POST.get('method')
-        reference = str(uuid.uuid4())
+        print("Donation POST request received")
+        if not form.is_valid():
+            print("Donation form is not valid")
+            errors = form.errors
+            print(errors)
+            return render(request, 'page/donation.html', {'form': form, 'errors': errors})
+        print("Donation form is valid")
+        # Récupérer les données du formulaire
 
-        user = request.user if request.user.is_authenticated else None
+        amount = form.cleaned_data['amount']
+        user_email = form.cleaned_data['donor_email']
+        donor_first_name = form.cleaned_data['donor_first_name']
+        donor_last_name = form.cleaned_data['donor_last_name']
+        donor_country = form.cleaned_data['donor_country']
+        donor_city = form.cleaned_data['donor_city']
+        donor_phone = form.cleaned_data['donor_phone']
+        donor_address = form.cleaned_data['donor_address']
+        try:
+            # Enregistrer le paiement dans la base de données
+            payment = Donation.objects.create(
+                amount=amount,
+                donor_email=user_email,
+                donor_first_name= donor_first_name,
+                donor_last_name= donor_last_name,
+                donor_address= donor_address,
+                donor_city=donor_city,
+                donor_country=donor_country,
+                donor_phone =donor_phone,
+                transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
+                #reference=data.get('reference')
+            )
 
-        if not user:
-            email = request.POST.get('email')
-            phone = request.POST.get('phone')
+            # payload = {
+            #     "public_key": settings.PAYCARD_API_KEY,
+            #     "amount": int(amount),
+            #     "currency": "GNF",
+            #     "email": user_email,
+            #     "description": f"Financement demande #{funding_id}",
+            #     "callback_url": request.build_absolute_uri(
+            #         reverse('paycard_payment_callback', kwargs={'payment_id': payment.id, 'type': 'Don'})
+            #     )
+            #     }
+            #
+            # response = requests.post(settings.PAYCARD_ENDPOINT, json=payload, timeout=10)
+            #
+            # if response.status_code != 200:
+            #     messages.error(request, "Erreur de communication avec PayCard.")
+            #     return  render(request, 'page/donation.html', { 'form': form})
+            #
+            # data = response.json()
+            # redirect_url = data.get('redirect_url')
+            #
+            # if not redirect_url:
+            #     messages.error(request, "Réponse invalide de PayCard.")
+            #     return  render(request, 'page/donation.html', {'form': form})
 
+
+
+            #Send email to donor
+            context = {
+                'name': str(donor_first_name).capitalize() + ' ' + str(donor_last_name).upper(),
+                'amount': amount,
+            }
+            template_email = 'page/template_email/donation_payment_email.html'
+            to_email = [user_email,]
+            mail_subject = "Don de financement"
             try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                username = email or phone or f"user_{uuid.uuid4().hex[:8]}"
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    first_name=request.POST.get('first_name', ''),
-                    last_name=request.POST.get('last_name', '')
-                )
-                user.save()
+                print("sending email")
+                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                print("email sent")
+            except SMTPException as e:
+                print("email not sent", e)
+                messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
+                return  render(request, 'page/donation.html', {'form': form})
 
-                # Créer ou mettre à jour le profil avec le téléphone
-                UserDetails.objects.update_or_create(
-                    user=user,
-                    defaults={'phone': phone}
-                )
 
-        else:
-            # Si connecté, tu peux mettre à jour le profil aussi si besoin
-            phone = request.POST.get('phone')
-            if phone:
-                UserDetails.objects.update_or_create(
-                    user=user,
-                    defaults={'phone': phone}
-                )
+            # Redirige vers la page de paiement de PayCard
+            # return redirect(redirect_url)
+            return redirect('paycard_payment_callback', payment_id=payment.id, type='Don')
+        except RequestException as e:
+            messages.error(request, "Service PayCard inaccessible. Réessayez plus tard.")
+            print("Erreur réseau PayCard:", e)
+            return  render(request, 'page/donation.html', {'form': form})
 
-        # Enregistrer le don
-        Donation.objects.create(
-            amount=amount,
-            method=method,
-            status='en_attente',
-            user=user,
-            reference=reference
-        )
+    return render(request, 'page/donation.html', {'form': form})
 
-        return redirect('donation_thanks')
-
-    return render(request, 'page/donation.html')
 def messageContact(request):
     if request.method == 'POST':
         print(request.POST)
@@ -251,15 +329,14 @@ def messageContact(request):
                 'message': message
             }
             
-            to_email = "yuss@yopmail.com"
+            to_email = [email]
             mail_subject = "Message de contact"
             template_email = 'page/template_email/contact_form_email.html'
             try:
                 print("sending email")
                 
-                Utilities.sending_email([to_email, email], mail_subject, template_email, context)
-                
-                
+                Utilities.sending_email(to_email, mail_subject, template_email, context)
+
                 print("email sent")
             except SMTPException as e:
                 print("email not sent", e)
@@ -423,3 +500,207 @@ class LossAlertListView(View):
 
 def donation_thanks(request):
     return render(request, 'page/donation_thanks.html')
+
+def paycard_funding(request, pk):
+    funding_request = get_object_or_404(FundingRequest, pk=pk)
+    if not funding_request:
+        messages.error(request, "Demande de financement non trouvée.")
+        return redirect('paycard_funding', pk)
+    form = FundingPaymentForm()
+    return render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+
+
+@csrf_protect
+def start_paycard_funding_payment(request, funding_id):
+    funding_request = FundingRequest.objects.filter(id=funding_id).first()
+
+    if not funding_request:
+        messages.error(request, "Demande de financement non trouvée.")
+        return redirect('paycard_funding', funding_id)
+    form = FundingPaymentForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            user_email = form.cleaned_data['donor_email']
+            donor_first_name = form.cleaned_data['donor_first_name']
+            donor_last_name = form.cleaned_data['donor_last_name']
+            donor_country = form.cleaned_data['donor_country']
+            donor_city = form.cleaned_data['donor_city']
+            donor_phone = form.cleaned_data['donor_phone']
+            donor_address = form.cleaned_data['donor_address']
+            try:
+                # Enregistrer le paiement dans la base de données
+                payment = FundPayment.objects.create(
+                    funding_request=funding_request,
+                    amount=amount,
+                    donor_email=user_email,
+                    donor_first_name= donor_first_name,
+                    donor_last_name= donor_last_name,
+                    donor_address= donor_address,
+                    donor_city=donor_city,
+                    donor_country=donor_country,
+                    donor_phone =donor_phone,
+                    transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
+                    #reference=data.get('reference')
+                )
+
+                # payload = {
+                #     "public_key": settings.PAYCARD_API_KEY,
+                #     "amount": int(amount),
+                #     "currency": "GNF",
+                #     "email": user_email,
+                #     "description": f"Financement demande #{funding_id}",
+                #     "callback_url": request.build_absolute_uri(
+                #         reverse('paycard_payment_callback', kwargs={'payment_id': payment.id, 'type': 'Financement'})
+                #     )
+                #     }
+                #
+                # response = requests.post(settings.PAYCARD_ENDPOINT, json=payload, timeout=10)
+                #
+                # if response.status_code != 200:
+                #     messages.error(request, "Erreur de communication avec PayCard.")
+                #     return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+                #
+                # data = response.json()
+                # redirect_url = data.get('redirect_url')
+                #
+                # if not redirect_url:
+                #     messages.error(request, "Réponse invalide de PayCard.")
+                #     return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+
+
+
+                #Send email to donor
+                context = {
+                    'name': str(donor_first_name).capitalize() + ' ' + str(donor_last_name).upper(),
+                    'beneficiary_name': funding_request.beneficiary_name,
+                    'amount': amount,
+                    'title': funding_request.title,
+                }
+                template_email = 'page/template_email/funding_payment_email.html'
+                to_email = [user_email,]
+                mail_subject = "Financement de demande de financement"
+                try:
+                    print("sending email")
+                    Utilities.sending_email(to_email, mail_subject, template_email, context)
+                    print("email sent")
+                except SMTPException as e:
+                    print("email not sent", e)
+                    messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
+                    return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+
+
+                # Redirige vers la page de paiement de PayCard
+                # return redirect(redirect_url)
+                return redirect('paycard_payment_callback', payment_id=funding_id, type='Financement')
+            except RequestException as e:
+                messages.error(request, "Service PayCard inaccessible. Réessayez plus tard.")
+                print("Erreur réseau PayCard:", e)
+                return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+
+        else:
+            return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
+
+    return redirect('paycard_funding', funding_id)
+
+
+def paycard_payment_callback(request, payment_id, type):
+    # Logique de validation possible ici (optionnel : appel à PayCard pour vérifier)
+    #Update le statut du paiement
+    payment = FundPayment.objects.filter(id=payment_id).first()
+    if payment:
+        payment.status = 'réussi'
+        payment.save()
+    return render(request,'page/confirmation_page/confirmation_payment.html', {'request':'added', 'type': type})
+
+
+@login_required
+def add_comment(request, model_name, object_id):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if request.method == 'POST':
+            print("add comment")
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                print("Form valid")
+                content_type = ContentType.objects.get(model=model_name.lower())
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.content_type = content_type
+                comment.object_id = object_id
+                comment.save()
+                print("Form saved")
+                return JsonResponse({
+                    'success': True,
+                    'comment': {
+                        'user': comment.user.username,
+                        'text': comment.text,
+                        'created_at': comment.created_at.strftime('%d/%m/%Y %H:%M')
+                    }
+                })
+            else:
+                return JsonResponse({'success': False, 'errors': form.errors})
+    return JsonResponse({'success': False, 'message': 'Requête invalide'})
+
+
+
+
+def reply_comment(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent')
+        parent = get_object_or_404(Comment, id=parent_id)
+        comment = Comment.objects.create(
+            user=request.user,
+            content_object=parent.content_object,
+            parent=parent,
+            text=text
+        )
+        html = render_to_string('page/components/comments/comment_item.html', {'comment': comment, 'user': request.user})
+        return JsonResponse({'success': True, 'reply_html': html})
+    return JsonResponse({'success': False}, status=400)
+
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, id=pk, user=request.user)
+    comment.delete()
+    return JsonResponse({'success': True})
+
+
+@login_required
+@require_POST
+def edit_comment(request, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id, user=request.user)
+    except Comment.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Commentaire non trouvé'}, status=404)
+
+    new_text = request.POST.get('text', '').strip()
+    if new_text:
+        comment.text = new_text
+        comment.save()
+        return JsonResponse({'success': True, 'text': comment.text})
+    return JsonResponse({'success': False, 'error': 'Texte invalide'}, status=400)
+
+
+@login_required
+@require_POST
+def delete_comment(request, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id, user=request.user)
+        comment.delete()
+        return JsonResponse({'success': True})
+    except Comment.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Commentaire introuvable'}, status=404)
+
+
+@login_required
+@require_POST
+def report_comment(request, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id)
+        # Optionnel : logguer ou sauvegarder dans une table Report si nécessaire
+        print(f"Commentaire signalé par {request.user.username}: {comment.text}")
+        return JsonResponse({'success': True, 'message': 'Le commentaire a été signalé'})
+    except Comment.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Commentaire introuvable'}, status=404)
+
+

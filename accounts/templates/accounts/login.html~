@@ -5,10 +5,10 @@
 {% block extra_css %}
   <!-- Styles spécifiques à la page de connexion -->
   <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+<meta name="robots" content="noindex">
 {% endblock %}
 
 {% block content %}
-  {% include 'page/components/nav.html' %}
 
 <main class="grey lighten-4 section">
   <div class="container">
@@ -84,7 +84,6 @@
     </div>
   </div>
 </main>
-{% include 'page/components/footer.html' %}
 {% endblock %}
 
 {% block extrajs %}

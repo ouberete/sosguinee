@@ -1,0 +1,28 @@
+<div class="card-panel" id="comment-{{ comment.id }}">
+  <p><strong>{{ comment.user.username }}</strong> — {{ comment.created_at|date:"d/m/Y H:i" }}</p>
+  <p>{{ comment.text }}</p>
+
+  <div class="comment-actions">
+    <a href="#" class="reply-link" data-parent-id="{{ comment.id }}">Répondre</a>
+    <a href="#" class="report-link" data-id="{{ comment.id }}">Signaler</a>
+
+    {% if user == comment.user %}
+    <a href="#" class="edit-link" data-id="{{ comment.id }}">Modifier</a>
+    <a href="#" class="delete-link" data-id="{{ comment.id }}">Supprimer</a>
+    {% endif %}
+  </div>
+
+  <div class="reply-form-container" id="reply-form-{{ comment.id }}"></div>
+
+  {% for reply in comment.replies.all %}
+  <div class="card grey lighten-4" style="margin-left: 30px;" id="comment-{{ reply.id }}">
+    <p><strong>{{ reply.user.username }}</strong> — {{ reply.created_at|date:"d/m/Y H:i" }}</p>
+    <p>{{ reply.text }}</p>
+
+    {% if user == reply.user %}
+    <a href="#" class="edit-link" data-id="{{ reply.id }}">Modifier</a>
+    <a href="#" class="delete-link" data-id="{{ reply.id }}">Supprimer</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>

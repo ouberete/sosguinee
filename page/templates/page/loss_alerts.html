@@ -1,119 +1,107 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Alertes de perte - SOS Guinée{% endblock %}
 {% block extra_head %}
-  <meta name="description" content="Consultez et filtrez les alertes de perte de biens et de proches sur SOS Guinée.">
-  <meta property="og:title" content="Alertes de perte - SOS Guinée">
-  <meta property="og:description" content="Filtrez par type, statut, nom et dates pour retrouver rapidement une alerte.">
+<meta name="description" content="Consultez et filtrez les alertes de perte de biens et de proches sur SOS Guinée.">
+<meta property="og:title" content="Alertes de perte - SOS Guinée">
+<meta property="og:description" content="Filtrez par type, statut, nom et dates pour retrouver rapidement une alerte.">
 {% endblock %}
-
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 {% block content %}
-  <main role="main">
-    <!-- Hero / Title -->
-    <section class="parallax-container" role="banner" aria-label="Bannière alertes">
-      <div class="parallax">
-        <img src="{% static 'img/articles/img7.avif' %}" alt="Alertes Guinée" class="responsive-img" loading="lazy">
-      </div>
-      <div class="container showcase-content">
-        <div class="row">
-          <div class="col s12 m8">
-            <div class="card-panel teal lighten-5">
-              <h1>Alertes de perte</h1>
-              <p>Filtrez et explorez les alertes de perte de biens ou proches.</p>
+<main role="main">
+    <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner"
+             aria-label="Bannière alertes">
+        <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}" alt="Alertes Guinée" loading="lazy"> {#
+            Removed responsive-img #}
+        </div>
+        <div class="container center-align white-text hero-content">
+            <div class="row">
+                <div class="col s12"><h1 class="header light text-shadow">Alertes de Perte</h1><h5
+                        class="light text-shadow">Filtrez et explorez les alertes de perte de biens ou proches.</h5>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </section>
-
-    <!-- Filter Form -->
-    <section class="section container" aria-labelledby="filter-alert-heading">
-      <h2 id="filter-alert-heading" class="center-align">Filtrer les alertes</h2>
-      <form id="filterForm" method="get" action="" class="row">
-        <div class="input-field col s12 m6 l4">
-          <select id="type_alert" name="type_alert">
-            <option value="" disabled {% if not request.GET.type_alert %}selected{% endif %}>Type d'alerte</option>
-            {% for t in loss_alert_types %}
-              <option value="{{ t.name }}" {% if request.GET.type_alert == t.name %}selected{% endif %}>{{ t.name }}</option>
-            {% endfor %}
-          </select>
-          <label for="type_alert">Type d'alerte</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <select id="status" name="status">
-            <option value="" disabled {% if not request.GET.status %}selected{% endif %}>Statut</option>
-            {% for s in loss_alert_statuses %}
-              <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %}>{{ s.name }}</option>
-            {% endfor %}
-          </select>
-          <label for="status">Statut</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="name" type="text" name="name" value="{{ request.GET.name }}">
-          <label for="name">Nom (personne ou bien)</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="start_date" type="date" name="start_date" value="{{ request.GET.start_date }}">
-          <label for="start_date">Date min</label>
-        </div>
-        <div class="input-field col s12 m6 l4">
-          <input id="end_date" type="date" name="end_date" value="{{ request.GET.end_date }}">
-          <label for="end_date">Date max</label>
-        </div>
-        <div class="col s12 m6 l4">
-          <button type="submit" class="btn waves-effect waves-light full-width">Appliquer</button>
-        </div>
-      </form>
+    <section class="section container" aria-labelledby="filter-alert-heading"><h2 id="filter-alert-heading"
+                                                                                  class="center-align light">Filtrer les
+        alertes</h2>
+        <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1">
+            <div class="input-field col s12 m6 l4"><select id="type_alert" name="type_alert">
+                <option value="" {% if not request.GET.type_alert %}selected{% endif %}>Tous les types d'alerte</option>
+                {# Changed disabled to allow selecting "all" #} {% for t in loss_alert_types %}
+                <option value="{{ t.name }}" {% if request.GET.type_alert == t.name %}selected{% endif %} >{{ t.name }}
+                </option>
+                {% endfor %} </select><label for="type_alert">Type d'alerte</label></div>
+            <div class="input-field col s12 m6 l4"><select id="status" name="status">
+                <option value="" {% if not request.GET.status %}selected{% endif %}>Tous les statuts</option>
+                {# Changed disabled to allow selecting "all" #} {% for s in loss_alert_statuses %}
+                <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %} >{{ s.name }}
+                </option>
+                {% endfor %} </select><label for="status">Statut</label></div>
+            <div class="input-field col s12 m6 l4"><input id="name" type="text" name="name"
+                                                          value="{{ request.GET.name }}"><label for="name">Nom (personne
+                ou bien)</label></div>
+            <div class="input-field col s12 m6 l4"><input id="start_date" type="text" class="datepicker"
+                                                          name="start_date" value="{{ request.GET.start_date }}"> {#
+                Changed type to text and added datepicker class #} <label for="start_date">Date min</label></div>
+            <div class="input-field col s12 m6 l4"><input id="end_date" type="text" class="datepicker" name="end_date"
+                                                          value="{{ request.GET.end_date }}"> {# Changed type to text
+                and added datepicker class #} <label for="end_date">Date max</label></div>
+            <div class="col s12 m6 l4 center-align filter-buttons">
+                <button type="submit" class="btn waves-effect waves-light teal darken-2 full-width"><i
+                        class="material-icons left">search</i> Appliquer
+                </button>
+                <a href="{% url 'loss_alert_list' %}"
+                   class="btn-flat waves-effect waves-light red-text text-darken-2 full-width reset-button"><i
+                        class="material-icons left">clear</i> Réinitialiser </a></div>
+        </form>
     </section>
-
-    <!-- Results Listing -->
     <section class="section container" aria-labelledby="results-alert-heading">
-      <h2 id="results-alert-heading" class="center-align">Alertes</h2>
-      <div id="loader" class="center-align" style="display: none;">
-        <div class="preloader-wrapper big active">
-          <div class="spinner-layer spinner-teal-only">
-            <div class="circle-clipper left"><div class="circle"></div></div>
-            <div class="gap-patch"><div class="circle"></div></div>
-            <div class="circle-clipper right"><div class="circle"></div></div>
-          </div>
-        </div>
-      </div>
-      <div id="alerts-container" class="row">
-        {% for alert in loss_alerts %}
-          {% include 'page/components/alert_card.html' with item=alert %}
-        {% empty %}
-          <p class="center-align">Aucune alerte trouvée.</p>
-        {% endfor %}
-      </div>
-      <!-- Pagination -->
-      <div class="center-align">
-        <ul class="pagination">
-          {% if page_obj.has_previous %}
-            <li class="waves-effect"><a href="?{% querystring page=page_obj.previous_page_number %}"><i class="material-icons">chevron_left</i></a></li>
-          {% else %}
-            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-          {% endif %}
-          {% for num in page_obj.paginator.page_range %}
-            <li class="{% if page_obj.number == num %}active{% else %}waves-effect{% endif %}"><a href="?{% querystring page=num %}">{{ num }}</a></li>
-          {% endfor %}
-          {% if page_obj.has_next %}
-            <li class="waves-effect"><a href="?{% querystring page=page_obj.next_page_number %}"><i class="material-icons">chevron_right</i></a></li>
-          {% else %}
-            <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </section>
-  </main>
+        <h2 id="results-alert-heading" class="center-align light">Liste des Alertes</h2>
 
-{% endblock %}
+        <div id="loader" class="center-align" style="display: none;">
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left"><div class="circle"></div></div>
+                    <div class="gap-patch"><div class="circle"></div></div>
+                    <div class="circle-clipper right"><div class="circle"></div></div>
+                </div>
+            </div>
+        </div>
+        <div id="alerts-container" class="row">
+        </div>
+        <div class="center-align">
+            <div id="pagination">
+
+            </div>
+        </div>
+    </section>
+</main> {% endblock %}
 
 {% block extrajs %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    M.FormSelect.init(document.querySelectorAll('select'));
-  });
+    document.addEventListener('DOMContentLoaded', function () {
+        M.FormSelect.init(document.querySelectorAll('select'));
+        M.Datepicker.init(document.querySelectorAll('.datepicker'), {
+            format: 'dd-mm-yyyy', // Ensure format matches Django's date input
+            i18n: {
+                cancel: 'Annuler',
+                clear: 'Effacer',
+                done: 'Ok',
+                months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+                monthsShort: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'],
+                weekdays: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
+                weekdaysShort: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
+                weekdaysAbbrev: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+            }
+        });
+        M.Parallax.init(document.querySelectorAll('.parallax'));
+        M.Materialbox.init(document.querySelectorAll('.materialboxed')); // For cards if they use materialboxed
+    });
 </script>
 <script src="{% static 'js/loss_alerts.js' %}"></script>
 {% endblock %}

@@ -1,3 +1,10 @@
+function convertToSQLDate(dateStr) {
+    if (!dateStr) return '';
+    const [day, month, year] = dateStr.split('-');
+    if (!day || !month || !year) return '';
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
 function GenerateLossAlertList(response) {
     $('#pagination').empty();
 
@@ -17,7 +24,7 @@ function GenerateLossAlertList(response) {
         response.loss_alerts.forEach(function(loss_alert) {
             $('#alerts-container').append(`
                 <div class="col s12 m12 l4">
-                    <div class="card card-alert card-main">
+                    <div class="card alert-card hoverable">
                         <div class="card-image">
                             <span class="yellow category">${loss_alert.status_alert_name}</span>
                             <img src="${loss_alert.principal_image_url ? loss_alert.principal_image_url : '{% static "img/articles/img1.avif" %}'}" alt="Image principale">
@@ -25,7 +32,7 @@ function GenerateLossAlertList(response) {
                         </div>
                         <div class="card-content">
                             <p><b>Type d'alerte : </b>${loss_alert.type_alert_name}</p>
-                            <p><b>Date : </b>${loss_alert.date_alert}</p>
+                            <p><b>Date : </b>${convertToSQLDate(loss_alert.date_alert)}</p>
                             <p><b>Heure : </b>${loss_alert.hour_alert}</p>
                         </div>
                         <div class="card-action">
@@ -102,8 +109,22 @@ $(document).ready(function() {
     $('#filterForm').submit(function(event) {
         event.preventDefault();
         $('#loader').show();
-        
-        const formData = $(this).serialize();
+
+        // Récupère les données du formulaire
+        const csrftoken = $('input[name=csrfmiddlewaretoken]').val();
+        let formData = $(this).serializeArray();
+
+        // Convertit les dates du format dd-mm-yyyy vers yyyy-mm-dd
+        formData = formData.map(field => {
+            if (field.name === 'start_date' || field.name === 'end_date') {
+                field.value = convertToSQLDate(field.value);
+            }
+            return field;
+        });
+
+        // Transformation en objet URL-encoded
+        const encodedData = $.param(formData);
+
         const page = 1;
         const itemsPerPage = 9;
         const apiUrl = "/api/loss-alerts/?page=" + page + "&items_per_page=" + itemsPerPage;
@@ -113,7 +134,7 @@ $(document).ready(function() {
         $.ajax({
             url: apiUrl,
             type: 'GET',
-            data: formData,
+            data: encodedData,
             dataType: 'json',
             success: function(response) {
                 $('#loader').hide();
@@ -128,8 +149,10 @@ $(document).ready(function() {
                     </div>
                 </div>
                     `);
-                console.log('Erreur:', error);
             }
         });
     });
+
+    // Fonction de conversion
+
 });

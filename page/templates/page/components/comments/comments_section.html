@@ -1,0 +1,72 @@
+<section class="section container" id="comments-container">
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="col s12">
+            <form id="comment-form" method="post">
+                {% csrf_token %}
+                {{ comment_form.text }}
+                <button type="submit" class="btn waves-effect waves-light blue">
+                    <i class="material-icons left">send</i> Commenter
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col s12">
+            <div class="card-panel yellow lighten-4">
+                <strong>Veuillez vous connecter pour commenter.</strong>
+                <a href="{% url 'login' %}" class="btn-small blue darken-2 right">
+                    <i class="material-icons left">login</i> Se connecter
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col s12">
+            <h5 class="mt-4">Commentaires récents</h5>
+            <div id="comments-list">
+                {% for comment in comments %}
+                <div class="card-panel" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <strong>{{ comment.user.username }}</strong>
+                        <small class="grey-text text-darken-1"> — {{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                        {% if user %}
+                        <div class="comment-actions">
+                            <a href="#">
+                                <i
+                                   data-target="dropdown-{{ comment.id }}"
+                                   aria-label="Options de commentaire"
+                                   aria-haspopup="true"
+                                   aria-expanded="false" class="dropdown-trigger comment-menu-trigger material-icons">more_vert&nbsp;&nbsp;</i>
+                            </a>
+
+                            <ul id="dropdown-{{ comment.id }}" class="dropdown-content">
+                                <li><a href="#" class="report-comment" data-id="{{ comment.id }}">Signaler</a></li>
+                                {% if user == comment.user %}
+                                <li><a href="#" class="edit-comment" data-id="{{ comment.id }}">Modifier</a></li>
+                                <li><a href="#" class="delete-comment" data-id="{{ comment.id }}">Supprimer</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="comment-text" id="text-{{ comment.id }}">{{ comment.text }}</p>
+                    <form class="edit-form" id="edit-form-{{ comment.id }}" data-id="{{ comment.id }}" style="display:none;">
+                        {% csrf_token %}
+                        <div class="input-field">
+                            <textarea class="materialize-textarea edit-text" id="textarea-{{ comment.id }}">{{ comment.text }}</textarea>
+                        </div>
+                        <button class="btn-small green update-comment" type="submit">Enregistrer</button>
+                        <button class="btn-small grey cancel-edit" type="button">Annuler</button>
+                    </form>
+                </div>
+                {% empty %}
+                <p class="grey-text center-align">Aucun commentaire pour l’instant.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
