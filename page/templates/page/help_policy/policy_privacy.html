@@ -1,10 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Politique de Confidentialité – SOS Guinée{% endblock %}
+{% block extra_head %}
+<meta name="description" content="Découvrez notre politique de confidentialité. Apprenez comment signaler une alerte, une trouvaille ou effectuer un don.">
+<meta name="keywords" content="SOS Guinée, alerte de perte, trouvaille, demande de financement, SOS, Guinée, dons, aide, support, FAQ">
+<meta name="author" content="SOS Guinée">
+<meta name="robots" content="index, follow">
+
+<!-- Métadonnées Open Graph pour Facebook et LinkedIn -->
+<meta property="og:title" content="Politique de Confidentialité – SOS Guinée">
+<meta property="og:description" content="Besoin d'aide pour utiliser SOS Guinée ? Consultez notre guide pas à pas.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.sosguinee.org/aide-support">
+<meta property="og:image" content="https://www.sosguinee.org/static/images/help-support-cover.png">
+{% endblock extra_head %}
 {% block content %}
-{% include "page/components/nav.html" %}
+<main role="main">
+
+    <section class="section" aria-labelledby="policy_privacy" >
 <div class="container">
-    <div class="card p-4 my-3">
+    <div class="card-panel ">
         <h2 class="mb-4">Politique de Confidentialité</h2>
         <p>Chez <strong>SOS Guinée</strong>, nous attachons une grande importance à la protection de votre vie privée et à la sécurité de vos données personnelles. Cette politique de confidentialité vous informe sur la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre plateforme.</p>
 
@@ -63,5 +78,6 @@
         {% include "page/components/address_contact.html" %}
     </div>
 </div>
-{% include "page/components/footer.html" %}
+    </section>
+</main>
 {% endblock %}
