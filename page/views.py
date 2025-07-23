@@ -28,7 +28,12 @@ User = get_user_model()
 def index(request):
     funding_requests= FundingRequest.objects.order_by("-created_at")[:6]
     loss_alerts = LossAlert.objects.order_by("-created_at")[:6]
-    return render(request, 'page/index.html', {'funding_requests': funding_requests, 'loss_alerts': loss_alerts})
+    funding_requests_count = FundingRequest.objects.count()
+    loss_alerts_count = LossAlert.objects.count()
+
+    return render(request, 'page/index.html', {'funding_requests': funding_requests, 'loss_alerts': loss_alerts,
+                                               'funding_requests_count':funding_requests_count, 'loss_alerts_count':loss_alerts_count,
+                                               'total_impact': loss_alerts_count + funding_requests_count})
 
 
 def funding_request_list(request):
