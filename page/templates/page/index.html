@@ -36,21 +36,21 @@
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large blue-text text-darken-2">people</i>
-          <h5 class="count-up" data-target="1500">0</h5>
+          <h5 class="count-up" data-target="{{ total_impact }}">0</h5>
           <p class="flow-text">Vies Impactées</p>
         </div>
       </div>
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large red-text text-darken-2">warning</i>
-          <h5 class="count-up" data-target="850">0</h5>
+          <h5 class="count-up" data-target="{{ loss_alerts_count }}">0</h5>
           <p class="flow-text">Alertes Traitées</p>
         </div>
       </div>
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large orange-text text-darken-2">local_hospital</i>
-          <h5 class="count-up" data-target="200">0</h5>
+          <h5 class="count-up" data-target="{{ funding_requests_count }}">0</h5>
           <p class="flow-text">Cas Financés</p>
         </div>
       </div>
@@ -172,42 +172,42 @@
   </div>
 </section>
 
-<section id="testimonials" class="section grey lighten-3">
+<!--<section id="testimonials" class="section grey lighten-3">
   <div class="container">
     <h4 class="center-align light">Ce qu'ils disent de nous</h4>
     <div class="carousel carousel-slider center" data-indicators="true">
-      <div class="carousel-fixed-item center">
+     &lt;!&ndash; <div class="carousel-fixed-item center">
         <a class="btn waves-effect white grey-text darken-text-2 next-carousel">
           <i class="material-icons">chevron_right</i>
         </a>
         <a class="btn waves-effect white grey-text darken-text-2 prev-carousel">
           <i class="material-icons">chevron_left</i>
         </a>
-      </div>
-      <div class="carousel-item blue white-text" href="#one!">
+      </div>&ndash;&gt;
+   &lt;!&ndash;   <div class="carousel-item blue white-text" href="#one!">
         <div class="testimonial-content">
-          <img src="{% static 'img/avatar/avatar1.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
+          <img src="{% static 'img/avatar/avatar1.png' %}" alt  ="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
           <p class="flow-text">"Grâce à SOS Guinée, j'ai pu retrouver mon enfant disparu en un temps record. Une plateforme indispensable pour notre communauté!"</p>
           <h5 class="light">- Mariam Diallo</h5>
         </div>
-      </div>
-      <div class="carousel-item orange white-text" href="#two!">
+      </div>&ndash;&gt;
+      &lt;!&ndash;<div class="carousel-item orange white-text" href="#two!">
         <div class="testimonial-content">
           <img src="{% static 'img/avatar/avatar2.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
           <p class="flow-text">"Le soutien financier reçu via SOS Guinée a été vital pour le traitement de ma sœur. Un immense merci à tous les donateurs!"</p>
           <h5 class="light">- Alpha Barry</h5>
         </div>
-      </div>
-      <div class="carousel-item red white-text" href="#three!">
+      </div>&ndash;&gt;
+      &lt;!&ndash;<div class="carousel-item red white-text" href="#three!">
         <div class="testimonial-content">
           <img src="{% static 'img/avatar/avatar3.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
           <p class="flow-text">"Je suis bénévole et je suis fier de faire partie de cette initiative qui apporte un réel changement dans la vie des Guinéens."</p>
           <h5 class="light">- Fatoumata Camara</h5>
         </div>
-      </div>
+      </div>&ndash;&gt;
     </div>
   </div>
-</section>
+</section>-->
 
 {% include 'page/components/contact_form.html' %}
 
@@ -230,8 +230,8 @@
     <i class="large material-icons">add</i>
   </a>
   <ul>
-    <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="Alerte de perte" href="{% url 'add_loss_alert' %}"><i class="material-icons">alarm_add</i></a></li>
-    <li><a class="btn-floating orange tooltipped" data-position="left" data-tooltip="Demande de financement" href="{% url 'add_funding_request' %}"><i class="material-icons">local_hospital</i></a></li>
+    <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="Alerte de perte" href="{% url 'add_loss_alert' %}"><i class="material-icons">add_alert</i></a></li>
+    <li><a class="btn-floating orange tooltipped" data-position="left" data-tooltip="Demande de financement" href="{% url 'add_funding_request' %}"><i class="material-icons">volunteer_activism</i></a></li>
   </ul>
 </div>
 
@@ -244,22 +244,22 @@
     M.Parallax.init(elemsParallax);
 
     // Initialisation du Carousel pour les témoignages
-    var elemsCarousel = document.querySelectorAll('.carousel.carousel-slider');
-    var instancesCarousel = M.Carousel.init(elemsCarousel, {
-      fullWidth: true,
-      indicators: true,
-      onCycleTo: function(item) {
-        // Optionnel: ajouter des animations ou des changements de style lors du cycle
-      }
-    });
-
-    // Contrôles de navigation du carousel
-    document.querySelector('.next-carousel').addEventListener('click', function() {
-      instancesCarousel.next();
-    });
-    document.querySelector('.prev-carousel').addEventListener('click', function() {
-      instancesCarousel.prev();
-    });
+    // var elemsCarousel = document.querySelectorAll('.carousel.carousel-slider');
+    // var instancesCarousel = M.Carousel.init(elemsCarousel, {
+    //   fullWidth: true,
+    //   indicators: true,
+    //   onCycleTo: function(item) {
+    //     // Optionnel: ajouter des animations ou des changements de style lors du cycle
+    //   }
+    // });
+    //
+    // // Contrôles de navigation du carousel
+    // document.querySelector('.next-carousel').addEventListener('click', function() {
+    //   instancesCarousel.next();
+    // });
+    // document.querySelector('.prev-carousel').addEventListener('click', function() {
+    //   instancesCarousel.prev();
+    // });
 
     // Initialisation des Materialboxed images
     var elemsMaterialboxed = document.querySelectorAll('.materialboxed');
