@@ -33,6 +33,7 @@
   <div class="container">
     <h4 class="light">Notre Impact en Chiffres</h4>
     <div class="row">
+      {% if total_impact and total_impact >   0 %}
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large blue-text text-darken-2">people</i>
@@ -40,6 +41,9 @@
           <p class="flow-text">Vies Impactées</p>
         </div>
       </div>
+      {% endif %}
+
+      {% if loss_alerts_count and loss_alerts_count > 0 %}
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large red-text text-darken-2">warning</i>
@@ -47,6 +51,9 @@
           <p class="flow-text">Alertes Traitées</p>
         </div>
       </div>
+      {% endif %}
+
+      {% if funding_requests_count and funding_requests_count > 0 %}
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large orange-text text-darken-2">local_hospital</i>
@@ -54,6 +61,7 @@
           <p class="flow-text">Cas Financés</p>
         </div>
       </div>
+        {% endif %}
     </div>
   </div>
 </section>
