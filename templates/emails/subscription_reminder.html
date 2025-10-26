@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f44336;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rappel d'abonnement</h1>
+        </div>
+        <div class="content">
+            <p>Cher(e) {{ user.username }},</p>
+            <p>Nous espérons que vous vous portez bien. Nous vous rappelons que votre abonnement arrive à échéance dans quelques jours.</p>
+            <p>Pour continuer à bénéficier de tous les avantages de SOS Guinée, n'oubliez pas de renouveler votre abonnement.</p>
+            <p>Avantages de votre abonnement :</p>
+            <ul>
+                <li>Accès illimité à toutes les fonctionnalités</li>
+                <li>Support prioritaire</li>
+                <li>Notifications en temps réel</li>
+                <li>Et bien plus encore...</li>
+            </ul>
+            <a href="{{ site_url }}{% url 'profile' %}" class="button">Renouveler mon abonnement</a>
+        </div>
+        <div class="footer">
+            <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>
+            <p>Si vous ne souhaitez plus recevoir ces rappels, vous pouvez vous désabonner <a href="#">ici</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4caf50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .amount {
+            font-size: 24px;
+            color: #4caf50;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Merci pour votre don!</h1>
+        </div>
+        <div class="content">
+            <p>Cher(e) {{ donation.donor.username }},</p>
+            <p>Nous vous remercions sincèrement pour votre généreuse contribution :</p>
+            <div class="amount">
+                {{ donation.amount|floatformat:0 }} GNF
+            </div>
+            {% if donation.funding_request %}
+            <p>Votre don sera utilisé pour soutenir :</p>
+            <h3>{{ donation.funding_request.title }}</h3>
+            <p>Bénéficiaire : {{ donation.funding_request.beneficiary_name }}</p>
+            {% endif %}
+            <p>Votre soutien fait une réelle différence dans la vie des personnes qui en ont besoin.</p>
+            {% if donation.funding_request %}
+            <a href="{{ site_url }}{% url 'funding_request_details' donation.funding_request.id %}" class="button">Suivre l'avancement</a>
+            {% endif %}
+        </div>
+        <div class="footer">
+            <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>
+            <p>Vous recevrez bientôt votre reçu fiscal par email.</p>
+        </div>
+    </div>
+</body>
+</html>

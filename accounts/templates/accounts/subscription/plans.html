@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Plans d'abonnement - SOS GUINEE{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h2 class="center-align">Nos plans d'abonnement</h2>
+            <p class="center-align">Choisissez le plan qui correspond le mieux à vos besoins</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title center-align">{{ plan.name }}</span>
+                    <div class="center-align">
+                        <h3>{{ plan.price|intcomma }} GNF</h3>
+                        <p>par {{ plan.duration }} mois</p>
+                    </div>
+                    <div class="divider"></div>
+                    <ul class="collection">
+                        {% for feature in plan.features.all %}
+                        <li class="collection-item">
+                            <i class="material-icons tiny">check</i> {{ feature.description }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-action center-align">
+                    {% if user.is_authenticated %}
+                        <button class="btn waves-effect waves-light subscribe-btn" data-plan-id="{{ plan.id }}">
+                            S'abonner
+                            <i class="material-icons right">send</i>
+                        </button>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn waves-effect waves-light">
+                            Connexion pour s'abonner
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h4>Confirmer l'abonnement</h4>
+        <p>Êtes-vous sûr de vouloir souscrire à ce plan ?</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-red btn-flat">Annuler</a>
+        <a href="#!" id="confirmSubscribe" class="modal-close waves-effect waves-green btn">Confirmer</a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser les modals
+    var elems = document.querySelectorAll('.modal');
+    var instances = M.Modal.init(elems);
+    var modalInstance = M.Modal.getInstance(document.getElementById('confirmationModal'));
+    var selectedPlanId = null;
+
+    // Gérer les clics sur les boutons d'abonnement
+    document.querySelectorAll('.subscribe-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            selectedPlanId = this.dataset.planId;
+            modalInstance.open();
+        });
+    });
+
+    // Gérer la confirmation d'abonnement
+    document.getElementById('confirmSubscribe').addEventListener('click', function() {
+        if (selectedPlanId) {
+            const formData = new FormData();
+            formData.append('plan_id', selectedPlanId);
+
+            fetch('{% url "accounts:subscribe" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    M.toast({html: 'Abonnement réussi !', classes: 'green'});
+                    setTimeout(() => window.location.href = '{% url "accounts:profile" %}', 2000);
+                } else {
+                    M.toast({html: data.error || 'Une erreur est survenue', classes: 'red'});
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                M.toast({html: 'Une erreur est survenue', classes: 'red'});
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
