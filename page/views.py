@@ -17,7 +17,7 @@ from page.forms import DonationForm, FundingRequestForm, LossAlertForm, MessageC
     CommentForm
 from django.core.paginator import Paginator
 from page.models import UserDetails
-from sosguinee.utils.sending_email import Utilities
+from sosguinee.utils.email_service import EmailService
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 from django.contrib import messages
@@ -86,13 +86,11 @@ def add_funding_request(request):
             email_subject = 'Demande de financement'
             
             try:
-                print("sending email")
-                Utilities.sending_email(to_email, email_subject, email_template, context)
-                print("email sent")
-            except SMTPException as e:
-                print(e)
-                return render(request, 'page/add_funding_request.html', {'error': 'L\'envoi du mail a été echoué. Veuillez contacter l\'administrateur.'})
-            
+                # Envoyer l'email avec le nouveau service
+                EmailService.send_funding_request_notification(fundingRequest)
+            except Exception as e:
+                print("Erreur d'envoi d'email:", e)
+                messages.error(request, 'L\'envoi du mail a échoué. Votre demande a bien été enregistrée.')
             
             return render(request,'page/confirmation_page/confirmation_funding_request_added.html', {'request':'added'})
         else:
@@ -139,12 +137,11 @@ def add_loss_alert(request):
                 }
                         
             try:
-                print("sending email")
-                Utilities.sending_email(to_email, email_subject, email_template, context)
-                print("email sent")
-            except SMTPException as e:
-                print("email not sent", e)
-                return render(request, 'page/add_loss_alert.html', {'form': form, 'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'}) 
+                # Envoyer l'email avec le nouveau service
+                EmailService.send_alert_notification(lossAlert)
+            except Exception as e:
+                print("Erreur d'envoi d'email:", e)
+                messages.error(request, 'L\'envoi du mail a échoué. Votre alerte a bien été enregistrée.')
           
             return render(request, 'page/confirmation_page/confirmation_loss_alert_added.html',{'request': 'added'} )
         else:

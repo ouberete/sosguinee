@@ -5,6 +5,7 @@ from django.urls import path, include
 from accounts.forms import UserDocumentForm, UserInfosForm, UserLinkForm
 from . import views
 from .views import FORMS
+from .views.subscription_views import subscription_plans, subscribe, cancel_subscription, subscription_status
 
 urlpatterns = [
     path(r'login', views.signin, name="login"),
@@ -20,4 +21,10 @@ urlpatterns = [
     path(r'user-documents', views.UserDocumentView.as_view(), name="user-documents"),
     path(r'user-link', views.UserLinkView.as_view(), name="user-link"),
     path(r'otp-login/', views.otp_login_view, name='otp_login'),
+    
+    # URLs d'abonnement
+    path('subscriptions/plans/', subscription_plans, name='subscription_plans'),
+    path('subscriptions/subscribe/', subscribe, name='subscribe'),
+    path('subscriptions/cancel/', cancel_subscription, name='cancel_subscription'),
+    path('subscriptions/status/', subscription_status, name='subscription_status'),
 ]
