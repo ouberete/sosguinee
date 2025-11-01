@@ -24,9 +24,9 @@ admin.site.site_url = "https://sosguinee.com"
 
 @admin.register(LossAlert)
 class LossAlertAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type_alert_name', 'status_alert_name', 'date_alert', 'priority_badge')
+    list_display = ('name', 'public_id', 'type_alert_name', 'status_alert_name', 'date_alert', 'priority_badge')
     list_filter = ('loss_alert_type', 'loss_alert_status', 'date_alert')
-    search_fields = ('name', 'description')
+    search_fields = ('name', 'description', 'public_id')
     ordering = ('-date_alert',)
     readonly_fields = ('created_at',)
     
@@ -54,11 +54,11 @@ class LossAlertAdmin(admin.ModelAdmin):
 
 @admin.register(FundingRequest)
 class FundingRequestAdmin(admin.ModelAdmin):
-    list_display = ('title', 'beneficiary_name', 'funding_request_status_name', 'funding_amount', 'progress_bar', 'days_remaining')
+    list_display = ('title', 'public_id', 'beneficiary_name', 'funding_request_status_name', 'funding_amount', 'progress_bar', 'days_remaining')
     list_filter = ('funding_request_type', 'funding_request_status', 'created_at')
-    search_fields = ('title', 'beneficiary_name', 'description_needs')
+    search_fields = ('title', 'beneficiary_name', 'description_needs', 'public_id')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'collected_amount')
+    readonly_fields = ('created_at', 'amount_received')
     
     def funding_request_status_name(self, obj):
         return obj.funding_request_status.name if obj.funding_request_status else '-'

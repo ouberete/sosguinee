@@ -55,7 +55,7 @@
                                 <p><strong>Date :</strong> {{ alert.date_alert }}</p>
                             </div>
                             <div class="card-action">
-                                <a href="{% url 'loss_alert_detail' alert.id %}" class="blue-text">Voir les détails</a>
+                                <a href="{% url 'loss_alert_detail_public' alert.public_id %}" class="blue-text">Voir les détails</a>
                             </div>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                                 </div>
                             </div>
                             <div class="card-action">
-                                <a href="{% url 'funding_request_details' request.id %}" class="blue-text">Voir les détails</a>
+                                <a href="{% url 'funding_request_details_public' request.public_id %}" class="blue-text">Voir les détails</a>
                             </div>
                         </div>
                     </div>
@@ -136,7 +136,7 @@
                                     <td>{{ donation.amount|floatformat:0 }} GNF</td>
                                     <td>
                                         {% if donation.funding_request %}
-                                        <a href="{% url 'funding_request_details' donation.funding_request.id %}">
+                                        <a href="{% url 'funding_request_details_public' donation.funding_request.public_id %}">
                                             {{ donation.funding_request.title }}
                                         </a>
                                         {% else %}

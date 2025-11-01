@@ -118,3 +118,28 @@ class EmailService:
             recipient_list=[user.email],
             fail_silently=False
         )
+
+    @staticmethod
+    def send_template_email(recipient_list, subject, template_path, context=None, from_email=None):
+        """Envoie un email basé sur un template arbitraire.
+
+        recipient_list: list of recipient emails
+        subject: email subject
+        template_path: path to django template for html body
+        context: dict context passed to template
+        from_email: optional from email (defaults to settings.EMAIL_HOST_USER)
+        """
+        if context is None:
+            context = {}
+        html_message = render_to_string(template_path, context)
+        plain_message = strip_tags(html_message)
+        sender = from_email or settings.EMAIL_HOST_USER
+
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            html_message=html_message,
+            from_email=sender,
+            recipient_list=recipient_list,
+            fail_silently=False
+        )

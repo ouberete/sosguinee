@@ -155,8 +155,12 @@ def add_loss_alert(request):
         form = LossAlertForm()
     return render(request, 'page/add_loss_alert.html', {'form': form})
 
-def funding_request_detail(request, pk):
-    funding_request = get_object_or_404(FundingRequest, pk=pk)
+def funding_request_detail(request, pk=None, public_id=None):
+    if pk is not None:
+        funding_request = get_object_or_404(FundingRequest, pk=pk)
+        return redirect('funding_request_details_public', public_id=funding_request.public_id, permanent=True)
+    else:
+        funding_request = get_object_or_404(FundingRequest, public_id=public_id)
 
     # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(FundingRequest)
@@ -172,9 +176,13 @@ def funding_request_detail(request, pk):
         'object_id': funding_request.id
     })
 
-def loss_alert_detail(request, pk):
+def loss_alert_detail(request, pk=None, public_id=None):
     #alert = LossAlert()
-    alert = get_object_or_404(LossAlert, pk=pk)
+    if pk is not None:
+        alert = get_object_or_404(LossAlert, pk=pk)
+        return redirect('loss_alert_detail_public', public_id=alert.public_id, permanent=True)
+    else:
+        alert = get_object_or_404(LossAlert, public_id=public_id)
 
     # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(LossAlert)
@@ -211,7 +219,7 @@ def contact(request):
             mail_subject = "Message de contact"
             try:
                 print("sending email")
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
             except SMTPException as e:
                 print("email not sent", e)
@@ -297,7 +305,7 @@ def donation(request):
             mail_subject = "Don de financement"
             try:
                 print("sending email")
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
             except SMTPException as e:
                 print("email not sent", e)
@@ -336,8 +344,7 @@ def messageContact(request):
             template_email = 'page/template_email/contact_form_email.html'
             try:
                 print("sending email")
-                
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
 
                 print("email sent")
             except SMTPException as e:
@@ -419,10 +426,11 @@ class FundingRequestListView(View):
                     'funding_request_status': element.funding_request_status_name,  # Utilise la propriété funding_request_status_name
                     'principal_image_url': element.principal_image.url if element.principal_image else '', 
                     'id': element.id,
+                    'public_id': str(element.public_id),
                     'progress': element.progress,  # Utilise la propriété progress
                     'days_remaining': element.days_remaining,  # Utilise la propriété days_remaining
                     'amount': element.funding_amount,
-                    'details_url': "/funding-request-details/"+str(element.id)+"/",          
+                    'details_url': "/funding-request-details/"+str(element.public_id)+"/",          
                 }
                 for element in page_obj
             ],
@@ -484,7 +492,8 @@ class LossAlertListView(View):
                     'date_alert': element.date_alert,
                     'hour_alert': element.hour_alert,
                     'id': element.id,
-                    'details_url': "/loss-alert-details/"+str(element.id)+"/",  # URL des détails de l'alerte
+                    'public_id': str(element.public_id),
+                    'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des détails de l'alerte
                 }
                 for element in page_obj
             ],
@@ -503,8 +512,12 @@ class LossAlertListView(View):
 def donation_thanks(request):
     return render(request, 'page/donation_thanks.html')
 
-def paycard_funding(request, pk):
-    funding_request = get_object_or_404(FundingRequest, pk=pk)
+def paycard_funding(request, pk=None, public_id=None):
+    if pk is not None:
+        funding_request = get_object_or_404(FundingRequest, pk=pk)
+        return redirect('paycard_funding_public', public_id=funding_request.public_id, permanent=True)
+    else:
+        funding_request = get_object_or_404(FundingRequest, public_id=public_id)
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
         return redirect('paycard_funding', pk)
@@ -513,8 +526,11 @@ def paycard_funding(request, pk):
 
 
 @csrf_protect
-def start_paycard_funding_payment(request, funding_id):
-    funding_request = FundingRequest.objects.filter(id=funding_id).first()
+def start_paycard_funding_payment(request, funding_id=None, funding_public_id=None):
+    if funding_id is not None:
+        funding_request = FundingRequest.objects.filter(id=funding_id).first()
+    else:
+        funding_request = FundingRequest.objects.filter(public_id=funding_public_id).first()
 
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
@@ -584,7 +600,7 @@ def start_paycard_funding_payment(request, funding_id):
                 mail_subject = "Financement de demande de financement"
                 try:
                     print("sending email")
-                    Utilities.sending_email(to_email, mail_subject, template_email, context)
+                    EmailService.send_template_email(to_email, mail_subject, template_email, context)
                     print("email sent")
                 except SMTPException as e:
                     print("email not sent", e)
@@ -606,10 +622,13 @@ def start_paycard_funding_payment(request, funding_id):
     return redirect('paycard_funding', funding_id)
 
 
-def paycard_payment_callback(request, payment_id, type):
+def paycard_payment_callback(request, payment_id=None, type=None, payment_public_id=None):
     # Logique de validation possible ici (optionnel : appel à PayCard pour vérifier)
     #Update le statut du paiement
-    payment = FundPayment.objects.filter(id=payment_id).first()
+    if payment_id is not None:
+        payment = FundPayment.objects.filter(id=payment_id).first()
+    else:
+        payment = FundPayment.objects.filter(public_id=payment_public_id).first()
     if payment:
         payment.status = 'réussi'
         payment.save()
@@ -704,5 +723,6 @@ def report_comment(request, comment_id):
         return JsonResponse({'success': True, 'message': 'Le commentaire a été signalé'})
     except Comment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Commentaire introuvable'}, status=404)
+
 
 

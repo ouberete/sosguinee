@@ -28,14 +28,14 @@
     </div>
     <div class="card-action">
       {% if is_funding %}
-      <a href="{% url 'funding_request_details' item.id %}" class="blue-text text-darken-2">PLUS D'INFOS</a>
-      <a href="{% url 'paycard_funding' item.id %}" class="btn-small green waves-effect waves-light">
+      <a href="{% url 'funding_request_details_public' item.public_id %}" class="blue-text text-darken-2">PLUS D'INFOS</a>
+      <a href="{% url 'paycard_funding_public' item.public_id %}" class="btn-small green waves-effect waves-light">
         <i class="material-icons left">payments</i> Financer
       </a>
       <a href="#" class="right social-icon"><i class="fab fa-facebook-f"></i></a>
       <a href="#" class="right social-icon"><i class="fab fa-twitter"></i></a>
       {% else %}
-      <a href="{% url 'loss_alert_detail' item.id %}" class="btn-small red waves-effect waves-light">Voir Détails</a>
+      <a href="{% url 'loss_alert_detail_public' item.public_id %}" class="btn-small red waves-effect waves-light">Voir Détails</a>
       <a href="#" class="btn-small blue right waves-effect waves-light">Contacter</a>
       {% endif %}
     </div>

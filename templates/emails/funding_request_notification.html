@@ -64,7 +64,7 @@
                 <li><strong>Statut :</strong> {{ funding_request.funding_request_status }}</li>
             </ul>
             <p>Nous vous notifierons dès qu'il y aura des contributions à votre demande.</p>
-            <a href="{{ site_url }}{% url 'funding_request_details' funding_request.id %}" class="button">Voir les détails</a>
+            <a href="{{ site_url }}{% url 'funding_request_details_public' funding_request.public_id %}" class="button">Voir les détails</a>
         </div>
         <div class="footer">
             <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>

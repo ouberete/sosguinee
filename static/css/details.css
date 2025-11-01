@@ -1,90 +1,60 @@
+/* Detail page improved styles: responsive and no fixed heights */
+
+.detail-main-image .card-image {
+  position: relative;
+  padding-bottom: 62%; /* taller aspect for detail images */
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.detail-main-image .card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.card-infos {
+  height: auto;
+}
+
+.detail-info p b, .detail-info ul li b {
+  margin-right: 1rem;
+}
+
+.responsive-img{
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: cover;
+}
+
+@media screen and (max-width: 600px) {
+  .responsive-img{
+    max-height: 320px;
+  }
+}
+
+td{
+  vertical-align: middle;
+  font-size: 1.05rem;
+  word-break: break-word;
+}
+
+.content-text-break{
+  word-break: break-word;
+}
+
+.detail-main-image .badge, .card .badge {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.social-share-buttons a { color: #2b2b2b; font-size: 1.6rem; }
 
     .card .card-image img {
+
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .p-1{
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-
-    .p-2{
-      padding-right: 2rem;
-      padding-left: 2rem;
-    }
-
-    .pa-1{
-      padding: 1rem;
-    }
-
-    .pa-2{
-      padding: 2rem;
-    }
-
-    .full-size-image{
-      width: 100%;
-      height: 600px !important;
-      object-fit: cover !important;
-      border: 1px solid red;
-    }
-
-    .full-size-image-fund{
-      height: 690px !important;
-      object-fit: cover !important;
-      border: 1px solid red;
-    }
-
-    .full-h-100{
-      height: 100% !important;
-    }
-
-    .full-h-50{
-      height: 50% !important;
-    }
-
-    .full-w-100{
-      width: 100% !important;
-    }
-
-    .full-w-50{
-      width: 50% !important;
-    }
-
-    .card-infos{
-      height: auto !important;
-    }
-
-    .detail-item{
-    
-    }
-
-    .detail-info p b, .detail-info ul li b {
-      margin-right: 2rem;
-    }
-
-    .responsive-img{
-      width: 100%;
-      height: 300px !important;
-      object-fit: cover;
-    }
-
-    @media screen and (max-width: 600px) {
-      .responsive-img{
-        width: 250px !important;
-        height: 300px !important;
-      }
-    }
-
-    td{
-      vertical-align: middle;
-      font-size: 1.2rem;
-      word-break: break-all !important;
-    }
-
-    .content-text-break{
-      word-break: break-all !important;
-    }
-
 
