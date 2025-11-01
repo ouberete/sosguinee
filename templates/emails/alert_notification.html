@@ -56,7 +56,7 @@
                 <li><strong>Statut :</strong> {{ alert.status_alert }}</li>
             </ul>
             <p>Nous vous tiendrons informé de tout développement concernant votre alerte.</p>
-            <a href="{{ site_url }}{% url 'loss_alert_detail' alert.id %}" class="button">Voir les détails</a>
+            <a href="{{ site_url }}{% url 'loss_alert_detail_public' alert.public_id %}" class="button">Voir les détails</a>
         </div>
         <div class="footer">
             <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>

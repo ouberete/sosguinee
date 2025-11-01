@@ -64,7 +64,7 @@
             {% endif %}
             <p>Votre soutien fait une réelle différence dans la vie des personnes qui en ont besoin.</p>
             {% if donation.funding_request %}
-            <a href="{{ site_url }}{% url 'funding_request_details' donation.funding_request.id %}" class="button">Suivre l'avancement</a>
+            <a href="{{ site_url }}{% url 'funding_request_details_public' donation.funding_request.public_id %}" class="button">Suivre l'avancement</a>
             {% endif %}
         </div>
         <div class="footer">

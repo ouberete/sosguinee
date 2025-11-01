@@ -60,7 +60,7 @@
             <h3>{{ donation.funding_request.title }}</h3>
             <p>Progression actuelle : {{ donation.funding_request.progress }}%</p>
             <p>Montant total collecté : {{ donation.funding_request.collected_amount|floatformat:0 }} GNF</p>
-            <a href="{{ site_url }}{% url 'funding_request_details' donation.funding_request.id %}" class="button">Voir les détails</a>
+            <a href="{{ site_url }}{% url 'funding_request_details_public' donation.funding_request.public_id %}" class="button">Voir les détails</a>
         </div>
         <div class="footer">
             <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>

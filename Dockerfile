@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-LABEL authors="ouber"
+LABEL authors="ouberete"
 
 ENTRYPOINT ["top", "-b"]
 #Dockerfile to run django python application in a container

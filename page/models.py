@@ -1,6 +1,7 @@
 from datetime import datetime
 from email.policy import default
 from random import choices
+import uuid
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User
@@ -11,6 +12,8 @@ from page.middleware import get_current_user
 
 
 class BaseEntity(models.Model):
+    # Final: enforce uniqueness and non-null after backfill
+    public_id = models.UUIDField(default=uuid.uuid4, db_index=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     #id = models.UUIDField(primary_key=True, )
@@ -430,6 +433,8 @@ class MessageContact(BaseEntity):
     message = models.TextField(verbose_name='Message')
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telephone')
     date_contact = models.DateTimeField(default=timezone.now, verbose_name='Date de contact', blank=True, null=True)
+    is_read = models.BooleanField(default=False, verbose_name='Lu')
+
     class Meta:
         verbose_name = 'Message de contact'
         verbose_name_plural = 'Messages de contact'
