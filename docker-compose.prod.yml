@@ -1,45 +1,41 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    container_name: sosguinee_db
+    environment:
+      - POSTGRES_DB=sosguinee
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=SEREma@2024
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
   web:
     build: .
-    container_name: sosguinee_web_prod
-    # La commande utilise Gunicorn pour un serveur de production
+    container_name: sosguinee_web
     command: gunicorn sosguinee.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      # Volumes pour les fichiers statiques et media
+      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
-    expose:
-      # Expose le port 8000 uniquement aux autres services du réseau Docker (comme Nginx)
-      - 8000
+    ports:
+      - "8000:8000"
     environment:
-      # Variables d'environnement pour la connexion à la base de données
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=db  # Le nom du service de la base de données
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DEBUG=0 # Mettre DEBUG à 0 pour la production
-    # Dépend du service 'db', 'web' ne démarrera qu'après 'db'
+      - DEBUG=0
+      - USE_POSTGRES=True
+      - POSTGRES_NAME=sosguinee
+      - POSTGRES_USER=sosguinee_user
+      - POSTGRES_PASSWORD=motdepassefort
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - ALLOWED_HOSTS=127.0.0.1,localhost,EC2_PUBLIC_IP
     depends_on:
       - db
+    restart: always
 
-  db:
-    # Utilise l'image officielle de PostgreSQL
-    image: postgres:13
-    container_name: sosguinee_db_prod
-    volumes:
-      # Monte un volume pour que les données de la BDD persistent
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      # Ces variables sont utilisées par l'image PostgreSQL pour initialiser la BDD
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-# Définition des volumes nommés
 volumes:
-  postgres_data:
+  pgdata:
   static_volume:
   media_volume:
