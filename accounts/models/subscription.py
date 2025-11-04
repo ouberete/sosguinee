@@ -1,8 +1,10 @@
 from django.db import models
+import uuid
 from django.contrib.auth.models import User
 from django.utils import timezone
 
 class SubscriptionPlan(models.Model):
+    public_id = models.UUIDField(default=uuid.uuid4, db_index=True, editable=False, null=True, blank=True, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -15,6 +17,7 @@ class SubscriptionPlan(models.Model):
         return self.name
 
 class UserSubscription(models.Model):
+    public_id = models.UUIDField(default=uuid.uuid4, db_index=True, editable=False, null=True, blank=True, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription')
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.SET_NULL, null=True)
     start_date = models.DateTimeField(default=timezone.now)
@@ -39,6 +42,7 @@ class UserSubscription(models.Model):
         return max(0, delta.days)
 
 class SubscriptionPayment(models.Model):
+    public_id = models.UUIDField(default=uuid.uuid4, db_index=True, editable=False, null=True, blank=True, unique=True)
     STATUS_CHOICES = (
         ('pending', 'En attente'),
         ('completed', 'Complété'),

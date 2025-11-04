@@ -28,7 +28,7 @@ class LossAlertAdmin(admin.ModelAdmin):
     list_filter = ('loss_alert_type', 'loss_alert_status', 'date_alert')
     search_fields = ('name', 'description', 'public_id')
     ordering = ('-date_alert',)
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at', 'public_id')
     
     def type_alert_name(self, obj):
         return obj.loss_alert_type.name if obj.loss_alert_type else '-'
@@ -58,7 +58,7 @@ class FundingRequestAdmin(admin.ModelAdmin):
     list_filter = ('funding_request_type', 'funding_request_status', 'created_at')
     search_fields = ('title', 'beneficiary_name', 'description_needs', 'public_id')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'amount_received')
+    readonly_fields = ('created_at', 'amount_received', 'public_id')
     
     def funding_request_status_name(self, obj):
         return obj.funding_request_status.name if obj.funding_request_status else '-'
@@ -81,11 +81,11 @@ class FundingRequestAdmin(admin.ModelAdmin):
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
-    list_display = ('donor_name', 'amount', 'created_at', 'status')
+    list_display = ('public_id', 'donor_name', 'amount', 'created_at', 'status')
     list_filter = ('status', 'created_at')
-    search_fields = ('donor_first_name', 'donor_last_name', 'donor_email')
+    search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'donor_email')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'transaction_id')
+    readonly_fields = ('created_at', 'transaction_id', 'public_id')
     
     def donor_name(self, obj):
         return f"{obj.donor_first_name} {obj.donor_last_name}"
@@ -93,11 +93,11 @@ class DonationAdmin(admin.ModelAdmin):
 
 @admin.register(FundPayment)
 class FundPaymentAdmin(admin.ModelAdmin):
-    list_display = ('funding_request_link', 'donor_name', 'amount', 'status', 'created_at')
+    list_display = ('public_id', 'funding_request_link', 'donor_name', 'amount', 'status', 'created_at')
     list_filter = ('status', 'created_at')
-    search_fields = ('donor_first_name', 'donor_last_name', 'funding_request__title')
+    search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'funding_request__title')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'transaction_id')
+    readonly_fields = ('created_at', 'transaction_id', 'public_id')
     
     def funding_request_link(self, obj):
         url = reverse('admin:page_fundingrequest_change', args=[obj.funding_request.id])
@@ -110,11 +110,11 @@ class FundPaymentAdmin(admin.ModelAdmin):
 
 @admin.register(MessageContact)
 class MessageContactAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'created_at', 'is_read')
+    list_display = ('public_id', 'name', 'email', 'created_at', 'is_read')
     list_filter = ('is_read', 'created_at')
-    search_fields = ('name', 'email', 'message')
+    search_fields = ('public_id', 'name', 'email', 'message')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at', 'public_id')
     
     actions = ['mark_as_read', 'mark_as_unread']
     
@@ -127,11 +127,42 @@ class MessageContactAdmin(admin.ModelAdmin):
     mark_as_unread.short_description = "Marquer comme non lu"
 
 # Enregistrement des autres modèles avec des configurations simples
-admin.site.register(LossAlertType)
-admin.site.register(FundingType)
-admin.site.register(LossAlertStatus)
-admin.site.register(FundingRequestStatus)
-admin.site.register(Comment)
+@admin.register(LossAlertType)
+class LossAlertTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'public_id', 'created_at')
+    search_fields = ('name', 'public_id', 'description')
+    ordering = ('name',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+
+@admin.register(FundingType)
+class FundingTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'public_id', 'created_at')
+    search_fields = ('name', 'public_id', 'description')
+    ordering = ('name',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+
+@admin.register(LossAlertStatus)
+class LossAlertStatusAdmin(admin.ModelAdmin):
+    list_display = ('name', 'public_id', 'created_at')
+    search_fields = ('name', 'public_id', 'description')
+    ordering = ('name',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+
+@admin.register(FundingRequestStatus)
+class FundingRequestStatusAdmin(admin.ModelAdmin):
+    list_display = ('name', 'public_id', 'created_at')
+    search_fields = ('name', 'public_id', 'description')
+    ordering = ('name',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'public_id', 'user', 'created_at')
+    search_fields = ('public_id', 'text', 'user__username')
+    ordering = ('-created_at',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
 
 # Personnalisation du tableau de bord admin
 class CustomAdminSite(admin.AdminSite):

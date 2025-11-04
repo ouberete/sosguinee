@@ -34,7 +34,7 @@
                 </div>
                 <div class="card-action center-align">
                     {% if user.is_authenticated %}
-                        <button class="btn waves-effect waves-light subscribe-btn" data-plan-id="{{ plan.id }}">
+                        <button class="btn waves-effect waves-light subscribe-btn" data-plan-public-id="{{ plan.public_id }}">
                             S'abonner
                             <i class="material-icons right">send</i>
                         </button>
@@ -71,21 +71,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('.modal');
     var instances = M.Modal.init(elems);
     var modalInstance = M.Modal.getInstance(document.getElementById('confirmationModal'));
-    var selectedPlanId = null;
+    var selectedPlanPublicId = null;
 
     // Gérer les clics sur les boutons d'abonnement
     document.querySelectorAll('.subscribe-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            selectedPlanId = this.dataset.planId;
+            selectedPlanPublicId = this.dataset.planPublicId;
             modalInstance.open();
         });
     });
 
     // Gérer la confirmation d'abonnement
     document.getElementById('confirmSubscribe').addEventListener('click', function() {
-        if (selectedPlanId) {
+        if (selectedPlanPublicId) {
             const formData = new FormData();
-            formData.append('plan_id', selectedPlanId);
+            formData.append('plan_public_id', selectedPlanPublicId);
 
             fetch('{% url "accounts:subscribe" %}', {
                 method: 'POST',

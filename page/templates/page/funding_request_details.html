@@ -74,7 +74,7 @@
             </a>
             {% endif %}
             {% if funding_request.funding_request_status.name == "En cours" %}
-            <a href="{% url 'paycard_funding' funding_request.id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
+            <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
               <i class="material-icons left">payments</i> Financer
             </a>
             {% endif %}
