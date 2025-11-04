@@ -123,9 +123,9 @@ if USE_POSTGRES:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": config("POSTGRES_NAME", default="postgres"),
+            "NAME": config("POSTGRES_NAME", default="sosguinee"),
             "USER": config("POSTGRES_USER", default="postgres"),
-            "PASSWORD": config("POSTGRES_PASSWORD", default="postgres"),
+            "PASSWORD": config("POSTGRES_PASSWORD", default="SEREma@2024"),
             "HOST": config("POSTGRES_HOST", default="db"),  # service Docker
             "PORT": config("POSTGRES_PORT", default="5432"),
         }
