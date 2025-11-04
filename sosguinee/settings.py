@@ -27,27 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-nqbfqt50fhyj158=c)nmfiw6_-8sv9ffzd#l+k=ojy-a=o+hav"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
 
-ALLOWED_HOSTS = []
-
-STATIC_URL = (
-    "/static/"  # URL to use when referring to static files located in STATICFILES_DIRS
-)
-
-# Additional locations of static files
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-# The directory where collected static files will be stored
+# --- STATIC & MEDIA ---
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-
-#Media Files
 MEDIA_URL = "/media/"
-
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Application definition
@@ -129,39 +117,26 @@ WSGI_APPLICATION = "sosguinee.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 # Database MongoDB for SOS Guineense
-
-
-DATABASES = {
-    
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config("POSTGRES_NAME", cast=str),
-        'USER': config("POSTGRES_USER", cast=str),
-        'PASSWORD': config("POSTGRES_PASSWORD", cast=str),
-        'HOST': config("POSTGRES_HOST", cast=str, default="localhost"),
-        'PORT': config("POSTGRES_PORT", cast=str, default="5432"),
-    },
-    
-    #Sqlite database for local development
-     'default': {
-         'ENGINE': 'django.db.backends.sqlite3',
-         'NAME': BASE_DIR / "db.sqlite3",
-     },
-    
-    # MySQL database for local development
-    
-     
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': 'crowdsily',
-#             'USER': 'ouberete',
-#             'PASSWORD': 'SEREma@2024',
-#             'HOST': 'localhost',  # Par exemple : 'localhost' ou une adresse IP
-#             'PORT': '3308',  # Le port par défaut de MySQL est 3306
-#         } """
-
-}
-
+# --- DATABASES ---
+USE_POSTGRES = config("USE_POSTGRES", default=False, cast=bool)
+if USE_POSTGRES:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("POSTGRES_NAME", default="postgres"),
+            "USER": config("POSTGRES_USER", default="postgres"),
+            "PASSWORD": config("POSTGRES_PASSWORD", default="postgres"),
+            "HOST": config("POSTGRES_HOST", default="db"),  # service Docker
+            "PORT": config("POSTGRES_PORT", default="5432"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 """ 
 DATABASES = {
     'default': {

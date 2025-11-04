@@ -1,21 +1,24 @@
-FROM ubuntu:latest
-LABEL authors="ouberete"
-
-ENTRYPOINT ["top", "-b"]
-#Dockerfile to run django python application in a container
-# Use the official Python image from the Docker Hub
-# Use the official Python image from the Docker Hub
+# Dockerfile pour Django (développement / simple)
 FROM python:3.9-slim
-# Set the working directory in the container
+
+# Assure des locales et OS deps minimum
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /app
-# Copy the requirements file into the container
+
+# OS deps utiles (psycopg2, pillow, etc. au cas où)
+RUN apt-get update && apt-get install -y build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copier les dépendances Python en premier pour profiter du cache
 COPY requirements.txt .
-# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-# Copy the rest of the application code into the container
+
+# Copier le reste du code
 COPY . .
-# Expose the port that the Django application will run on
+
+# Exposer le port Django
 EXPOSE 8000
-# Run the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-# Use the official Ubuntu image from the Docker Hub
+
+# Par défaut on laisse la commande à compose (voir docker-compose.yml)

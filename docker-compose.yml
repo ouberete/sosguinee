@@ -1,27 +1,41 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    container_name: sosguinee_db
+    environment:
+      - POSTGRES_DB=sosguinee
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=SEREma@2024
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
   web:
-    # Construit l'image à partir du Dockerfile dans le répertoire courant
     build: .
-    # Nom du conteneur
-    container_name: sosguinee_web_sqlite
-    # Commande pour lancer le serveur de développement Django.
-    # Ceci surcharge le CMD du Dockerfile.
-    command: python manage.py runserver 0.0.0.0:8000
-    # Lie le répertoire courant du projet au répertoire /app dans le conteneur.
-    # Permet le rechargement à chaud (hot-reloading) lors des modifications de code.
+    container_name: sosguinee_web
+    command: gunicorn sosguinee.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
-      # Volume pour la base de données SQLite pour qu'elle persiste
-      - sqlite_data:/app
-    # Mappe le port 8000 du conteneur au port 8000 de votre machine hôte.
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
     ports:
       - "8000:8000"
-    # Nom de la base de données SQLite
     environment:
-      - SQLITE_DATABASE=db.sqlite3
+      - DEBUG=0
+      - USE_POSTGRES=True
+      - POSTGRES_NAME=sosguinee
+      - POSTGRES_USER=sosguinee_user
+      - POSTGRES_PASSWORD=motdepassefort
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - ALLOWED_HOSTS=127.0.0.1,localhost,EC2_PUBLIC_IP
+    depends_on:
+      - db
+    restart: always
 
-# Définit un volume nommé pour stocker la base de données
 volumes:
-  sqlite_data:
+  pgdata:
+  static_volume:
+  media_volume:
