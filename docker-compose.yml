@@ -26,11 +26,11 @@ services:
       - DEBUG=0
       - USE_POSTGRES=True
       - POSTGRES_NAME=sosguinee
-      - POSTGRES_USER=sosguinee_user
-      - POSTGRES_PASSWORD=motdepassefort
-      - POSTGRES_HOST=db
+      - POSTGRES_DB=sosguinee
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=SEREma@2024
       - POSTGRES_PORT=5432
-      - ALLOWED_HOSTS=127.0.0.1,localhost,EC2_PUBLIC_IP
+      - ALLOWED_HOSTS=127.0.0.1,localhost,18.170.114.4
     depends_on:
       - db
     restart: always
