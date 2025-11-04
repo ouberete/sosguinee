@@ -41,7 +41,7 @@ services:
       - POSTGRES_NAME=sosguinee
       - POSTGRES_DB=sosguinee
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=SEREma@2024
+      - POSTGRES_PASSWORD=SEREma@2025
       - POSTGRES_PORT=5432
       - ALLOWED_HOSTS=127.0.0.1,localhost,18.170.114.4
     depends_on:
