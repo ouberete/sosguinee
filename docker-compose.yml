@@ -20,7 +20,7 @@ services:
     environment:
       - POSTGRES_DB=sosguinee
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=SEREma@2024
+      - POSTGRES_PASSWORD=SEREma@2025
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
