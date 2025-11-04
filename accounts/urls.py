@@ -5,7 +5,14 @@ from django.urls import path, include
 from accounts.forms import UserDocumentForm, UserInfosForm, UserLinkForm
 from . import views
 from . import views
-from .views.subscription_views import subscription_plans, subscribe, cancel_subscription, subscription_status
+from .views.subscription_views import (
+    subscription_plans,
+    subscribe,
+    cancel_subscription,
+    subscription_status,
+    plan_detail_by_public_id,
+    payment_detail_by_public_id,
+)
 
 urlpatterns = [
     path(r'login', views.signin, name="login"),
@@ -27,4 +34,7 @@ urlpatterns = [
     path('subscriptions/subscribe/', subscribe, name='subscribe'),
     path('subscriptions/cancel/', cancel_subscription, name='cancel_subscription'),
     path('subscriptions/status/', subscription_status, name='subscription_status'),
+    # API (lecture par UUID)
+    path('api/subscriptions/plans/<uuid:public_id>/', plan_detail_by_public_id, name='subscription_plan_detail_by_public_id'),
+    path('api/subscriptions/payments/<uuid:public_id>/', payment_detail_by_public_id, name='subscription_payment_detail_by_public_id'),
 ]

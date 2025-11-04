@@ -20,7 +20,7 @@
         <p><strong>Description :</strong> {{ funding_request.title }}</p>
         <p><strong>Montant Cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</p>
         <br>
-        <form action="{% url 'funding_paycard_payment' funding_request.id %}" method="post" class="paycard-form">
+        <form action="{% url 'funding_paycard_payment_public' funding_request.public_id %}" method="post" class="paycard-form">
             {% csrf_token %}
             <!-- Informations du donateur -->
             {% if request.user.is_authenticated %}
