@@ -28,7 +28,6 @@ services:
   web:
     build: .
     container_name: sosguinee_web
-    command: gunicorn sosguinee.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
