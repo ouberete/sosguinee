@@ -32,8 +32,7 @@ ALLOWED_HOSTS = ["18.170.114.4", "votre-domaine.com", "localhost", "127.0.0.1"]
 
 # --- STATIC & MEDIA ---
 
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles" 
