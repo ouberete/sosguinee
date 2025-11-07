@@ -120,7 +120,7 @@ WSGI_APPLICATION = "sosguinee.wsgi.application"
 
 # Database MongoDB for SOS Guineense
 # --- DATABASES ---
-USE_POSTGRES = config("USE_POSTGRES", default=False, cast=bool)
+USE_POSTGRES = config("USE_POSTGRES", default=True)
 if USE_POSTGRES:
     DATABASES = {
         "default": {
@@ -320,11 +320,16 @@ django_heroku.settings(locals())
 # Google email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", cast=str, default="smtp.gmail.com")
-EMAIL_PORT =config("EMAIL_PORT",cast=int,default=587)
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER =config("EMAIL_HOST_USER", cast=str, default="contactdevsenior@gmail.com")  # Your Gmail address
+EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
+EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default="contactdevsenior@gmail.com")  # Your Gmail address
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default="mjqk xujs higl cxaw")
+EMAIL_CLIENT_DOMAIN = config("EMAIL_CLIENT_DOMAIN", cast=str, default="localhost")
+
+# Site URL used in emails and links
+SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
+EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=15)
 
 
 print("Email configuration loaded successfully.")

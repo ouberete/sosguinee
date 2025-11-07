@@ -1,0 +1,88 @@
+.card-image img {
+    height: 310px; 
+    object-fit: cover; 
+    width: 100% !important; 
+    margin: 1px;
+}
+
+.card-main {
+    min-height: 400px; 
+    width: auto !important; 
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    background-color: brown;
+
+}
+
+.card-highlight-title p:first-of-type {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    position: relative;
+    min-height: 4.5em; 
+}
+
+.card-highlight-title p:first-of-type:hover::after {
+    content: attr(data-fulltext);
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+    left: 0;
+    top: 100%;
+    z-index: 1;
+    white-space: normal;
+    transform: translateY(5px);
+}
+
+.card-content p:first-of-type:hover::after {
+    content: attr(data-fulltext);
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+    left: 0;
+    top: 100%;
+    z-index: 1;
+    white-space: normal;
+    transform: translateY(5px);
+}
+
+.card-title {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 100%; 
+    display: block; 
+    color: black;
+}
+
+.opacity-05 {
+    opacity: 0.5;
+}
+
+.opacity-08 {
+    opacity: 0.8;
+}
+
+.opacity-02 {
+    opacity: 0.2;
+}
+
+.card-action-share {
+    display: grid;
+    grid-template-columns: 1fr 1fr ;
+    gap: 1;
+}
+
+.social-icone{
+    margin-right: .2rem;
+}

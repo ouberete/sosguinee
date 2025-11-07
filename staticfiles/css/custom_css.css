@@ -1,0 +1,282 @@
+
+/* Styles pour la section Hero */
+.hero-section {
+    min-height: 600px; /* Hauteur minimale pour le parallax */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Assure que le contenu ne déborde pas */
+}
+
+.hero-content {
+    z-index: 10; /* Assure que le texte est au-dessus de l'image parallax */
+    position: relative;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4); /* Overlay sombre pour la lisibilité du texte */
+    border-radius: 8px;
+}
+
+.hero-content h1,.hero-content h5 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.hero-content.btn-large {
+    margin: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+
+
+
+/* Hero Section for List Pages */
+.list-hero-section {
+    min-height: 400px; /* Height for list page hero */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.list-hero-content {
+    z-index: 10;
+    position: relative;
+    padding: 25px 35px; /* Augmenter le padding pour un fond plus large */
+    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Ombre pour la profondeur */
+}
+
+.list-hero-content h1, .list-hero-content h5 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.list-hero-content .btn-large {
+    margin: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Assurez-vous que le texte a une couleur claire pour contraster avec le fond sombre */
+.list-hero-content h1,
+.list-hero-content h5 {
+    color: white; /* Texte blanc */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Ombre pour le texte */
+}
+
+
+/* Card base improvements: responsive, accessible and consistent visuals */
+.card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+    background: #fff;
+}
+
+.card:focus {
+    outline: 3px solid rgba(33,150,243,0.35);
+    outline-offset: 2px;
+}
+
+/* Card image area: responsive height with aspect-ratio fallback */
+.card .card-image {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect by default */
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+.card .card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .35s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.03);
+}
+
+.card .card-content { flex: 1; padding: 16px; }
+.card .card-action { margin-top: auto; padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); }
+
+
+/* Hero Section for Detail Page */
+.detail-hero-section {
+    min-height: 300px; /* Smaller height for detail page hero */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.detail-hero-content {
+    z-index: 10;
+    position: relative;
+    padding: 25px 35px; /* Augmenter le padding */
+    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Ombre pour la profondeur */
+}
+
+.detail-hero-content h1, .detail-hero-content h5 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: white; /* Texte blanc */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Ombre pour le texte */
+}
+
+/*
+ * 1. Transformer la ligne principale en conteneur Flexbox
+ * Ceci force les colonnes enfants (gauche et droite) à avoir la même hauteur.
+ */
+.section > .row:first-child {
+    display: flex;
+    flex-wrap: wrap; /* Assure le passage à la ligne sur les petits écrans */
+}
+
+/*
+ * 2. Forcer la carte de l'image à occuper toute la hauteur de sa colonne
+ * On la transforme aussi en conteneur flex pour contrôler son contenu.
+ */
+/* Detail page: use natural sizing and flex to align content */
+.detail-main-image .card, .card-main-details .card-panel {
+    display: flex;
+    flex-direction: column; /* Aligne les enfants (image, actions) verticalement */
+    min-height: 100%;
+}
+
+/*
+ * 3. Faire en sorte que le conteneur de l'image grandisse
+ * pour occuper tout l'espace vertical disponible dans la carte.
+ */
+.detail-main-image .card .card-image {
+    flex-grow: 1;
+}
+
+/*
+ * 4. Ajuster l'image elle-même pour qu'elle remplisse son conteneur
+ * sans être déformée.
+ */
+.detail-main-image .card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Redimensionne l'image pour remplir le conteneur en conservant son ratio, en la rognant si nécessaire. */
+}
+
+ .loader {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     height: 200px;
+ }
+
+
+/* Conteneur principal en Flex pour égaliser les hauteurs */
+.section > .row:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+/* Colonne image et infos même hauteur */
+.detail-main-image,
+.card-main-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-main-image .card,
+.card-main-details .card-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    height: 100%;
+}
+
+/* Detail image container adjustments */
+.detail-main-image .card .card-image {
+    padding-bottom: 62%; /* taller aspect for detail images */
+    position: relative;
+    background-color: #f5f5f5;
+    overflow: hidden;
+}
+
+.detail-main-image .card .card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Badge de statut en haut à gauche flottant */
+.detail-main-image .card .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background-color: #fbc02d;
+    color: #111;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Boutons en bas du card */
+.detail-main-image .social-share-buttons {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Réduire taille image sans couper */
+.detail-main-image img.materialboxed {
+    object-fit: contain !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 600px !important;
+    margin: auto;
+}
+
+@media (max-width: 992px) {
+    .section > .row:first-child {
+        flex-direction: column;
+    }
+}
+
+.comment-actions {
+    float: right;
+    position: relative;
+}
+.comment-actions .dropdown-content {
+    min-width: 150px;
+}
+
+
+
+
+
