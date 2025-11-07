@@ -221,7 +221,7 @@ def contact(request):
                 print("sending email")
                 EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 return render(request, 'page/contact.html', {'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'})
             contact = MessageContactForm()
@@ -307,7 +307,7 @@ def donation(request):
                 print("sending email")
                 EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
                 return  render(request, 'page/donation.html', {'form': form})
@@ -347,7 +347,7 @@ def messageContact(request):
                 EmailService.send_template_email(to_email, mail_subject, template_email, context)
 
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 return JsonResponse({'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'})
             return JsonResponse( {'success': 'Le message a été envoyé.'})
@@ -602,7 +602,7 @@ def start_paycard_funding_payment(request, funding_id=None, funding_public_id=No
                     print("sending email")
                     EmailService.send_template_email(to_email, mail_subject, template_email, context)
                     print("email sent")
-                except SMTPException as e:
+                except Exception as e:
                     print("email not sent", e)
                     messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
                     return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
@@ -723,6 +723,7 @@ def report_comment(request, comment_id):
         return JsonResponse({'success': True, 'message': 'Le commentaire a été signalé'})
     except Comment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Commentaire introuvable'}, status=404)
+
 
 
 
