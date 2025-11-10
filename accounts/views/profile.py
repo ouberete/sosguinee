@@ -11,12 +11,19 @@ from ..forms import ProfileForm, UserInfosForm, UserDocumentForm, UserLinkForm
 def user_profile(request):
     if request.user.is_authenticated:
         try:
-            profile = UserDetails.objects.get(user=request.user)
+            # Sécurise le fetch même s'il y a des doublons inattendus
+            profile = (
+                UserDetails.objects.filter(user=request.user)
+                .order_by('-created_at')
+                .first()
+            )
+            if profile is None:
+                profile = UserDetails.objects.create(user=request.user)
             user_details = ProfileForm(instance=profile)
 
-            # Récupérer les alertes, demandes de financement et dons de l'utilisateur
-            alerts = LossAlert.objects.filter(user=request.user).order_by('-created_at')
-            funding_requests = FundingRequest.objects.filter(user=request.user).order_by('-created_at')
+            # Récupérer les éléments créés par l'utilisateur
+            alerts = LossAlert.objects.filter(created_by=request.user).order_by('-created_at')
+            funding_requests = FundingRequest.objects.filter(created_by=request.user).order_by('-created_at')
             donations = Donation.objects.filter(donor_email=request.user.email).order_by('-created_at')
 
             countries = dict(UserDetails.COUNTRY_CHOICES)
