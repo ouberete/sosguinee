@@ -166,12 +166,22 @@ class RegisterForm(UserCreationForm):
         return user
 
     def _send_activation_email(self, user):
-        current_site = get_current_site(self.request)
+        
+        if settings.DEBUG:
+            # En local : utilise ton adresse de dev
+            domain = "127.0.0.1:7400"
+            protocol = "http"
+        else:
+            # En production : récupère le domaine configuré
+            domain = "18.170.114.4"
+            protocol = "http"
+            
         token = default_token_generator.make_token(user)
         context = {
             'user': user,
-            'domain': current_site.domain,
+            'domain': domain,
             'uid': user.pk,
+            'protocol': protocol,
             'token': token,
         }
         subject = "Activation de votre compte SOS Guinée"

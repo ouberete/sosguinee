@@ -38,7 +38,14 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles" 
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "mediafiles"
+# Choix explicite selon DEBUG
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / "media"
+else:
+    MEDIA_ROOT = BASE_DIR / "mediafiles"
+import logging
+logger = logging.getLogger(__name__)
+logger.warning(f"MEDIA_ROOT actif : {MEDIA_ROOT}")
 
 # Application definition
 
@@ -192,7 +199,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -335,12 +341,6 @@ EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=15)
 print("Email configuration loaded successfully.")
 print(f"EMAIL_HOST: {EMAIL_HOST}")
 print(f"EMAIL_PORT: {EMAIL_PORT}")
-print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER}")
-print(f"EMAIL_HOST_PASSWORD: {EMAIL_HOST_PASSWORD}")
-print("If you see this message, the email configuration is set up correctly.")
-print("You can now send emails using Django's email backend.")
-print("Make sure to test sending an email to verify everything is working as expected.")
-print("If you encounter any issues, check your email settings and ensure your Gmail account allows less secure apps or use an app password if 2FA is enabled.")
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.

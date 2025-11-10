@@ -1,13 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
 from django.utils.encoding import force_str
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 from ..forms import LoginForm, RegisterForm
+from django.conf import settings
+from sosguinee.utils.utilities import Utilities
 
 def signin(request):
     if request.user.is_authenticated:
@@ -70,10 +78,60 @@ def acount_created(request):
     return render(request, 'accounts/account_created.html')
 
 def reset_password(request):
-    return render(request, 'accounts/reset-password.html')
+    # Simple reset via Django PasswordResetForm
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            users = list(form.get_users(email))
 
+            # Domain/protocol comme pour l'activation
+            if settings.DEBUG:
+                domain = "127.0.0.1:7400"
+                protocol = "http"
+            else:
+                domain = "18.170.114.4"
+                protocol = "http"
+
+            for user in users:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                context = {
+                    'user': user,
+                    'domain': domain,
+                    'uid': uid,
+                    'protocol': protocol,
+                    'token': token,
+                }
+                subject = "Réinitialisation de votre mot de passe"
+                try:
+                    Utilities.sending_email("accounts/emails/password_reset_email.html", [user.email], context, subject)
+                except Exception:
+                    if not settings.DEBUG:
+                        # en prod, on reste silencieux pour éviter de divulguer l'existence des emails
+                        pass
+                    else:
+                        raise
+            messages.success(request, "Si un compte existe pour cet email, un lien de réinitialisation a été envoyé.")
+            return redirect('password_reset_done')
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'accounts/reset_password.html', {"form": form})
+
+@login_required
 def change_password(request):
-    return render(request, 'accounts/password_change.html')
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "Votre mot de passe a été modifié avec succès.")
+            return redirect('profile')
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, 'accounts/change_password.html', {"form": form})
 
 def otp_login_view(request):
     return render(request, 'accounts/otp_login.html')
