@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from page.middleware import get_current_user
@@ -77,6 +78,68 @@ Gender = (
     ('Male', 'Masculin'),
     ('Female', 'Feminin'),
 )
+
+# --- Location hierarchy: Region > Prefecture > Commune > Quarter ---
+class Region(BaseEntity):
+    name = models.CharField(max_length=255, unique=True, verbose_name='Région')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Région'
+        verbose_name_plural = 'Régions'
+        db_table = 'region'
+
+    def __str__(self):
+        return self.name
+
+
+class Prefecture(BaseEntity):
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, related_name='prefectures', verbose_name='Région')
+    name = models.CharField(max_length=255, verbose_name='Préfecture')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('region', 'name')
+        verbose_name = 'Préfecture'
+        verbose_name_plural = 'Préfectures'
+        db_table = 'prefecture'
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Commune(BaseEntity):
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, related_name='communes', verbose_name='Préfecture')
+    name = models.CharField(max_length=255, verbose_name='Commune')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('prefecture', 'name')
+        verbose_name = 'Commune'
+        verbose_name_plural = 'Communes'
+        db_table = 'commune'
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Quarter(BaseEntity):
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, related_name='quarters', verbose_name='Commune')
+    name = models.CharField(max_length=255, verbose_name='Quartier')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('commune', 'name')
+        verbose_name = 'Quartier'
+        verbose_name_plural = 'Quartiers'
+        db_table = 'quarter'
+
+    def __str__(self):
+        return f"{self.name}"
 
 class FundingType(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Type Financement', unique=True)
@@ -171,8 +234,10 @@ class LossAlert(BaseEntity):
     email = models.CharField(max_length=255, null=True, blank=True, verbose_name='Email')
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telephone')
     country = models.CharField(max_length=255, default="Guinée", blank=True, null=True, verbose_name='Pays')
-    city = models.CharField(max_length=255, verbose_name='Ville')
-    quarter = models.CharField(max_length=255, verbose_name='Quartier')
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Région')
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Préfecture')
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Commune')
+    quarter = models.ForeignKey('Quarter', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Quartier')
     address = models.CharField(max_length=255, verbose_name='Adresse')
     date_alert = models.DateField(verbose_name='Date alerte perte')
     hour_alert = models.TimeField(blank=True, null=True, verbose_name='Heure alerte perte')
@@ -234,8 +299,10 @@ class FundingRequest(BaseEntity):
     email = models.CharField(max_length=255, null=True, blank=True, verbose_name='Email')
     phone = models.CharField(max_length=255, verbose_name='Telephone', blank=True, null=True)
     country = models.CharField(max_length=255, default="Guinée", blank=True, null=True)
-    city = models.CharField(max_length=255, verbose_name='Ville')
-    quarter = models.CharField(max_length=255, verbose_name='Quartier', blank=True, null=True)
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Région')
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Préfecture')
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Commune')
+    quarter = models.ForeignKey('Quarter', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Quartier')
     address = models.CharField(max_length=255, verbose_name='Adresse', blank=True, null=True)
     end_date = models.DateField(verbose_name='Date Fin Financement', blank=True, null=True)
     start_date = models.DateField(verbose_name='Date Debut Demande', default=timezone.now, blank=True, null=True)

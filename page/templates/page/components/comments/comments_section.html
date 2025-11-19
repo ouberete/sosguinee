@@ -2,7 +2,7 @@
     {% if user.is_authenticated %}
     <div class="row">
         <div class="col s12">
-            <form id="comment-form" method="post">
+            <form id="comment-form" method="post" action="{% url 'add_comment' model_name object_id %}">
                 {% csrf_token %}
                 {{ comment_form.text }}
                 <button type="submit" class="btn waves-effect waves-light blue">
@@ -28,45 +28,44 @@
         <div class="col s12">
             <h5 class="mt-4">Commentaires récents</h5>
             <div id="comments-list">
-                {% for comment in comments %}
-                <div class="card-panel" id="comment-{{ comment.id }}">
-                    <div class="comment-header">
-                        <strong>{{ comment.user.username }}</strong>
-                        <small class="grey-text text-darken-1"> — {{ comment.created_at|date:"d/m/Y H:i" }}</small>
-                        {% if user %}
-                        <div class="comment-actions">
-                            <a href="#">
-                                <i
-                                   data-target="dropdown-{{ comment.id }}"
-                                   aria-label="Options de commentaire"
-                                   aria-haspopup="true"
-                                   aria-expanded="false" class="dropdown-trigger comment-menu-trigger material-icons">more_vert&nbsp;&nbsp;</i>
-                            </a>
-
-                            <ul id="dropdown-{{ comment.id }}" class="dropdown-content">
-                                <li><a href="#" class="report-comment" data-id="{{ comment.id }}">Signaler</a></li>
-                                {% if user == comment.user %}
-                                <li><a href="#" class="edit-comment" data-id="{{ comment.id }}">Modifier</a></li>
-                                <li><a href="#" class="delete-comment" data-id="{{ comment.id }}">Supprimer</a></li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <p class="comment-text" id="text-{{ comment.id }}">{{ comment.text }}</p>
-                    <form class="edit-form" id="edit-form-{{ comment.id }}" data-id="{{ comment.id }}" style="display:none;">
-                        {% csrf_token %}
-                        <div class="input-field">
-                            <textarea class="materialize-textarea edit-text" id="textarea-{{ comment.id }}">{{ comment.text }}</textarea>
-                        </div>
-                        <button class="btn-small green update-comment" type="submit">Enregistrer</button>
-                        <button class="btn-small grey cancel-edit" type="button">Annuler</button>
-                    </form>
-                </div>
-                {% empty %}
-                <p class="grey-text center-align">Aucun commentaire pour l’instant.</p>
-                {% endfor %}
+                {% if comments %}
+                    {% for comment in comments %}
+                        {% include 'page/components/comments/comment_item.html' with comment=comment user=user %}
+                    {% endfor %}
+                {% else %}
+                    <p class="grey-text center-align">Aucun commentaire pour l’instant.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
+
+<!-- Modal de confirmation de suppression de commentaire -->
+<div id="delete-comment-modal" class="modal">
+  <div class="modal-content">
+    <h5>Supprimer ce commentaire ?</h5>
+    <p>Cette action est définitive et supprimera le commentaire.</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close btn-flat">Annuler</a>
+    <a href="#!" id="confirm-delete-comment" class="modal-close btn red">Supprimer</a>
+</div>
+</div>
+
+
+
+
+<!-- Modal d'édition de commentaire -->
+<div id="edit-comment-modal" class="modal">
+  <div class="modal-content">
+    <h5>Modifier votre commentaire</h5>
+    <div class="input-field">
+      <textarea id="edit-comment-text" class="materialize-textarea" rows="3"></textarea>
+      <label for="edit-comment-text" class="active">Texte</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-close btn-flat">Annuler</a>
+    <a href="#!" id="confirm-edit-comment" class="modal-close btn green">Enregistrer</a>
+  </div>
+</div>

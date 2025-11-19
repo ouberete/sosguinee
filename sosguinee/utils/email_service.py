@@ -39,7 +39,7 @@ class EmailService:
             message=plain_message,
             html_message=html_message,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[alert.user.email],
+            recipient_list=[alert.email],
             fail_silently=False
         )
 
@@ -53,12 +53,17 @@ class EmailService:
         })
         plain_message = strip_tags(html_message)
         
+        # Destinataire: email saisi sur la demande, ou fallback sur le créateur si disponible
+        recipient = getattr(funding_request, 'email', None)
+        if not recipient and hasattr(funding_request, 'created_by') and funding_request.created_by:
+            recipient = funding_request.created_by.email
+
         send_mail(
             subject=subject,
             message=plain_message,
             html_message=html_message,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[funding_request.user.email],
+            recipient_list=[recipient] if recipient else [],
             fail_silently=False
         )
 
@@ -78,12 +83,12 @@ class EmailService:
             message=plain_message,
             html_message=html_message,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[donation.donor.email],
+            recipient_list=[donation.donor_email],
             fail_silently=False
         )
         
         # Email au bénéficiaire
-        if donation.funding_request and donation.funding_request.user:
+        if donation.funding_request:
             subject = 'Vous avez reçu un nouveau don!'
             html_message = render_to_string('emails/donation_received_notification.html', {
                 'donation': donation,
@@ -96,7 +101,7 @@ class EmailService:
                 message=plain_message,
                 html_message=html_message,
                 from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[donation.funding_request.user.email],
+                recipient_list=[donation.funding_request.email],
                 fail_silently=False
             )
 

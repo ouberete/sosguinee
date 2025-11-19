@@ -3,9 +3,9 @@ FROM python:3.11-slim
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Installer les dépendances système nécessaires
+# Installer les dépendances système nécessaires (inclut gettext pour i18n)
 RUN apt-get update && \
-    apt-get install -y build-essential libpq-dev netcat-openbsd && \
+    apt-get install -y build-essential libpq-dev netcat-openbsd gettext && \
     rm -rf /var/lib/apt/lists/*
 
 
@@ -13,7 +13,7 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copier le script d'initialisation et lui donner les droits d’exécution
+# Copier le script d'initialisation et lui donner les droits d'exécution
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
@@ -25,3 +25,4 @@ EXPOSE 8000
 
 # Utiliser le script comme point d'entrée
 ENTRYPOINT ["/app/entrypoint.sh"]
+

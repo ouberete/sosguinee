@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
-from page.models import UserDetails, LossAlert, FundingRequest, Donation
+from page.models import UserDetails, LossAlert, FundingRequest, Donation, FundPayment, MessageContact, Comment
 from ..forms import ProfileForm, UserInfosForm, UserDocumentForm, UserLinkForm
 
 @login_required
@@ -25,6 +25,12 @@ def user_profile(request):
             alerts = LossAlert.objects.filter(created_by=request.user).order_by('-created_at')
             funding_requests = FundingRequest.objects.filter(created_by=request.user).order_by('-created_at')
             donations = Donation.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            # Paiements (financements effectués)
+            fundings = FundPayment.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            # Messages de contact envoyés
+            messages_sent = MessageContact.objects.filter(email=request.user.email).order_by('-created_at')
+            # Commentaires postés
+            comments = Comment.objects.filter(user=request.user).order_by('-created_at')
 
             countries = dict(UserDetails.COUNTRY_CHOICES)
             country = countries.get(profile.birth_country, 'Non renseigne')
@@ -49,7 +55,10 @@ def user_profile(request):
                 'category': category,
                 'alerts': alerts,
                 'funding_requests': funding_requests,
-                'donations': donations
+                'donations': donations,
+                'fundings': fundings,
+                'messages_sent': messages_sent,
+                'comments': comments,
             }
 
             return render(request, 'accounts/profil.html', context)

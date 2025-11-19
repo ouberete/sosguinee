@@ -47,13 +47,13 @@
         </div>
         <div class="content">
             <h2>Alerte de perte - {{ alert.name }}</h2>
-            <p>Bonjour {{ alert.user.username }},</p>
+            <p>Bonjour,</p>
             <p>Votre alerte a été créée avec succès. Voici les détails :</p>
             <ul>
-                <li><strong>Type :</strong> {{ alert.type_alert }}</li>
-                <li><strong>Date :</strong> {{ alert.date_alert }}</li>
-                <li><strong>Heure :</strong> {{ alert.hour_alert }}</li>
-                <li><strong>Statut :</strong> {{ alert.status_alert }}</li>
+                <li><strong>Type :</strong> {{ alert.type_alert_name }}</li>
+                <li><strong>Date :</strong> {{ alert.date_alert|date:"d/m/Y" }}</li>
+                <li><strong>Heure :</strong> {{ alert.hour_alert|default:"—" }}</li>
+                <li><strong>Statut :</strong> {{ alert.status_alert_name }}</li>
             </ul>
             <p>Nous vous tiendrons informé de tout développement concernant votre alerte.</p>
             <a href="{{ site_url }}{% url 'loss_alert_detail_public' alert.public_id %}" class="button">Voir les détails</a>
