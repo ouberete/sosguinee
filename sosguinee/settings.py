@@ -329,7 +329,7 @@ PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.pay
 
 django_heroku.settings(locals())
 
-# Google email configuration
+#Email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", cast=str, default="smtp.gmail.com")
 EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
