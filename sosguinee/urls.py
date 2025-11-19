@@ -20,8 +20,15 @@ from django.urls import include, path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
+
 urlpatterns = [
-    path('i18n/', include('django.conf.urls.i18n')),
+    # Pour le changement de langue (set_language)
+    path("i18n/", include("django.conf.urls.i18n")),
+]
+
+
+urlpatterns  += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('page.urls')),
     path('', include('accounts.urls')),
@@ -29,10 +36,9 @@ urlpatterns = [
     path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('login')), name='password_reset_confirm'),
     path('password/reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    # Ajouter cette ligne pour activer le namespace 'social'
-    path('auth/', include('social_django.urls', namespace='social')),
+    # Retiré: python-social-auth; on utilise allauth uniquement
     path('accounts/', include('allauth.urls')),
-]
+)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

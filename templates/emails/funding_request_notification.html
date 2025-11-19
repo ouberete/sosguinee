@@ -52,16 +52,16 @@
             <h1>Nouvelle Demande de Financement</h1>
         </div>
         <div class="content">
-            <h2>{{ funding_request.title }}</h2>
-            <p>Bonjour {{ funding_request.user.username }},</p>
+            <h2>{{ funding_request.title|default:funding_request.beneficiary_name }}</h2>
+            <p>Bonjour,</p>
             <p>Votre demande de financement a été créée avec succès. Voici les détails :</p>
             <div class="amount">
                 {{ funding_request.funding_amount|floatformat:0 }} GNF
             </div>
             <ul>
                 <li><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</li>
-                <li><strong>Type :</strong> {{ funding_request.funding_type }}</li>
-                <li><strong>Statut :</strong> {{ funding_request.funding_request_status }}</li>
+                <li><strong>Type :</strong> {{ funding_request.funding_request_type_name }}</li>
+                <li><strong>Statut :</strong> {{ funding_request.funding_request_status_name }}</li>
             </ul>
             <p>Nous vous notifierons dès qu'il y aura des contributions à votre demande.</p>
             <a href="{{ site_url }}{% url 'funding_request_details_public' funding_request.public_id %}" class="button">Voir les détails</a>

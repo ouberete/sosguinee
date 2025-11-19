@@ -23,6 +23,7 @@ from django.conf import settings
 from django.contrib import messages
 import requests
 from requests.exceptions import RequestException
+from django.http import HttpResponseForbidden
 User = get_user_model()
 #Add new user
 def index(request):
@@ -73,13 +74,15 @@ def add_funding_request(request):
                 'email': fundingRequest.email,
                 'phone': fundingRequest.phone,
                 'country': fundingRequest.country,
-                'city': fundingRequest.city,
-                'quarter': fundingRequest.quarter,
+                'region': str(fundingRequest.region) if fundingRequest.region else '',
+                'prefecture': str(fundingRequest.prefecture) if fundingRequest.prefecture else '',
+                'commune': str(fundingRequest.commune) if fundingRequest.commune else '',
+                'quarter': str(fundingRequest.quarter) if fundingRequest.quarter else '',
                 'address': fundingRequest.address,
                 'amount': fundingRequest.funding_amount,
                 'email': fundingRequest.email,
                 'phone': fundingRequest.phone,
-                'city': fundingRequest.city,    
+                'commune': str(fundingRequest.commune) if fundingRequest.commune else '',
             }
             email_template ='page/template_email/add_funding_request_email.html'
             to_email = [fundingRequest.email,]
@@ -101,6 +104,37 @@ def add_funding_request(request):
         print("add_funding_request GET")
         form = FundingRequestForm()
     return render(request, 'page/add_funding_request.html', {'form': form})
+
+
+@login_required
+def edit_funding_request(request, public_id):
+    fr = FundingRequest.objects.filter(public_id=public_id).first()
+    if not fr or fr.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette demande.")
+    if request.method == 'POST':
+        form = FundingRequestForm(request.POST, request.FILES, instance=fr)
+        if form.is_valid():
+            fr = form.save()
+            docs = request.FILES.getlist('optional_docs')
+            if docs:
+                fr.add_funding_docs(docs)
+            messages.success(request, "Demande mise à jour.")
+            return redirect('funding_request_details_public', public_id=fr.public_id)
+    else:
+        form = FundingRequestForm(instance=fr)
+    return render(request, 'page/add_funding_request.html', {'form': form, 'update': True})
+
+
+@login_required
+def delete_funding_request(request, public_id):
+    fr = FundingRequest.objects.filter(public_id=public_id).first()
+    if not fr or fr.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette demande.")
+    if request.method == 'POST':
+        fr.delete()
+        messages.success(request, "Demande supprimée.")
+        return redirect('profile')
+    return render(request, 'page/confirm_delete.html', {'object': fr, 'type': 'funding_request'})
 
 def add_loss_alert(request):
     print("add_loss_alert")
@@ -124,13 +158,15 @@ def add_loss_alert(request):
             email_subject = 'Ajout alerte'
             context = {
                     'name': lossAlert.name,
-                    'type': lossAlert.loss_alert_type.name,
+                    'type': lossAlert.loss_alert_type.name if lossAlert.loss_alert_type else '',
                     'description': lossAlert.description,
                     'email': lossAlert.email,
                     'phone': lossAlert.phone,
                     'country': lossAlert.country,
-                    'city': lossAlert.city,
-                    'quarter': lossAlert.quarter,
+                    'region': str(lossAlert.region) if lossAlert.region else '',
+                    'prefecture': str(lossAlert.prefecture) if lossAlert.prefecture else '',
+                    'commune': str(lossAlert.commune) if lossAlert.commune else '',
+                    'quarter': str(lossAlert.quarter) if lossAlert.quarter else '',
                     'address': lossAlert.address,
                     'date_alert': lossAlert.date_alert,
                     'hour_alert': lossAlert.hour_alert
@@ -154,6 +190,37 @@ def add_loss_alert(request):
         print("add_loss_alert GET")
         form = LossAlertForm()
     return render(request, 'page/add_loss_alert.html', {'form': form})
+
+
+@login_required
+def edit_loss_alert(request, public_id):
+    alert = LossAlert.objects.filter(public_id=public_id).first()
+    if not alert or alert.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette alerte.")
+    if request.method == 'POST':
+        form = LossAlertForm(request.POST, request.FILES, instance=alert)
+        if form.is_valid():
+            alert = form.save()
+            docs = request.FILES.getlist('optional_docs')
+            if docs:
+                alert.add_docs(docs)
+            messages.success(request, "Alerte mise à jour.")
+            return redirect('loss_alert_detail_public', public_id=alert.public_id)
+    else:
+        form = LossAlertForm(instance=alert)
+    return render(request, 'page/add_loss_alert.html', {'form': form, 'update': True})
+
+
+@login_required
+def delete_loss_alert(request, public_id):
+    alert = LossAlert.objects.filter(public_id=public_id).first()
+    if not alert or alert.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette alerte.")
+    if request.method == 'POST':
+        alert.delete()
+        messages.success(request, "Alerte supprimée.")
+        return redirect('profile')
+    return render(request, 'page/confirm_delete.html', {'object': alert, 'type': 'alert'})
 
 def funding_request_detail(request, pk=None, public_id=None):
     if pk is not None:
@@ -650,8 +717,13 @@ def add_comment(request, model_name, object_id):
                 comment.object_id = object_id
                 comment.save()
                 print("Form saved")
+                html = render_to_string(
+                    'page/components/comments/comment_item.html',
+                    {'comment': comment, 'user': request.user}
+                )
                 return JsonResponse({
                     'success': True,
+                    'comment_html': html,
                     'comment': {
                         'user': comment.user.username,
                         'text': comment.text,
@@ -693,8 +765,17 @@ def edit_comment(request, comment_id):
         comment = Comment.objects.get(id=comment_id, user=request.user)
     except Comment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Commentaire non trouvé'}, status=404)
-
-    new_text = request.POST.get('text', '').strip()
+    # Support both form-encoded and JSON payloads
+    new_text = ''
+    if request.content_type and 'application/json' in request.content_type:
+        import json
+        try:
+            payload = json.loads(request.body.decode('utf-8')) if request.body else {}
+            new_text = (payload.get('text') or '').strip()
+        except Exception:
+            new_text = ''
+    else:
+        new_text = (request.POST.get('text') or '').strip()
     if new_text:
         comment.text = new_text
         comment.save()
@@ -718,6 +799,8 @@ def delete_comment(request, comment_id):
 def report_comment(request, comment_id):
     try:
         comment = Comment.objects.get(id=comment_id)
+        if comment.user_id == request.user.id:
+            return JsonResponse({'success': False, 'error': 'Vous ne pouvez pas signaler votre propre commentaire'}, status=400)
         # Optionnel : logguer ou sauvegarder dans une table Report si nécessaire
         print(f"Commentaire signalé par {request.user.username}: {comment.text}")
         return JsonResponse({'success': True, 'message': 'Le commentaire a été signalé'})
@@ -727,3 +810,44 @@ def report_comment(request, comment_id):
 
 
 
+
+
+
+# --- Location dependent lists (JSON) ---
+def prefectures_by_region(request):
+    region_id = request.GET.get('region')
+    data = []
+    if region_id:
+        try:
+            from .models import Prefecture
+            qs = Prefecture.objects.filter(region_id=region_id).order_by('name')
+            data = [{'id': p.id, 'name': p.name} for p in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})
+
+
+def communes_by_prefecture(request):
+    prefecture_id = request.GET.get('prefecture')
+    data = []
+    if prefecture_id:
+        try:
+            from .models import Commune
+            qs = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
+            data = [{'id': c.id, 'name': c.name} for c in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})
+
+
+def quarters_by_commune(request):
+    commune_id = request.GET.get('commune')
+    data = []
+    if commune_id:
+        try:
+            from .models import Quarter
+            qs = Quarter.objects.filter(commune_id=commune_id).order_by('name')
+            data = [{'id': q.id, 'name': q.name} for q in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})

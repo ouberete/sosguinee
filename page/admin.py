@@ -13,7 +13,11 @@ from .models import (
     Donation,
     FundPayment,
     MessageContact,
-    Comment
+    Comment,
+    Region,
+    Prefecture,
+    Commune,
+    Quarter,
 )
 
 # Register your models here.
@@ -24,8 +28,8 @@ admin.site.site_url = "https://sosguinee.com"
 
 @admin.register(LossAlert)
 class LossAlertAdmin(admin.ModelAdmin):
-    list_display = ('name', 'public_id', 'type_alert_name', 'status_alert_name', 'date_alert', 'priority_badge')
-    list_filter = ('loss_alert_type', 'loss_alert_status', 'date_alert')
+    list_display = ('name', 'public_id', 'type_alert_name', 'status_alert_name', 'region', 'prefecture', 'commune', 'quarter', 'date_alert', 'priority_badge')
+    list_filter = ('loss_alert_type', 'loss_alert_status', 'region', 'prefecture', 'commune', 'quarter', 'date_alert')
     search_fields = ('name', 'description', 'public_id')
     ordering = ('-date_alert',)
     readonly_fields = ('created_at', 'public_id')
@@ -39,23 +43,27 @@ class LossAlertAdmin(admin.ModelAdmin):
     status_alert_name.short_description = 'Statut'
     
     def priority_badge(self, obj):
+        # Some deployments might not have a 'priority' field on LossAlert
+        priority = getattr(obj, 'priority', None)
+        if not priority:
+            return '-'
         colors = {
             'Haute': 'red',
             'Moyenne': 'orange',
             'Basse': 'green'
         }
-        color = colors.get(obj.priority, 'gray')
+        color = colors.get(priority, 'gray')
         return format_html(
             '<span style="background-color: {}; color: white; padding: 3px 7px; border-radius: 3px;">{}</span>',
             color,
-            obj.priority
+            priority
         )
     priority_badge.short_description = 'Priorité'
 
 @admin.register(FundingRequest)
 class FundingRequestAdmin(admin.ModelAdmin):
-    list_display = ('title', 'public_id', 'beneficiary_name', 'funding_request_status_name', 'funding_amount', 'progress_bar', 'days_remaining')
-    list_filter = ('funding_request_type', 'funding_request_status', 'created_at')
+    list_display = ('title', 'public_id', 'beneficiary_name', 'funding_request_status_name', 'region', 'prefecture', 'commune', 'quarter', 'funding_amount', 'progress_bar', 'days_remaining')
+    list_filter = ('funding_request_type', 'funding_request_status', 'region', 'prefecture', 'commune', 'quarter', 'created_at')
     search_fields = ('title', 'beneficiary_name', 'description_needs', 'public_id')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'amount_received', 'public_id')
@@ -70,7 +78,7 @@ class FundingRequestAdmin(admin.ModelAdmin):
             '''
             <div style="width: 100px; background-color: #f0f0f0; height: 20px; border-radius: 10px;">
                 <div style="width: {}%; background-color: #4CAF50; height: 100%; border-radius: 10px;">
-                    <span style="padding: 0 5px; color: white;">{:.0f}%</span>
+                    <span style="padding: 0 5px; color: white;">{}%</span>
                 </div>
             </div>
             ''',
@@ -157,6 +165,37 @@ class FundingRequestStatusAdmin(admin.ModelAdmin):
     search_fields = ('name', 'public_id', 'description')
     ordering = ('name',)
     readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'public_id', 'created_at')
+    search_fields = ('name',)
+    ordering = ('name',)
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+@admin.register(Prefecture)
+class PrefectureAdmin(admin.ModelAdmin):
+    list_display = ('name', 'region', 'public_id', 'created_at')
+    list_filter = ('region',)
+    search_fields = ('name', 'region__name')
+    ordering = ('region__name', 'name')
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+@admin.register(Commune)
+class CommuneAdmin(admin.ModelAdmin):
+    list_display = ('name', 'prefecture', 'public_id', 'created_at')
+    list_filter = ('prefecture',)
+    search_fields = ('name', 'prefecture__name', 'prefecture__region__name')
+    ordering = ('prefecture__name', 'name')
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
+
+@admin.register(Quarter)
+class QuarterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'commune', 'public_id', 'created_at')
+    list_filter = ('commune',)
+    search_fields = ('name', 'commune__name', 'commune__prefecture__name', 'commune__prefecture__region__name')
+    ordering = ('commune__name', 'name')
+    readonly_fields = ('public_id', 'created_at', 'updated_at')
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'public_id', 'user', 'created_at')
@@ -188,3 +227,4 @@ class CustomAdminSite(admin.AdminSite):
         })
         
         return super().index(request, extra_context)
+
