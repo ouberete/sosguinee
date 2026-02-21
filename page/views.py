@@ -9,7 +9,8 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth import get_user_model
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
+from django.utils.crypto import constant_time_compare
 
 from page.models import FundingRequest, LossAlert, FundingType, LossAlertType, LossAlertStatus, FundingRequestStatus, \
     Donation, FundPayment, Comment
@@ -17,13 +18,25 @@ from page.forms import DonationForm, FundingRequestForm, LossAlertForm, MessageC
     CommentForm
 from django.core.paginator import Paginator
 from page.models import UserDetails
-from sosguinee.utils.sending_email import Utilities
+from sosguinee.utils.email_service import EmailService
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 from django.contrib import messages
 import requests
 from requests.exceptions import RequestException
+from django.http import HttpResponseForbidden
 User = get_user_model()
+ALLOWED_COMMENT_MODELS = {
+    "fundingrequest": FundingRequest,
+    "lossalert": LossAlert,
+}
+
+
+def _is_valid_payment_callback_token(payment, token):
+    if not payment or not token:
+        return False
+    tx = (payment.transaction_id or "").strip()
+    return bool(tx) and constant_time_compare(token, tx)
 #Add new user
 def index(request):
     funding_requests= FundingRequest.objects.order_by("-created_at")[:6]
@@ -73,26 +86,26 @@ def add_funding_request(request):
                 'email': fundingRequest.email,
                 'phone': fundingRequest.phone,
                 'country': fundingRequest.country,
-                'city': fundingRequest.city,
-                'quarter': fundingRequest.quarter,
+                'region': str(fundingRequest.region) if fundingRequest.region else '',
+                'prefecture': str(fundingRequest.prefecture) if fundingRequest.prefecture else '',
+                'commune': str(fundingRequest.commune) if fundingRequest.commune else '',
+                'quarter': str(fundingRequest.quarter) if fundingRequest.quarter else '',
                 'address': fundingRequest.address,
                 'amount': fundingRequest.funding_amount,
                 'email': fundingRequest.email,
                 'phone': fundingRequest.phone,
-                'city': fundingRequest.city,    
+                'commune': str(fundingRequest.commune) if fundingRequest.commune else '',
             }
             email_template ='page/template_email/add_funding_request_email.html'
             to_email = [fundingRequest.email,]
             email_subject = 'Demande de financement'
             
             try:
-                print("sending email")
-                Utilities.sending_email(to_email, email_subject, email_template, context)
-                print("email sent")
-            except SMTPException as e:
-                print(e)
-                return render(request, 'page/add_funding_request.html', {'error': 'L\'envoi du mail a été echoué. Veuillez contacter l\'administrateur.'})
-            
+                # Envoyer l'email avec le nouveau service
+                EmailService.send_funding_request_notification(fundingRequest)
+            except Exception as e:
+                print("Erreur d'envoi d'email:", e)
+                messages.error(request, 'L\'envoi du mail a échoué. Votre demande a bien été enregistrée.')
             
             return render(request,'page/confirmation_page/confirmation_funding_request_added.html', {'request':'added'})
         else:
@@ -103,6 +116,37 @@ def add_funding_request(request):
         print("add_funding_request GET")
         form = FundingRequestForm()
     return render(request, 'page/add_funding_request.html', {'form': form})
+
+
+@login_required
+def edit_funding_request(request, public_id):
+    fr = FundingRequest.objects.filter(public_id=public_id).first()
+    if not fr or fr.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette demande.")
+    if request.method == 'POST':
+        form = FundingRequestForm(request.POST, request.FILES, instance=fr)
+        if form.is_valid():
+            fr = form.save()
+            docs = request.FILES.getlist('optional_docs')
+            if docs:
+                fr.add_funding_docs(docs)
+            messages.success(request, "Demande mise à jour.")
+            return redirect('funding_request_details_public', public_id=fr.public_id)
+    else:
+        form = FundingRequestForm(instance=fr)
+    return render(request, 'page/add_funding_request.html', {'form': form, 'update': True})
+
+
+@login_required
+def delete_funding_request(request, public_id):
+    fr = FundingRequest.objects.filter(public_id=public_id).first()
+    if not fr or fr.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette demande.")
+    if request.method == 'POST':
+        fr.delete()
+        messages.success(request, "Demande supprimée.")
+        return redirect('profile')
+    return render(request, 'page/confirm_delete.html', {'object': fr, 'type': 'funding_request'})
 
 def add_loss_alert(request):
     print("add_loss_alert")
@@ -126,25 +170,26 @@ def add_loss_alert(request):
             email_subject = 'Ajout alerte'
             context = {
                     'name': lossAlert.name,
-                    'type': lossAlert.loss_alert_type.name,
+                    'type': lossAlert.loss_alert_type.name if lossAlert.loss_alert_type else '',
                     'description': lossAlert.description,
                     'email': lossAlert.email,
                     'phone': lossAlert.phone,
                     'country': lossAlert.country,
-                    'city': lossAlert.city,
-                    'quarter': lossAlert.quarter,
+                    'region': str(lossAlert.region) if lossAlert.region else '',
+                    'prefecture': str(lossAlert.prefecture) if lossAlert.prefecture else '',
+                    'commune': str(lossAlert.commune) if lossAlert.commune else '',
+                    'quarter': str(lossAlert.quarter) if lossAlert.quarter else '',
                     'address': lossAlert.address,
                     'date_alert': lossAlert.date_alert,
                     'hour_alert': lossAlert.hour_alert
                 }
                         
             try:
-                print("sending email")
-                Utilities.sending_email(to_email, email_subject, email_template, context)
-                print("email sent")
-            except SMTPException as e:
-                print("email not sent", e)
-                return render(request, 'page/add_loss_alert.html', {'form': form, 'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'}) 
+                # Envoyer l'email avec le nouveau service
+                EmailService.send_alert_notification(lossAlert)
+            except Exception as e:
+                print("Erreur d'envoi d'email:", e)
+                messages.error(request, 'L\'envoi du mail a échoué. Votre alerte a bien été enregistrée.')
           
             return render(request, 'page/confirmation_page/confirmation_loss_alert_added.html',{'request': 'added'} )
         else:
@@ -158,8 +203,43 @@ def add_loss_alert(request):
         form = LossAlertForm()
     return render(request, 'page/add_loss_alert.html', {'form': form})
 
-def funding_request_detail(request, pk):
-    funding_request = get_object_or_404(FundingRequest, pk=pk)
+
+@login_required
+def edit_loss_alert(request, public_id):
+    alert = LossAlert.objects.filter(public_id=public_id).first()
+    if not alert or alert.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette alerte.")
+    if request.method == 'POST':
+        form = LossAlertForm(request.POST, request.FILES, instance=alert)
+        if form.is_valid():
+            alert = form.save()
+            docs = request.FILES.getlist('optional_docs')
+            if docs:
+                alert.add_docs(docs)
+            messages.success(request, "Alerte mise à jour.")
+            return redirect('loss_alert_detail_public', public_id=alert.public_id)
+    else:
+        form = LossAlertForm(instance=alert)
+    return render(request, 'page/add_loss_alert.html', {'form': form, 'update': True})
+
+
+@login_required
+def delete_loss_alert(request, public_id):
+    alert = LossAlert.objects.filter(public_id=public_id).first()
+    if not alert or alert.created_by != request.user:
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette alerte.")
+    if request.method == 'POST':
+        alert.delete()
+        messages.success(request, "Alerte supprimée.")
+        return redirect('profile')
+    return render(request, 'page/confirm_delete.html', {'object': alert, 'type': 'alert'})
+
+def funding_request_detail(request, pk=None, public_id=None):
+    if pk is not None:
+        funding_request = get_object_or_404(FundingRequest, pk=pk)
+        return redirect('funding_request_details_public', public_id=funding_request.public_id, permanent=True)
+    else:
+        funding_request = get_object_or_404(FundingRequest, public_id=public_id)
 
     # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(FundingRequest)
@@ -175,9 +255,13 @@ def funding_request_detail(request, pk):
         'object_id': funding_request.id
     })
 
-def loss_alert_detail(request, pk):
+def loss_alert_detail(request, pk=None, public_id=None):
     #alert = LossAlert()
-    alert = get_object_or_404(LossAlert, pk=pk)
+    if pk is not None:
+        alert = get_object_or_404(LossAlert, pk=pk)
+        return redirect('loss_alert_detail_public', public_id=alert.public_id, permanent=True)
+    else:
+        alert = get_object_or_404(LossAlert, public_id=public_id)
 
     # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(LossAlert)
@@ -214,9 +298,9 @@ def contact(request):
             mail_subject = "Message de contact"
             try:
                 print("sending email")
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 return render(request, 'page/contact.html', {'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'})
             contact = MessageContactForm()
@@ -300,9 +384,9 @@ def donation(request):
             mail_subject = "Don de financement"
             try:
                 print("sending email")
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
                 return  render(request, 'page/donation.html', {'form': form})
@@ -310,7 +394,8 @@ def donation(request):
 
             # Redirige vers la page de paiement de PayCard
             # return redirect(redirect_url)
-            return redirect('paycard_payment_callback', payment_id=payment.id, type='Don')
+            callback_url = reverse('paycard_payment_callback', kwargs={'payment_id': payment.id, 'type': 'Don'})
+            return redirect(f"{callback_url}?token={payment.transaction_id}")
         except RequestException as e:
             messages.error(request, "Service PayCard inaccessible. Réessayez plus tard.")
             print("Erreur réseau PayCard:", e)
@@ -339,11 +424,10 @@ def messageContact(request):
             template_email = 'page/template_email/contact_form_email.html'
             try:
                 print("sending email")
-                
-                Utilities.sending_email(to_email, mail_subject, template_email, context)
+                EmailService.send_template_email(to_email, mail_subject, template_email, context)
 
                 print("email sent")
-            except SMTPException as e:
+            except Exception as e:
                 print("email not sent", e)
                 return JsonResponse({'error': 'L\'envoi du mail a échoué. Veuillez contacter l\'administrateur.'})
             return JsonResponse( {'success': 'Le message a été envoyé.'})
@@ -422,10 +506,11 @@ class FundingRequestListView(View):
                     'funding_request_status': element.funding_request_status_name,  # Utilise la propriété funding_request_status_name
                     'principal_image_url': element.principal_image.url if element.principal_image else '', 
                     'id': element.id,
+                    'public_id': str(element.public_id),
                     'progress': element.progress,  # Utilise la propriété progress
                     'days_remaining': element.days_remaining,  # Utilise la propriété days_remaining
                     'amount': element.funding_amount,
-                    'details_url': "/funding-request-details/"+str(element.id)+"/",          
+                    'details_url': "/funding-request-details/"+str(element.public_id)+"/",          
                 }
                 for element in page_obj
             ],
@@ -487,7 +572,8 @@ class LossAlertListView(View):
                     'date_alert': element.date_alert,
                     'hour_alert': element.hour_alert,
                     'id': element.id,
-                    'details_url': "/loss-alert-details/"+str(element.id)+"/",  # URL des détails de l'alerte
+                    'public_id': str(element.public_id),
+                    'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des détails de l'alerte
                 }
                 for element in page_obj
             ],
@@ -506,8 +592,12 @@ class LossAlertListView(View):
 def donation_thanks(request):
     return render(request, 'page/donation_thanks.html')
 
-def paycard_funding(request, pk):
-    funding_request = get_object_or_404(FundingRequest, pk=pk)
+def paycard_funding(request, pk=None, public_id=None):
+    if pk is not None:
+        funding_request = get_object_or_404(FundingRequest, pk=pk)
+        return redirect('paycard_funding_public', public_id=funding_request.public_id, permanent=True)
+    else:
+        funding_request = get_object_or_404(FundingRequest, public_id=public_id)
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
         return redirect('paycard_funding', pk)
@@ -516,8 +606,11 @@ def paycard_funding(request, pk):
 
 
 @csrf_protect
-def start_paycard_funding_payment(request, funding_id):
-    funding_request = FundingRequest.objects.filter(id=funding_id).first()
+def start_paycard_funding_payment(request, funding_id=None, funding_public_id=None):
+    if funding_id is not None:
+        funding_request = FundingRequest.objects.filter(id=funding_id).first()
+    else:
+        funding_request = FundingRequest.objects.filter(public_id=funding_public_id).first()
 
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
@@ -587,9 +680,9 @@ def start_paycard_funding_payment(request, funding_id):
                 mail_subject = "Financement de demande de financement"
                 try:
                     print("sending email")
-                    Utilities.sending_email(to_email, mail_subject, template_email, context)
+                    EmailService.send_template_email(to_email, mail_subject, template_email, context)
                     print("email sent")
-                except SMTPException as e:
+                except Exception as e:
                     print("email not sent", e)
                     messages.error(request, "L'envoi du mail a échoué. Veuillez contacter l'administrateur.")
                     return  render(request, 'page/funding_payment.html', {'funding_request': funding_request, 'form': form})
@@ -597,7 +690,8 @@ def start_paycard_funding_payment(request, funding_id):
 
                 # Redirige vers la page de paiement de PayCard
                 # return redirect(redirect_url)
-                return redirect('paycard_payment_callback', payment_id=funding_id, type='Financement')
+                callback_url = reverse('paycard_payment_callback', kwargs={'payment_id': payment.id, 'type': 'Financement'})
+                return redirect(f"{callback_url}?token={payment.transaction_id}")
             except RequestException as e:
                 messages.error(request, "Service PayCard inaccessible. Réessayez plus tard.")
                 print("Erreur réseau PayCard:", e)
@@ -609,43 +703,70 @@ def start_paycard_funding_payment(request, funding_id):
     return redirect('paycard_funding', funding_id)
 
 
-def paycard_payment_callback(request, payment_id, type):
-    # Logique de validation possible ici (optionnel : appel à PayCard pour vérifier)
-    #Update le statut du paiement
-    payment = FundPayment.objects.filter(id=payment_id).first()
-    if payment:
-        payment.status = 'réussi'
-        payment.save()
-    return render(request,'page/confirmation_page/confirmation_payment.html', {'request':'added', 'type': type})
+@require_GET
+def paycard_payment_callback(request, payment_id=None, type=None, payment_public_id=None):
+    payment_type = (type or "").strip().lower()
+    token = (request.GET.get("token") or "").strip()
+    model = Donation if payment_type == "don" else FundPayment if payment_type == "financement" else None
+
+    if model is None:
+        return HttpResponseForbidden("Type de paiement invalide.")
+
+    if payment_id is not None:
+        payment = model.objects.filter(id=payment_id).first()
+    else:
+        payment = model.objects.filter(public_id=payment_public_id).first()
+
+    if not _is_valid_payment_callback_token(payment, token):
+        return HttpResponseForbidden("Callback paiement invalide.")
+
+    if payment.status == "en_attente":
+        success_status = payment._meta.get_field("status").choices[1][0]
+        payment.status = success_status
+        payment.save(update_fields=["status", "updated_at"])
+
+        if model is FundPayment and getattr(payment, "funding_request_id", None):
+            funding_request = payment.funding_request
+            funding_request.amount_received = (funding_request.amount_received or 0) + payment.amount
+            funding_request.save(update_fields=["amount_received", "updated_at"])
+
+    return render(request, 'page/confirmation_page/confirmation_payment.html', {'request': 'added', 'type': type})
 
 
 @login_required
+@require_POST
 def add_comment(request, model_name, object_id):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        if request.method == 'POST':
-            print("add comment")
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                print("Form valid")
-                content_type = ContentType.objects.get(model=model_name.lower())
-                comment = form.save(commit=False)
-                comment.user = request.user
-                comment.content_type = content_type
-                comment.object_id = object_id
-                comment.save()
-                print("Form saved")
-                return JsonResponse({
-                    'success': True,
-                    'comment': {
-                        'user': comment.user.username,
-                        'text': comment.text,
-                        'created_at': comment.created_at.strftime('%d/%m/%Y %H:%M')
-                    }
-                })
-            else:
-                return JsonResponse({'success': False, 'errors': form.errors})
-    return JsonResponse({'success': False, 'message': 'Requête invalide'})
+    model_key = (model_name or "").lower()
+    model_cls = ALLOWED_COMMENT_MODELS.get(model_key)
+    if model_cls is None:
+        return JsonResponse({'success': False, 'message': 'Modele non autorise'}, status=400)
 
+    target = model_cls.objects.filter(id=object_id).first()
+    if target is None:
+        return JsonResponse({'success': False, 'message': 'Objet introuvable'}, status=404)
+
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        content_type = ContentType.objects.get_for_model(model_cls)
+        comment = form.save(commit=False)
+        comment.user = request.user
+        comment.content_type = content_type
+        comment.object_id = target.id
+        comment.save()
+        html = render_to_string(
+            'page/components/comments/comment_item.html',
+            {'comment': comment, 'user': request.user}
+        )
+        return JsonResponse({
+            'success': True,
+            'comment_html': html,
+            'comment': {
+                'user': comment.user.username,
+                'text': comment.text,
+                'created_at': comment.created_at.strftime('%d/%m/%Y %H:%M')
+            }
+        })
+    return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
 
 
@@ -664,12 +785,6 @@ def reply_comment(request):
         return JsonResponse({'success': True, 'reply_html': html})
     return JsonResponse({'success': False}, status=400)
 
-def delete_comment(request, pk):
-    comment = get_object_or_404(Comment, id=pk, user=request.user)
-    comment.delete()
-    return JsonResponse({'success': True})
-
-
 @login_required
 @require_POST
 def edit_comment(request, comment_id):
@@ -677,8 +792,17 @@ def edit_comment(request, comment_id):
         comment = Comment.objects.get(id=comment_id, user=request.user)
     except Comment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Commentaire non trouvé'}, status=404)
-
-    new_text = request.POST.get('text', '').strip()
+    # Support both form-encoded and JSON payloads
+    new_text = ''
+    if request.content_type and 'application/json' in request.content_type:
+        import json
+        try:
+            payload = json.loads(request.body.decode('utf-8')) if request.body else {}
+            new_text = (payload.get('text') or '').strip()
+        except Exception:
+            new_text = ''
+    else:
+        new_text = (request.POST.get('text') or '').strip()
     if new_text:
         comment.text = new_text
         comment.save()
@@ -702,6 +826,8 @@ def delete_comment(request, comment_id):
 def report_comment(request, comment_id):
     try:
         comment = Comment.objects.get(id=comment_id)
+        if comment.user_id == request.user.id:
+            return JsonResponse({'success': False, 'error': 'Vous ne pouvez pas signaler votre propre commentaire'}, status=400)
         # Optionnel : logguer ou sauvegarder dans une table Report si nécessaire
         print(f"Commentaire signalé par {request.user.username}: {comment.text}")
         return JsonResponse({'success': True, 'message': 'Le commentaire a été signalé'})
@@ -709,3 +835,46 @@ def report_comment(request, comment_id):
         return JsonResponse({'success': False, 'error': 'Commentaire introuvable'}, status=404)
 
 
+
+
+
+
+
+# --- Location dependent lists (JSON) ---
+def prefectures_by_region(request):
+    region_id = request.GET.get('region')
+    data = []
+    if region_id:
+        try:
+            from .models import Prefecture
+            qs = Prefecture.objects.filter(region_id=region_id).order_by('name')
+            data = [{'id': p.id, 'name': p.name} for p in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})
+
+
+def communes_by_prefecture(request):
+    prefecture_id = request.GET.get('prefecture')
+    data = []
+    if prefecture_id:
+        try:
+            from .models import Commune
+            qs = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
+            data = [{'id': c.id, 'name': c.name} for c in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})
+
+
+def quarters_by_commune(request):
+    commune_id = request.GET.get('commune')
+    data = []
+    if commune_id:
+        try:
+            from .models import Quarter
+            qs = Quarter.objects.filter(commune_id=commune_id).order_by('name')
+            data = [{'id': q.id, 'name': q.name} for q in qs]
+        except Exception:
+            data = []
+    return JsonResponse({'results': data})
