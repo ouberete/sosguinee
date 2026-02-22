@@ -35,7 +35,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Verify Jazzmin import
-        run: python -c "import jazzmin; print(jazzmin.__version__)"
+        run: python -c "import jazzmin; print('jazzmin import ok')"
 
       - name: Django check
         run: python manage.py check
