@@ -60,7 +60,7 @@
               {% providers_media_js %}
               {% get_providers as providers %}
               {% for provider in providers %}
-                <a href="{% provider_login_url provider.id process='login' %}"
+                <a href="{% provider_login_url "google" %}"
                    class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="margin-bottom:.5rem; display:block;">
                   <i class="material-icons left">
                     {% if provider.id == 'google' %}account_circle

@@ -15,8 +15,7 @@
 <main role="main">
     <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner"
              aria-label="Bannière alertes">
-        <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}" alt="Alertes Guinée" loading="lazy"> {#
-            Removed responsive-img #}
+        <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}" alt="Alertes Guinée" loading="lazy">
         </div>
         <div class="container center-align white-text hero-content">
             <div class="row">
@@ -32,13 +31,13 @@
         <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1">
             <div class="input-field col s12 m6 l4"><select id="type_alert" name="type_alert">
                 <option value="" {% if not request.GET.type_alert %}selected{% endif %}>Tous les types d'alerte</option>
-                {# Changed disabled to allow selecting "all" #} {% for t in loss_alert_types %}
+                 {% for t in loss_alert_types %}
                 <option value="{{ t.name }}" {% if request.GET.type_alert == t.name %}selected{% endif %} >{{ t.name }}
                 </option>
                 {% endfor %} </select><label for="type_alert">Type d'alerte</label></div>
             <div class="input-field col s12 m6 l4"><select id="status" name="status">
                 <option value="" {% if not request.GET.status %}selected{% endif %}>Tous les statuts</option>
-                {# Changed disabled to allow selecting "all" #} {% for s in loss_alert_statuses %}
+                {% for s in loss_alert_statuses %}
                 <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %} >{{ s.name }}
                 </option>
                 {% endfor %} </select><label for="status">Statut</label></div>
@@ -46,11 +45,11 @@
                                                           value="{{ request.GET.name }}"><label for="name">Nom (personne
                 ou bien)</label></div>
             <div class="input-field col s12 m6 l4"><input id="start_date" type="text" class="datepicker"
-                                                          name="start_date" value="{{ request.GET.start_date }}"> {#
-                Changed type to text and added datepicker class #} <label for="start_date">Date min</label></div>
+                                                          name="start_date" value="{{ request.GET.start_date }}"> 
+                                                          <label for="start_date">Date min</label></div>
             <div class="input-field col s12 m6 l4"><input id="end_date" type="text" class="datepicker" name="end_date"
-                                                          value="{{ request.GET.end_date }}"> {# Changed type to text
-                and added datepicker class #} <label for="end_date">Date max</label></div>
+                                                          value="{{ request.GET.end_date }}"> 
+                                                           <label for="end_date">Date max</label></div>
             <div class="col s12 m6 l4 center-align filter-buttons">
                 <button type="submit" class="btn waves-effect waves-light teal darken-2 full-width"><i
                         class="material-icons left">search</i> Appliquer

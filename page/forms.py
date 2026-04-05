@@ -1,7 +1,9 @@
 
 from django import forms
-from .models import FundingRequest, Gender, LossAlert, MessageContact, Donation, UserDetails, FundPayment, Comment
+from .models import FundingRequest, Gender, LossAlert, MessageContact, Donation, UserDetails, FundPayment, Comment, Region, Prefecture, Commune, Quarter
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+import os
 
 
 class CustomClearableFileInput(forms.ClearableFileInput):
@@ -32,7 +34,7 @@ def filesizeformat(value):
 
 class MultipleFileField(forms.FileField):
     widget = CustomClearableFileInput
-    max_upload_size = 5 * 1024 * 1024  # 5 MB
+    max_upload_size = 1 * 1024 * 1024  # 1 MB
     def to_python(self, data):
         if not data:
             return []
@@ -42,14 +44,15 @@ class MultipleFileField(forms.FileField):
         # Call the parent class's validate method
         super().validate(data)
         for file in data:
-           
-            #Check if the file name is not too large then rename with short name
+            # Truncate long filenames but preserve extension
             if len(file.name) > 50:
-                file.name = file.name[:50]
-                
+                base, ext = os.path.splitext(file.name)
+                base_max = max(1, 50 - len(ext))
+                file.name = f"{base[:base_max]}{ext}"
+
             if file.size > self.max_upload_size:
                 raise forms.ValidationError(
-                    _('la taille du fichier doit faire moins de %(max_size)s. Taille actuelle %(current_size)s.') % {
+                    _('La taille du fichier doit être inférieure à %(max_size)s. Taille actuelle: %(current_size)s.') % {
                         'max_size': filesizeformat(self.max_upload_size),
                         'current_size': filesizeformat(file.size)
                     }
@@ -78,9 +81,46 @@ class FundingRequestForm(forms.ModelForm):
     class Meta:
         model = FundingRequest
         fields = [
-            'beneficiary_name','funding_request_type', 'funding_amount','title','description_needs',  'city',
-            'quarter', 'address', 'email', 'phone', 'start_date','end_date',  'principal_image'
-        ] 
+            'beneficiary_name','funding_request_type', 'funding_amount','title','description_needs',
+            'region','prefecture','commune','quarter', 'address', 'email', 'phone', 'start_date','end_date',  'principal_image'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['region'].queryset = Region.objects.all().order_by('name')
+        self.fields['prefecture'].queryset = Prefecture.objects.none()
+        self.fields['commune'].queryset = Commune.objects.none()
+        self.fields['quarter'].queryset = Quarter.objects.none()
+
+        if 'region' in self.data:
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=region_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        if 'prefecture' in self.data:
+            try:
+                prefecture_id = int(self.data.get('prefecture'))
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        if 'commune' in self.data:
+            try:
+                commune_id = int(self.data.get('commune'))
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=commune_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        # For editing instances
+        if self.instance and self.instance.pk:
+            if self.instance.region_id:
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
+            if self.instance.prefecture_id:
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
+            if self.instance.commune_id:
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
     
     #throw errors if start date is greater than end date
     def clean(self):
@@ -101,7 +141,44 @@ class LossAlertForm(forms.ModelForm):
     optional_docs = MultipleFileField(required=False)
     class Meta:
         model = LossAlert
-        fields = ['name', 'loss_alert_type', 'description',  'email', 'phone', 'city', 'quarter', 'address', 'date_alert', 'hour_alert','principal_image']
+        fields = ['name', 'loss_alert_type', 'description',  'email', 'phone', 'region','prefecture','commune','quarter', 'address', 'date_alert', 'hour_alert','principal_image']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['region'].queryset = Region.objects.all().order_by('name')
+        self.fields['prefecture'].queryset = Prefecture.objects.none()
+        self.fields['commune'].queryset = Commune.objects.none()
+        self.fields['quarter'].queryset = Quarter.objects.none()
+
+        if 'region' in self.data:
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=region_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        if 'prefecture' in self.data:
+            try:
+                prefecture_id = int(self.data.get('prefecture'))
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        if 'commune' in self.data:
+            try:
+                commune_id = int(self.data.get('commune'))
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=commune_id).order_by('name')
+            except (ValueError, TypeError):
+                pass
+
+        # For editing instances
+        if self.instance and self.instance.pk:
+            if self.instance.region_id:
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
+            if self.instance.prefecture_id:
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
+            if self.instance.commune_id:
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
 
 class MessageContactForm(forms.ModelForm):
     
