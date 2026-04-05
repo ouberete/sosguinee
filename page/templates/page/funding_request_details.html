@@ -66,19 +66,29 @@
             <li class="collection-item"><strong>Email :</strong> {{ funding_request.email|default:"Non fourni" }} </li>
           </ul>
           <div class="card-action center-align">
-            <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2" aria-label="Retour aux demandes">
-              <i class="material-icons left">arrow_back</i>
-            </a>
-            {% if funding_request.phone %}
-            <a href="tel:{{ funding_request.phone }}" class="btn waves-effect waves-light red darken-2" aria-label="Contacter par téléphone">
-              <i class="material-icons left">call</i>
-            </a>
-            {% endif %}
-            {% if funding_request.funding_request_status.name == "En cours" %}
-            <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
-              <i class="material-icons left">payments</i> Financer
-            </a>
-            {% endif %}
+            <div class="action-buttons-wrapper">
+              <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2" aria-label="Retour aux demandes">
+                <i class="material-icons left">arrow_back</i> Retour
+              </a>
+              {% if funding_request.phone %}
+              <a href="tel:{{ funding_request.phone }}" class="btn waves-effect waves-light red darken-2" aria-label="Contacter par téléphone">
+                <i class="material-icons left">call</i> Contacter
+              </a>
+              {% endif %}
+              {% if funding_request.funding_request_status.name == "En cours" %}
+              <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
+                <i class="material-icons left">payments</i> Financer
+              </a>
+              {% endif %}
+              {% if user == funding_request.created_by %}
+              <form method="post" action="{% url 'close_funding_request' funding_request.public_id %}" style="display:inline;" class="close-form">
+                {% csrf_token %}
+                <button type="submit" class="btn waves-effect waves-light grey darken-1" onclick="return confirm('Voulez-vous vraiment clôturer cette demande de financement ?')" aria-label="Clôturer la demande">
+                  <i class="material-icons left">check_circle</i> Clôturer
+                </button>
+              </form>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
