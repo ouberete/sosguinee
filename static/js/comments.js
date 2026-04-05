@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fermer tous les dropdowns si on clique ailleurs
 document.addEventListener('DOMContentLoaded', function () {
+    function showToast(message, classes = '') {
+        if (window.M && M.toast) {
+            M.toast({ html: message, classes, displayLength: 3000 });
+        } else {
+            alert(message);
+        }
+    }
     const commentForm = document.getElementById('comment-form');
     const commentsList = document.getElementById('comments-list');
 
@@ -35,10 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.comment_html) {
-                        commentsList.insertAdjacentHTML('afterbegin', data.comment_html);
-                        this.reset();
+                        \n                        if (typeof initDropdowns === 'function') { initDropdowns(); }
+                        showToast('Commentaire ajouté', 'green');
                     } else {
-                        alert('Erreur: ' + (data.errors || 'Inconnue'));
+                        showToast('Erreur: ' + (data.errors || 'Inconnue'), 'red');
                     }
                 });
         });
@@ -70,9 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Commentaire signalé avec succès.');
+                        showToast('Commentaire signalé', 'orange');
                     } else {
-                        alert('Erreur de signalement.');
+                        showToast(data.error || 'Erreur de signalement', 'red');
                     }
                 });
         }
@@ -96,8 +103,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(data => {
                         if (data.success) {
                             commentText.textContent = newText;
+                            showToast('Commentaire modifié', 'green');
                         } else {
-                            alert('Erreur lors de la modification.');
+                            showToast('Erreur lors de la modification', 'red');
                         }
                     });
             }
@@ -117,10 +125,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            const commentCard = document.getElementById(`comment-card-${commentId}`);
+                            const commentCard = document.getElementById(`comment-${commentId}`);
                             if (commentCard) commentCard.remove();
+                            showToast('Commentaire supprimé', 'green');
                         } else {
-                            alert('Erreur lors de la suppression.');
+                            showToast('Erreur lors de la suppression', 'red');
                         }
                     });
             }
@@ -131,3 +140,5 @@ document.addEventListener('DOMContentLoaded', function () {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 });
+
+

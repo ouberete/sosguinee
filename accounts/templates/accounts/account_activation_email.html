@@ -26,7 +26,7 @@
                     </tr>
                     <tr>
                         <td align="center" style="padding: 10px 0 30px;">
-                            <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" style="background-color: #2196F3; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 5px; display: inline-block;">
+                            <a href="{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}" style="background-color: #2196F3; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 5px; display: inline-block;">
                                 Activer mon compte
                             </a>
                         </td>

@@ -148,6 +148,59 @@ def delete_funding_request(request, public_id):
         return redirect('profile')
     return render(request, 'page/confirm_delete.html', {'object': fr, 'type': 'funding_request'})
 
+
+@login_required
+@require_POST
+def close_funding_request(request, public_id):
+    """Clôturer une demande de financement (marquer comme terminée)"""
+    fr = FundingRequest.objects.filter(public_id=public_id).first()
+    if not fr or fr.created_by != request.user:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette demande."}, status=403)
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette demande.")
+
+    # Trouver le statut "Clos" ou "Terminé"
+    closed_status = FundingRequestStatus.objects.filter(name__in=["Clos", "Terminé", "Clôturé"]).first()
+    if closed_status:
+        fr.funding_request_status = closed_status
+        fr.save(update_fields=['funding_request_status', 'updated_at'])
+        messages.success(request, "Demande de financement clôturée avec succès.")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': 'Demande clôturée avec succès.', 'new_status': closed_status.name})
+    else:
+        messages.error(request, "Statut 'Clos' non trouvé. Veuillez contacter un administrateur.")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': "Statut 'Clos' non trouvé."}, status=400)
+
+    return redirect('funding_request_details_public', public_id=fr.public_id)
+
+
+@login_required
+@require_POST
+def close_loss_alert(request, public_id):
+    """Clôturer une alerte de perte (marquer comme trouvé/résolu)"""
+    alert = LossAlert.objects.filter(public_id=public_id).first()
+    if not alert or alert.created_by != request.user:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette alerte."}, status=403)
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette alerte.")
+
+    # Trouver le statut "Trouvé" ou "Résolu" ou "Retrouvé" ou "Clos"
+    found_status = LossAlertStatus.objects.filter(name__in=["Trouvé", "Résolu", "Retrouvé", "Clos"]).first()
+    if found_status:
+        alert.loss_alert_status = found_status
+        alert.save(update_fields=['loss_alert_status', 'updated_at'])
+        messages.success(request, "Alerte clôturée avec succès. Merci d'avoir tenu SOS Guinée informé !")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': 'Alerte clôturée avec succès.', 'new_status': found_status.name})
+    else:
+        messages.error(request, "Statut 'Trouvé' non trouvé. Veuillez contacter un administrateur.")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': "Statut 'Trouvé' non trouvé."}, status=400)
+
+    return redirect('loss_alert_detail_public', public_id=alert.public_id)
+
+
 def add_loss_alert(request):
     print("add_loss_alert")
     if request.method == 'POST':
@@ -504,13 +557,15 @@ class FundingRequestListView(View):
                     'title': element.title,
                     'beneficiary_name': element.beneficiary_name,
                     'funding_request_status': element.funding_request_status_name,  # Utilise la propriété funding_request_status_name
-                    'principal_image_url': element.principal_image.url if element.principal_image else '', 
+                    'principal_image_url': element.principal_image.url if element.principal_image else '',
                     'id': element.id,
                     'public_id': str(element.public_id),
                     'progress': element.progress,  # Utilise la propriété progress
                     'days_remaining': element.days_remaining,  # Utilise la propriété days_remaining
                     'amount': element.funding_amount,
-                    'details_url': "/funding-request-details/"+str(element.public_id)+"/",          
+                    'details_url': "/funding-request-details/"+str(element.public_id)+"/",
+                    'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
+                    'close_url': "/funding-request/"+str(element.public_id)+"/close/",
                 }
                 for element in page_obj
             ],
@@ -567,13 +622,16 @@ class LossAlertListView(View):
                 {
                     'name': element.name,
                     'status_alert_name': element.status_alert_name,  # Utilise la propriété status_alert_name
-                    'principal_image_url': element.principal_image.url if element.principal_image else '', 
+                    'principal_image_url': element.principal_image.url if element.principal_image else '',
                     'type_alert_name': element.type_alert_name,  # Utilise la propriété type_alert_name
                     'date_alert': element.date_alert,
                     'hour_alert': element.hour_alert,
                     'id': element.id,
                     'public_id': str(element.public_id),
                     'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des détails de l'alerte
+                    'phone': element.phone or '',
+                    'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
+                    'close_url': "/loss-alert/"+str(element.public_id)+"/close/",
                 }
                 for element in page_obj
             ],

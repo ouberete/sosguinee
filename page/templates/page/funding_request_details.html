@@ -3,10 +3,10 @@
 {% load i18n %}
 {% load custom_filters %}
 
-{% block title %}Détails Demande {{ funding_request.id }} - SOS Guinée{% endblock %}
+{% block title %}Détails de la demande - SOS Guinée{% endblock %}
 {% block extra_head %}
-<meta name="description" content="Détails de la demande N° {{ funding_request.id }} pour {{ funding_request.beneficiary_name }}.">
-<meta property="og:title" content="Demande {{ funding_request.id }} - {{ funding_request.beneficiary_name }}">
+<meta name="description" content="Détails de la demande pour {{ funding_request.beneficiary_name }}.">
+<meta property="og:title" content="Demande - {{ funding_request.beneficiary_name }}">
 <meta property="og:description" content="{{ funding_request.description_needs|truncatechars:100 }}">
 <meta property="og:image" content="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/og-image.png' %}{% endif %}">
 {% endblock %}
@@ -22,8 +22,8 @@
     <div class="container center-align white-text hero-content">
       <div class="row">
         <div class="col s12">
-          <h3 class="header light text-shadow">Détails de la Demande N° {{ funding_request.id }}</h3>
-          <h5 class="light text-shadow truncate">{{ funding_request.beneficiary_name }}</h5>
+          <h3 class="header light text-shadow">Détails de la demande</h3>
+          <h5 class="light text-shadow truncate-3">{{ funding_request.title }}</h5>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <div class="col s12 m6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-            <span class="badge orange white-text">{{ funding_request.funding_request_status }}</span>
+            <span class="yellow category">{{ funding_request.funding_request_status }}</span>
             <img src="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
           </div>
@@ -47,7 +47,6 @@
       </div>
       <div class="col s12 m6 card-main-details">
         <div class="card-panel">
-          <h4 class="card-title">{{ funding_request.title }}</h4>
           <ul class="collection with-header">
             <li class="collection-header"><h5>Informations sur la Demande</h5></li>
             <li class="collection-item"><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</li>
@@ -58,8 +57,10 @@
               </div>
               <p>{{ funding_request.progress }}% collecté • {{ funding_request.days_remaining }} jours restants</p>
             </li>
-            <li class="collection-item"><strong>Ville :</strong> {{ funding_request.city }}</li>
-            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter }}</li>
+            <li class="collection-item"><strong>Région :</strong> {{ funding_request.region|default:"-" }}</li>
+            <li class="collection-item"><strong>Préfecture :</strong> {{ funding_request.prefecture|default:"-" }}</li>
+            <li class="collection-item"><strong>Commune :</strong> {{ funding_request.commune|default:"-" }}</li>
+            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter|default:"-" }}</li>
             <li class="collection-item"><strong>Adresse :</strong> {{ funding_request.address }}</li>
             <li class="collection-item"><strong>Téléphone :</strong> {{ funding_request.phone }} {{ funding_request.funding_request_status }}</li>
             <li class="collection-item"><strong>Email :</strong> {{ funding_request.email|default:"Non fourni" }} </li>
@@ -74,7 +75,7 @@
             </a>
             {% endif %}
             {% if funding_request.funding_request_status.name == "En cours" %}
-            <a href="{% url 'paycard_funding' funding_request.id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
+            <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
               <i class="material-icons left">payments</i> Financer
             </a>
             {% endif %}
