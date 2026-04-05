@@ -59,22 +59,24 @@
             <li class="collection-item"><strong>Email :</strong> {{ alert.email|default:"Non fourni" }}</li>
           </ul>
           <div class="card-action center-align">
-            <a href="{% url 'loss_alert_list' %}" class="btn-flat waves-effect waves-light blue-text text-darken-2" aria-label="Retour aux alertes">
-              <i class="material-icons left">arrow_back</i> Retour aux Alertes
-            </a>
-            {% if alert.phone %}
-            <a href="tel:{{ alert.phone }}" class="btn waves-effect waves-light red darken-2" aria-label="Contacter par téléphone">
-              <i class="material-icons left">call</i> Contacter
-            </a>
-            {% endif %}
-            {% if user == alert.created_by %}
-            <form method="post" action="{% url 'close_loss_alert' alert.public_id %}" style="display:inline;" class="close-form">
-              {% csrf_token %}
-              <button type="submit" class="btn waves-effect waves-light grey darken-1" onclick="return confirm('Voulez-vous vraiment clôturer cette alerte ?')" aria-label="Clôturer l'alerte">
-                <i class="material-icons left">check_circle</i> Clôturer
-              </button>
-            </form>
-            {% endif %}
+            <div class="action-buttons-wrapper">
+              <a href="{% url 'loss_alert_list' %}" class="btn-flat waves-effect waves-light blue-text text-darken-2" aria-label="Retour aux alertes">
+                <i class="material-icons left">arrow_back</i> Retour aux Alertes
+              </a>
+              {% if alert.phone %}
+              <a href="tel:{{ alert.phone }}" class="btn waves-effect waves-light red darken-2" aria-label="Contacter par téléphone">
+                <i class="material-icons left">call</i> Contacter
+              </a>
+              {% endif %}
+              {% if user == alert.created_by %}
+              <form method="post" action="{% url 'close_loss_alert' alert.public_id %}" style="display:inline;" class="close-form">
+                {% csrf_token %}
+                <button type="submit" class="btn waves-effect waves-light grey darken-1" onclick="return confirm('Voulez-vous vraiment clôturer cette alerte ?')" aria-label="Clôturer l'alerte">
+                  <i class="material-icons left">check_circle</i> Clôturer
+                </button>
+              </form>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>

@@ -276,7 +276,609 @@
     min-width: 150px;
 }
 
+/* ============================================
+   DESIGN PROFESSIONNEL OPTIMISÉ
+   ============================================ */
 
+/* --- Cartes modernes avec hauteurs égales --- */
+.funding-grid, .row[id*="container"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
 
+.funding-grid .col, .row[id*="container"] .col {
+    display: flex;
+}
 
+.funding-grid .card, .row[id*="container"] .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.funding-grid .card:hover, .row[id*="container"] .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+/* --- Badge de statut amélioré --- */
+.card .badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card .badge.yellow {
+    background: linear-gradient(135deg, #fbc02d 0%, #f9a825 100%);
+    color: #1a1a1a;
+}
+
+.card-image .card-title {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+/* --- Card content typography --- */
+.card-content {
+    padding: 20px !important;
+}
+
+.card-content p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.card-content .card-highlight-title strong {
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    display: block;
+    margin-bottom: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- Progress bar moderne --- */
+.card-content .progress {
+    height: 10px;
+    border-radius: 10px;
+    background: #e0e0e0;
+    margin: 16px 0 12px;
+    overflow: hidden;
+}
+
+.card-content .progress .determinate {
+    background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* --- Card action amélioré --- */
+.card-action {
+    padding: 16px 20px !important;
+    border-top: 1px solid #f0f0f0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-action a:not(.social-icon) {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.card-action a:not(.social-icon):hover {
+    letter-spacing: 0.8px;
+}
+
+/* --- Boutons de partage --- */
+.social-share-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #616161;
+    transition: all 0.25s ease;
+    font-size: 18px;
+}
+
+.social-icon:hover {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.social-icon.fa-facebook-f:hover {
+    background: #1877f2;
+    color: white;
+}
+
+.social-icon.fa-twitter:hover {
+    background: #1da1f2;
+    color: white;
+}
+
+/* --- Bouton Clôturer --- */
+.close-btn, .close-form .btn {
+    background: linear-gradient(135deg, #757575 0%, #616161 100%) !important;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.close-btn:hover, .close-form .btn:hover {
+    background: linear-gradient(135deg, #616161 0%, #424242 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.close-btn i, .close-form .btn i {
+    font-size: 18px;
+}
+
+/* --- Hero sections améliorées --- */
+.hero-section, .list-hero-section, .detail-hero-section {
+    position: relative;
+}
+
+.hero-section::before, .list-hero-section::before, .detail-hero-section::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    pointer-events: none;
+}
+
+.hero-content, .list-hero-content, .detail-hero-content {
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* --- Animations d'entrée --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(211, 47, 47, 0);
+    }
+}
+
+.section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* --- Sections avec espacement --- */
+.section {
+    padding: 60px 0;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 40px 0;
+    }
+}
+
+/* --- Stat cards (Accueil) --- */
+#impact-stats .card-panel {
+    border-radius: 16px;
+    padding: 30px 20px;
+    transition: all 0.3s ease;
+}
+
+#impact-stats .card-panel:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+#impact-stats .material-icons {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+#impact-stats h5.count-up {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 16px 0;
+    background: linear-gradient(135deg, #1976d2, #42a5f5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Icon blocks --- */
+.icon-block {
+    padding: 30px 20px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.icon-block:hover {
+    background: rgba(33, 150, 243, 0.05);
+    transform: translateY(-5px);
+}
+
+.icon-block .material-icons {
+    font-size: 56px;
+    margin-bottom: 20px;
+}
+
+.icon-block h5 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+}
+
+/* --- Alert cards spécifiques --- */
+.alert-card .card-image .badge {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    color: white;
+}
+
+.alert-card .card-action .btn.red {
+    background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+}
+
+/* --- Funding cards spécifiques --- */
+.funding-card .card-image .badge {
+    background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+    color: white;
+}
+
+.funding-card .card-action .blue-text {
+    color: #1976d2 !important;
+    font-weight: 700;
+}
+
+/* --- Detail page enhancements --- */
+.collection-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 16px;
+    transition: background 0.2s ease;
+}
+
+.collection-item:hover {
+    background: #fafafa;
+}
+
+.collection-item strong {
+    color: #1976d2;
+    min-width: 140px;
+    display: inline-block;
+}
+
+/* --- Action buttons wrapper (detail pages) --- */
+.action-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons-wrapper .btn,
+.action-buttons-wrapper .btn-flat {
+    margin: 4px;
+}
+
+/* --- Boutons d'action --- */
+.btn, .btn-large, .btn-small {
+    border-radius: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.btn:hover, .btn-large:hover, .btn-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.btn-large {
+    padding: 0 32px;
+    height: 54px;
+    line-height: 54px;
+}
+
+/* --- Fixed action button --- */
+.fixed-action-btn {
+    bottom: 30px;
+    right: 30px;
+}
+
+.fixed-action-btn ul {
+    padding: 10px;
+}
+
+.fixed-action-btn ul li a {
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.25s ease;
+}
+
+.fixed-action-btn ul li a:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+}
+
+/* --- Loader amélioré --- */
+#loader {
+    padding: 60px 0;
+}
+
+#loader .preloader-wrapper {
+    width: 64px;
+    height: 64px;
+}
+
+/* --- Pagination --- */
+#pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+#pagination .btn-page, #pagination button {
+    background: white;
+    color: #1976d2;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+#pagination .btn-page:hover, #pagination button:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-2px);
+}
+
+#pagination span {
+    font-weight: 500;
+    color: #616161;
+}
+
+/* --- Toast notifications --- */
+.toast {
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* --- Formulaire de contact --- */
+.contact-form .input-field input,
+.contact-form .input-field textarea {
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.25s ease;
+}
+
+.contact-form .input-field input:focus,
+.contact-form .input-field textarea:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE OPTIMISÉ
+   ============================================ */
+
+/* Tablettes */
+@media (max-width: 992px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-content h5 {
+        font-size: 1.1rem;
+    }
+
+    .funding-grid {
+        gap: 16px;
+    }
+
+    .card-action {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .card-action > div {
+        text-align: center;
+    }
+
+    .social-share-buttons {
+        justify-content: center;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .hero-section {
+        min-height: 450px;
+    }
+
+    .hero-content {
+        padding: 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-content h5 {
+        font-size: 0.95rem;
+    }
+
+    .hero-content .btn-large {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin: 8px 0;
+    }
+
+    .section {
+        padding: 30px 0;
+    }
+
+    #impact-stats h5.count-up {
+        font-size: 2.2rem;
+    }
+
+    #impact-stats .material-icons {
+        font-size: 48px;
+    }
+
+    .icon-block {
+        padding: 20px 15px;
+    }
+
+    .icon-block .material-icons {
+        font-size: 42px;
+    }
+
+    .card-content {
+        padding: 16px !important;
+    }
+
+    .card-action {
+        padding: 12px 16px !important;
+    }
+
+    /* Bouton Clôturer en pleine largeur sur mobile */
+    .close-btn, .close-form .btn {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .fixed-action-btn {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .fixed-action-btn ul li a {
+        width: 44px;
+        height: 44px;
+        line-height: 44px;
+    }
+
+    /* Collection items */
+    .collection-item {
+        padding: 12px;
+    }
+
+    .collection-item strong {
+        display: block;
+        min-width: auto;
+        margin-bottom: 4px;
+    }
+}
+
+/* Petits mobiles */
+@media (max-width: 360px) {
+    .hero-section {
+        min-height: 380px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.3rem;
+    }
+
+    .hero-content h5 {
+        font-size: 0.85rem;
+    }
+
+    #impact-stats h5.count-up {
+        font-size: 1.8rem;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITÉ
+   ============================================ */
+
+/* Focus visible */
+.btn:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid #1976d2;
+    outline-offset: 2px;
+}
+
+/* Réduire les animations pour les utilisateurs sensibles */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Mode sombre (préparation) */
+@media (prefers-color-scheme: dark) {
+    .card {
+        background: #1e1e1e;
+    }
+
+    .card-content {
+        color: #e0e0e0;
+    }
+
+    .collection-item {
+        border-bottom-color: #333;
+    }
+
+    .collection-item:hover {
+        background: #252525;
+    }
+}
 
