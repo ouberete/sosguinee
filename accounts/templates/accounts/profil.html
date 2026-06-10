@@ -75,19 +75,19 @@
                                 <ul class="collection">
                                     <li class="collection-item">
                                         <i class="fab fa-facebook blue-text text-darken-3"></i> <strong>Facebook:</strong> 
-                                        {% if profile.facebook %}<a href="{{ profile.facebook }}" target="_blank" rel="noopener noreferrer">{{ profile.facebook }}</a>{% else %}Non renseigné{% endif %}
+                                        {% if profile.facebook %}<a href="{% if 'http' in profile.facebook %}{{ profile.facebook }}{% elif '/' in profile.facebook or '.com' in profile.facebook %}https://{{ profile.facebook }}{% else %}https://facebook.com/{{ profile.facebook }}{% endif %}" target="_blank" rel="noopener noreferrer">Facebook / {{ profile.facebook }}</a>{% else %}Non renseigné{% endif %}
                                     </li>
                                     <li class="collection-item">
                                         <i class="fab fa-twitter blue-text"></i> <strong>Twitter:</strong> 
-                                        {% if profile.twitter %}<a href="{{ profile.twitter }}" target="_blank" rel="noopener noreferrer">{{ profile.twitter }}</a>{% else %}Non renseigné{% endif %}
+                                        {% if profile.twitter %}<a href="{% if 'http' in profile.twitter %}{{ profile.twitter }}{% elif '/' in profile.twitter or '.com' in profile.twitter %}https://{{ profile.twitter }}{% else %}https://twitter.com/{{ profile.twitter }}{% endif %}" target="_blank" rel="noopener noreferrer">Twitter / {{ profile.twitter }}</a>{% else %}Non renseigné{% endif %}
                                     </li>
                                     <li class="collection-item">
                                         <i class="fab fa-linkedin blue-text text-darken-1"></i> <strong>Linkedin:</strong> 
-                                        {% if profile.linkedin %}<a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer">{{ profile.linkedin }}</a>{% else %}Non renseigné{% endif %}
+                                        {% if profile.linkedin %}<a href="{% if 'http' in profile.linkedin %}{{ profile.linkedin }}{% elif '/' in profile.linkedin or '.com' in profile.linkedin %}https://{{ profile.linkedin }}{% else %}https://linkedin.com/in/{{ profile.linkedin }}{% endif %}" target="_blank" rel="noopener noreferrer">Linkedin / {{ profile.linkedin }}</a>{% else %}Non renseigné{% endif %}
                                     </li>
                                     <li class="collection-item">
                                         <i class="fab fa-instagram pink-text"></i> <strong>Instagram:</strong> 
-                                        {% if profile.instagram %}<a href="{{ profile.instagram }}" target="_blank" rel="noopener noreferrer">{{ profile.instagram }}</a>{% else %}Non renseigné{% endif %}
+                                        {% if profile.instagram %}<a href="{% if 'http' in profile.instagram %}{{ profile.instagram }}{% elif '/' in profile.instagram or '.com' in profile.instagram %}https://{{ profile.instagram }}{% else %}https://instagram.com/{{ profile.instagram }}{% endif %}" target="_blank" rel="noopener noreferrer">Instagram / {{ profile.instagram }}</a>{% else %}Non renseigné{% endif %}
                                     </li>
                                 </ul>
                             </div>
@@ -97,7 +97,11 @@
                             <div class="col s12">
                                 <h5 class="mt-4">Pièce d'identité</h5>
                                 <div class="card-panel center-align">
+                                    {% if ".pdf" in profile.id_card.url|lower %}
                                     <embed type="application/pdf" src="{{ profile.id_card.url }}" width="100%" height="400px">
+                                    {% else %}
+                                    <img src="{{ profile.id_card.url }}" alt="Pièce d'identité" style="max-width: 100%; height: auto; border-radius: 8px;">
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -112,7 +116,7 @@
     </section>
     <section class="section container profile-sections">
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="alerts-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">report_problem</i> Mes Alertes</span>
@@ -140,13 +144,36 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if alerts.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if alerts.has_previous %}
+                                <li class="waves-effect"><a href="?page_alerts={{ alerts.previous_page_number }}#alerts-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in alerts.paginator.page_range %}
+                                    {% if alerts.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_alerts={{ num }}#alerts-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if alerts.has_next %}
+                                <li class="waves-effect"><a href="?page_alerts={{ alerts.next_page_number }}#alerts-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucune alerte créée.</p>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="funding-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">request_quote</i> Mes Demandes de financement</span>
@@ -183,6 +210,29 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if funding_requests.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if funding_requests.has_previous %}
+                                <li class="waves-effect"><a href="?page_fr={{ funding_requests.previous_page_number }}#funding-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in funding_requests.paginator.page_range %}
+                                    {% if funding_requests.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_fr={{ num }}#funding-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if funding_requests.has_next %}
+                                <li class="waves-effect"><a href="?page_fr={{ funding_requests.next_page_number }}#funding-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucune demande de financement créée.</p>
                         {% endif %}
@@ -191,7 +241,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="donations-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">volunteer_activism</i> Mes Dons</span>
@@ -212,13 +262,36 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if donations.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if donations.has_previous %}
+                                <li class="waves-effect"><a href="?page_don={{ donations.previous_page_number }}#donations-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in donations.paginator.page_range %}
+                                    {% if donations.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_don={{ num }}#donations-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if donations.has_next %}
+                                <li class="waves-effect"><a href="?page_don={{ donations.next_page_number }}#donations-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucun don effectué.</p>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="fundings-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">account_balance_wallet</i> Mes Financements</span>
@@ -242,6 +315,29 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if fundings.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if fundings.has_previous %}
+                                <li class="waves-effect"><a href="?page_fun={{ fundings.previous_page_number }}#fundings-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in fundings.paginator.page_range %}
+                                    {% if fundings.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_fun={{ num }}#fundings-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if fundings.has_next %}
+                                <li class="waves-effect"><a href="?page_fun={{ fundings.next_page_number }}#fundings-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucun financement effectué.</p>
                         {% endif %}
@@ -250,7 +346,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="messages-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">mail</i> Mes Messages</span>
@@ -270,13 +366,36 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if messages_sent.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if messages_sent.has_previous %}
+                                <li class="waves-effect"><a href="?page_msg={{ messages_sent.previous_page_number }}#messages-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in messages_sent.paginator.page_range %}
+                                    {% if messages_sent.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_msg={{ num }}#messages-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if messages_sent.has_next %}
+                                <li class="waves-effect"><a href="?page_msg={{ messages_sent.next_page_number }}#messages-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucun message envoyé.</p>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m6" id="comments-section">
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">chat_bubble_outline</i> Mes Commentaires</span>
@@ -297,6 +416,29 @@
                             </article>
                             {% endfor %}
                         </div>
+                        {% if comments.has_other_pages %}
+                        <div class="center-align" style="margin-top: 20px;">
+                            <ul class="pagination">
+                                {% if comments.has_previous %}
+                                <li class="waves-effect"><a href="?page_com={{ comments.previous_page_number }}#comments-section"><i class="material-icons">chevron_left</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                                {% endif %}
+                                {% for num in comments.paginator.page_range %}
+                                    {% if comments.number == num %}
+                                    <li class="active blue darken-2"><a href="#!">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="waves-effect"><a href="?page_com={{ num }}#comments-section">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if comments.has_next %}
+                                <li class="waves-effect"><a href="?page_com={{ comments.next_page_number }}#comments-section"><i class="material-icons">chevron_right</i></a></li>
+                                {% else %}
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <p class="grey-text">Aucun commentaire.</p>
                         {% endif %}
@@ -315,8 +457,12 @@
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 <style>
+    html, body {
+        overflow-x: hidden;
+    }
     .profile-page {
         background: #f4f7fb;
+        overflow-x: hidden;
     }
     .profile-shell {
         max-width: 1280px;
@@ -520,6 +666,7 @@
         grid-template-columns: 48px minmax(0, 1fr);
         gap: 14px;
         padding: 14px;
+        overflow: hidden;
         border: 1px solid #e3ebf4;
         border-radius: 16px;
         background: #ffffff;

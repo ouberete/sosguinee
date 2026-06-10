@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
+from django.core.paginator import Paginator
 from django.core.files.storage import FileSystemStorage
 from page.models import UserDetails, LossAlert, FundingRequest, Donation, FundPayment, MessageContact, Comment
 from ..forms import ProfileForm, UserInfosForm, UserDocumentForm, UserLinkForm
@@ -22,15 +23,26 @@ def user_profile(request):
             user_details = ProfileForm(instance=profile)
 
             # Récupérer les éléments créés par l'utilisateur
-            alerts = LossAlert.objects.filter(created_by=request.user).order_by('-created_at')
-            funding_requests = FundingRequest.objects.filter(created_by=request.user).order_by('-created_at')
-            donations = Donation.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            alerts_qs = LossAlert.objects.filter(created_by=request.user).order_by('-created_at')
+            alerts = Paginator(alerts_qs, 4).get_page(request.GET.get('page_alerts'))
+            
+            funding_requests_qs = FundingRequest.objects.filter(created_by=request.user).order_by('-created_at')
+            funding_requests = Paginator(funding_requests_qs, 4).get_page(request.GET.get('page_fr'))
+            
+            donations_qs = Donation.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            donations = Paginator(donations_qs, 4).get_page(request.GET.get('page_don'))
+            
             # Paiements (financements effectués)
-            fundings = FundPayment.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            fundings_qs = FundPayment.objects.filter(donor_email=request.user.email).order_by('-created_at')
+            fundings = Paginator(fundings_qs, 4).get_page(request.GET.get('page_fun'))
+            
             # Messages de contact envoyés
-            messages_sent = MessageContact.objects.filter(email=request.user.email).order_by('-created_at')
+            messages_sent_qs = MessageContact.objects.filter(email=request.user.email).order_by('-created_at')
+            messages_sent = Paginator(messages_sent_qs, 4).get_page(request.GET.get('page_msg'))
+            
             # Commentaires postés
-            comments = Comment.objects.filter(user=request.user).order_by('-created_at')
+            comments_qs = Comment.objects.filter(user=request.user).order_by('-created_at')
+            comments = Paginator(comments_qs, 4).get_page(request.GET.get('page_com'))
 
             countries = dict(UserDetails.COUNTRY_CHOICES)
             country = countries.get(profile.birth_country, 'Non renseigne')
@@ -133,7 +145,7 @@ class UpdateUserProfileWizard(SessionWizardView):
         for form in form_list:
             for key, value in form.cleaned_data.items():
                 # Handle location fields specially (they are model FKs)
-                if key in ('region', 'prefecture', 'commune'):
+                if key in ('region', 'prefecture', 'commune', 'quarter'):
                     setattr(user_details, f'{key}_id', value.id if value else None)
                 else:
                     setattr(user_details, key, value)
