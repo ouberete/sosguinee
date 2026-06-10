@@ -49,7 +49,11 @@
     padding: 8px;
 }
 
+<<<<<<< HEAD
 .aligned .selector-chosen-title label {
+=======
+.selector-chosen-title label {
+>>>>>>> chore/security-design-hardening
     color: var(--header-link-color);
     width: 100%;
 }
@@ -60,7 +64,11 @@
     padding: 8px;
 }
 
+<<<<<<< HEAD
 .aligned .selector-available-title label {
+=======
+.selector-available-title label {
+>>>>>>> chore/security-design-hardening
     width: 100%;
 }
 
@@ -162,6 +170,7 @@
 
 .selector-chooseall, .selector-clearall {
     display: inline-block;
+<<<<<<< HEAD
     height: 16px;
     text-align: left;
     margin: 0 auto;
@@ -172,11 +181,27 @@
     text-decoration: none;
     opacity: 0.55;
     border: none;
+=======
+    text-align: left;
+    padding: 4px 5px;
+    margin: 0 auto;
+    overflow: hidden;
+    color: var(--button-fg);
+    background-color: var(--button-bg);
+    text-decoration: none;
+    opacity: 0.55;
+    border: none;
+    border-radius: 4px;
+>>>>>>> chore/security-design-hardening
 }
 
 :enabled.selector-chooseall:focus, :enabled.selector-clearall:focus,
 :enabled.selector-chooseall:hover, :enabled.selector-clearall:hover {
+<<<<<<< HEAD
     color: var(--link-fg);
+=======
+    background-color: var(--button-hover-bg);
+>>>>>>> chore/security-design-hardening
 }
 
 :enabled.selector-chooseall, :enabled.selector-clearall {
@@ -187,22 +212,28 @@
     cursor: pointer;
 }
 
+<<<<<<< HEAD
 .selector-chooseall {
     padding: 0 18px 0 0;
     background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
+=======
+>>>>>>> chore/security-design-hardening
 :enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
+<<<<<<< HEAD
 .selector-clearall {
     padding: 0 0 0 18px;
     background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
+=======
+>>>>>>> chore/security-design-hardening
 :enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -144px;
 }
@@ -313,6 +344,13 @@ p.datetime {
     font-weight: bold;
 }
 
+<<<<<<< HEAD
+=======
+p.datetime label {
+    display: inline;
+}
+
+>>>>>>> chore/security-design-hardening
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
@@ -576,7 +614,12 @@ ul.timelist, .timelist li {
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
+<<<<<<< HEAD
     background: url(../img/inline-delete.svg) 0 0 no-repeat;
+=======
+    background: url(../img/inline-delete.svg) center center no-repeat;
+    background-size: contain;
+>>>>>>> chore/security-design-hardening
     width: 1.5rem;
     height: 1.5rem;
     border: 0px none;

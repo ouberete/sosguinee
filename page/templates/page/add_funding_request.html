@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ajouter une Demande de Financement - SOS Guinée{% endblock %}
+{% block title %}Ajouter une demande de financement - SOS Guinée{% endblock %}
 {% block extra_head %}
   <meta name="description" content="Soumettez une nouvelle demande de financement sur SOS Guinée pour des soins médicaux, une campagne religieuse ou communautaire.">
 {% endblock %}
@@ -9,76 +9,104 @@
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 {% block content %}
-  <main role="main">
-    <!-- Hero -->
-   <!-- <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner" aria-label="Ajout de demande de financement">
-      <div class="parallax">
-        <img src="{% static 'img/articles/img7.avif' %}" alt="Ajout de financement" class="responsive-img" loading="lazy">
-      </div>
-      <div class="container showcase-content">
-        <div class="row">
-          <div class="col s12">
-            <div class="card-panel blue lighten-5">
-              <h4>Ajouter une Demande de Financement</h4>
-              <p>Besoin d'une aide pour des soins médicaux, une campagne religieuse ou communautaire ? Remplissez le formulaire ci-dessous.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
--->
-    <!-- Formulaire d'ajout -->
+  <main role="main" class="sos-form-page">
     <section class="section container" aria-labelledby="add-fund-heading">
-      <h5 id="add-fund-heading" class="center-align">Formulaire d'ajout de demande de Financement</h5>
-      <form method="post" enctype="multipart/form-data" class="row" novalidate>
+      <h1 id="add-fund-heading" class="center-align">Formulaire d'ajout de demande de financement</h1>
+      <p class="form-required-note center-align"><span class="required-mark">*</span> Champs obligatoires</p>
+
+      <form method="post" enctype="multipart/form-data" class="row sos-form-grid" data-location-cascade="true">
         {% csrf_token %}
-        {# Champs standards sauf fichiers #}
-        {% for field in form.visible_fields %}
-          {% if field.field.widget.input_type != 'file' %}
-            <div class="input-field col s12 {% if field.name == 'description' or field.name == 'title'  or field.name == 'beneficiary_name' or field.name == 'description_needs' or field.name == 'address' %}m12{% else %}m6{% endif %}">
-              {{ field }}
-              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-              {% if field.help_text %}
-                <span class="helper-text">{{ field.help_text }}</span>
-              {% endif %}
-              {% for error in field.errors %}
-                <span class="red-text">{{ error }}</span>
+        {% if form.non_field_errors %}
+          <div class="col s12">
+            <div class="card-panel red lighten-5 red-text text-darken-3" role="alert" aria-live="assertive">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
               {% endfor %}
             </div>
+          </div>
+        {% endif %}
+
+        {% for field in form.visible_fields %}
+          {% if field.name != 'compress_principal_image' and field.field.widget.input_type != 'file' %}
+            {% if field.name == 'description' or field.name == 'title' or field.name == 'beneficiary_name' or field.name == 'description_needs' or field.name == 'address' %}
+              {% include 'page/includes/form_field.html' with field=field field_width='m12' %}
+            {% else %}
+              {% include 'page/includes/form_field.html' with field=field field_width='m6' %}
+            {% endif %}
           {% endif %}
         {% endfor %}
 
-        {# Champ image principale #}
-        <div class="file-field input-field col s12 m6">
-          <div class="btn">
-            <span>Image Principale</span>
+        <div class="col s12 m6">
+          <div class="upload-field{% if form.principal_image.errors %} has-error{% endif %}{% if form.principal_image.field.required %} is-required{% endif %}">
+            <label class="upload-dropzone" for="{{ form.principal_image.id_for_label }}" data-upload-zone="principal_image">
+              <div class="upload-dropzone-head">
+                <span class="upload-dropzone-icon material-icons">image</span>
+                <div class="upload-dropzone-copy">
+                  <strong>Image principale{% if form.principal_image.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</strong>
+                  <span>Glissez-déposez votre image ici ou cliquez pour choisir un fichier.</span>
+                </div>
+                <span class="upload-dropzone-action" data-upload-action="principal_image">
+                  <i class="material-icons">add_photo_alternate</i>
+                  <em>Ajouter</em>
+                </span>
+              </div>
+              <small>Formats autorisés : JPG, JPEG, PNG, WEBP, AVIF. Taille max : 3 MB.</small>
+            </label>
             {{ form.principal_image }}
+            <div class="upload-preview" data-upload-preview="principal_image"></div>
+            {% for error in form.principal_image.errors %}
+              <span class="field-error red-text">{{ error }}</span>
+            {% endfor %}
           </div>
-          <div class="file-path-wrapper">
-            <input class="file-path validate" type="text" placeholder="Aucune image sélectionnée">
-          </div>
-          {% for error in form.principal_image.errors %}
-            <span class="red-text">{{ error }}</span>
+        </div>
+
+        <div class="input-field col s12 m6 form-field">
+          <p>
+            <label>
+              {{ form.compress_principal_image }}
+              <span>{{ form.compress_principal_image.label }}</span>
+            </label>
+          </p>
+          {% if form.compress_principal_image.help_text %}
+            <span class="helper-text">{{ form.compress_principal_image.help_text }}</span>
+          {% endif %}
+          {% for error in form.compress_principal_image.errors %}
+            <span class="field-error red-text">{{ error }}</span>
           {% endfor %}
         </div>
 
-        {# Champ documents optionnels #}
-        <div class="file-field input-field col s12 m6">
-          <div class="btn">
-            <span>Documents supplémentaires</span>
+        <div class="col s12 m6">
+          <div class="upload-field{% if form.optional_docs.errors %} has-error{% endif %}">
+            <label class="upload-dropzone upload-dropzone-multiple" for="{{ form.optional_docs.id_for_label }}" data-upload-zone="optional_docs">
+              <div class="upload-dropzone-head">
+                <span class="upload-dropzone-icon material-icons">attach_file</span>
+                <div class="upload-dropzone-copy">
+                  <strong>Documents supplémentaires</strong>
+                  <span>Glissez-déposez vos documents ici ou cliquez pour sélectionner plusieurs fichiers.</span>
+                </div>
+                <span class="upload-dropzone-action" data-upload-action="optional_docs">
+                  <i class="material-icons">add_circle</i>
+                  <em>Ajouter</em>
+                </span>
+              </div>
+              <small>Jusqu'à 5 fichiers (PDF, JPG, JPEG, PNG, WEBP, AVIF), 1 MB max par fichier.</small>
+            </label>
             {{ form.optional_docs }}
+            <div class="upload-preview upload-preview-list" data-upload-preview="optional_docs"></div>
+            {% for error in form.optional_docs.errors %}
+              <span class="field-error red-text">{{ error }}</span>
+            {% endfor %}
           </div>
-          <div class="file-path-wrapper">
-            <input class="file-path validate" type="text" placeholder="Aucun fichier sélectionné">
-          </div>
-          {% for error in form.optional_docs.errors %}
-            <span class="red-text">{{ error }}</span>
-          {% endfor %}
         </div>
 
-        <!-- Submit -->
-        <div class="col s12 center-align">
-          <button type="submit" class="btn-large green waves-effect waves-light" aria-label="Soumettre la demande">Ajouter Demande</button>
+        {% if turnstile_site_key %}
+          <div class="col s12">
+            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+          </div>
+        {% endif %}
+
+        <div class="col s12 center-align form-submit-row">
+          <button type="submit" class="btn-large green waves-effect waves-light" aria-label="Soumettre la demande">Ajouter la demande</button>
         </div>
       </form>
     </section>
@@ -87,6 +115,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<<<<<<< HEAD
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     M.FormSelect.init(document.querySelectorAll('select'));
@@ -149,4 +178,9 @@
     }
   });
 </script>
+=======
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="{% static 'js/location_cascade.js' %}"></script>
+<script src="{% static 'js/upload_dropzones.js' %}"></script>
+>>>>>>> chore/security-design-hardening
 {% endblock %}

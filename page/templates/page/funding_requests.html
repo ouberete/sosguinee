@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load i18n %}
 {% load custom_filters %}
 
 {% block title %}Demandes de financement - SOS Guinée{% endblock %}
 {% block extra_head %}
-<meta name="description" content="Consultez et filtrez les demandes de financement solidaires sur SOS Guinée. Découvrez les bénéficiaires, montants et statuts en un coup d'œil.">
+<meta name="description" content="Consultez et filtrez les demandes de financement solidaires sur SOS Guinée.">
 <meta property="og:title" content="Demandes de financement - SOS Guinée">
 <meta property="og:description" content="Filtrez les demandes de financement par bénéficiaire, montant, date, statut et type.">
 {% endblock %}
@@ -15,21 +14,22 @@
 {% block content %}
 
 <main role="main">
-  <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner" aria-label="Bannière financement">
+  <section class="parallax-container valign-wrapper hero-section hero-list-page" role="banner"
+    aria-label="Bannière financement">
     <div class="parallax">
-      <img src="{% static 'img/articles/img7.avif' %}" alt="Solidarité Guinée" loading="lazy">
+      <img src="{% static 'img/hero_2.png' %}" alt="Solidarité Guinée" loading="lazy">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
         <div class="col s12">
-          <h1 class="header light text-shadow">Demandes de Financement</h1>
+          <h1 class="header light text-shadow">Demandes de financement</h1>
           <h5 class="light text-shadow">Filtrez et explorez les demandes de solidarité médicale et communautaire.</h5>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section container" aria-labelledby="filter-heading">
+  <section class="section container page-width-wide" aria-labelledby="filter-heading">
     <h2 id="filter-heading" class="center-align light">Filtrer les demandes</h2>
     <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1">
       <div class="input-field col s12 m6 l4">
@@ -49,12 +49,20 @@
         <label for="start_date">Date début</label>
       </div>
       <div class="input-field col s12 m6 l4">
+<<<<<<< HEAD
         <input id="end_date" type="text" class="datepicker" name="end_date" value="{{ request.GET.end_date }}"> 
+=======
+        <input id="end_date" type="text" class="datepicker" name="end_date" value="{{ request.GET.end_date }}">
+>>>>>>> chore/security-design-hardening
         <label for="end_date">Date fin</label>
       </div>
       <div class="input-field col s12 m6 l4">
         <select id="status" name="status">
+<<<<<<< HEAD
           <option value="" {% if not request.GET.status %}selected{% endif %}>Tous les statuts</option> 
+=======
+          <option value="" {% if not request.GET.status %}selected{% endif %}>Tous les statuts</option>
+>>>>>>> chore/security-design-hardening
           {% for s in funding_request_statuses %}
           <option value="{{ s.name }}" {% if request.GET.status == s.name %}selected{% endif %}>{{ s.name }}</option>
           {% endfor %}
@@ -74,33 +82,21 @@
         <button type="submit" class="btn large waves-effect waves-light blue darken-2 full-width">
           <i class="material-icons left">search</i> Appliquer
         </button>
-        <a href="{% url 'funding_request_list' %}" class="btn-flat large waves-effect waves-light red-text text-darken-2 full-width reset-button">
+        <a href="{% url 'funding_request_list' %}"
+          class="btn-flat large waves-effect waves-light red-text text-darken-2 full-width reset-button">
           <i class="material-icons left">clear</i> Réinitialiser
         </a>
       </div>
     </form>
   </section>
 
-
-
-  <section class="section container" aria-labelledby="results-heading">
-    <h2 id="results-heading" class="center-align light">Demandes de Financement</h2>
-    <div id="loader" class="center-align" style="display: none;">
-      <div class="preloader-wrapper big active">
-        <div class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left"><div class="circle"></div></div>
-          <div class="gap-patch"><div class="circle"></div></div>
-          <div class="circle-clipper right"><div class="circle"></div></div>
-        </div>
-      </div>
-    </div>
-    <div id="fundings-container" class="row">
-
-    </div>
+  <section class="section page-width-wide" aria-labelledby="results-heading">
+    <h2 id="results-heading" class="center-align light">Demandes de financement</h2>
+    <div id="loader" style="display: none;"></div>
+    <div id="results-count" class="right-align grey-text" style="margin-bottom: 8px;"></div>
+    <div id="fundings-container" class="row funding-grid funding-grid-wiseed"></div>
     <div class="center-align">
-      <div id="pagination">
-
-      </div>
+      <div id="pagination"></div>
     </div>
   </section>
 </main>
@@ -109,10 +105,10 @@
 
 {% block extrajs %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     M.FormSelect.init(document.querySelectorAll('select'));
     M.Datepicker.init(document.querySelectorAll('.datepicker'), {
-      format: 'dd-mm-yyyy', // Ensure format matches Django's date input
+      format: 'dd-mm-yyyy',
       i18n: {
         cancel: 'Annuler',
         clear: 'Effacer',
@@ -125,7 +121,7 @@
       }
     });
     M.Parallax.init(document.querySelectorAll('.parallax'));
-    M.Materialbox.init(document.querySelectorAll('.materialboxed')); // For cards if they use materialboxed
+    M.Materialbox.init(document.querySelectorAll('.materialboxed'));
   });
 </script>
 <script src="{% static 'js/funding_requests.js' %}"></script>

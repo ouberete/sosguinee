@@ -4,18 +4,24 @@
 {% block title %}Merci pour votre don - SOS Guinée{% endblock %}
 
 {% block content %}
-
-<div class="section center-align m-5">
-    <div class="container">
-        <h4>🙏 Merci pour votre générosité !</h4>
-        <p>Votre don nous aidera à apporter un soutien vital à ceux qui en ont besoin.</p>
-        <br>
-        <a href="{% url 'home' %}" class="btn waves-effect waves-light">
-            Retour à l'accueil
-            <i class="material-icons right">home</i>
-        </a>
+<main role="main" class="valign-wrapper" style="min-height: 70vh; background-color: #f9f9f9;">
+  <section class="section container">
+    <div class="row">
+      <div class="col s12 m8 offset-m2 l6 offset-l3">
+        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 20px;">
+          <div style="background-color: #e8f5e9; width: 80px; height: 80px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <i class="material-icons green-text text-darken-2" style="font-size: 48px;">favorite</i>
+          </div>
+          <h4 style="font-weight: 600; color: #2e7d32;">Merci pour votre générosité !</h4>
+          <p class="flow-text" style="font-size: 1.1rem; color: #555; margin-top: 20px; margin-bottom: 30px;">
+            Votre don nous aidera à apporter un soutien vital à ceux qui en ont besoin.
+          </p>
+          <a href="{% url 'home' %}" class="btn-large waves-effect waves-light blue darken-2" style="border-radius: 25px; padding: 0 30px;">
+            <i class="material-icons left">home</i> Retour à l'accueil
+          </a>
+        </div>
+      </div>
     </div>
-</div>
-<br>
-<br>
+  </section>
+</main>
 {% endblock %}

@@ -1,0 +1,12 @@
+<div class="input-field col s12 {{ field_width|default:'m6' }} form-field{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
+  {{ field }}
+  <label for="{{ field.id_for_label }}" class="form-field-label{% if field.field.widget.input_type == 'select' %} select-label{% endif %}{% if field.field.widget.attrs.rows %} textarea-label{% endif %}{% if field.value or field.field.widget.attrs.placeholder or field.field.widget.attrs.rows or field.field.widget.input_type == 'date' or field.field.widget.input_type == 'time' or field.field.widget.input_type == 'select' %} active{% endif %}">
+    {{ field.label }}{% if field.field.required %}<span class="required-mark" aria-hidden="true">*</span>{% endif %}
+  </label>
+  {% if field.help_text %}
+    <span class="helper-text">{{ field.help_text }}</span>
+  {% endif %}
+  {% for error in field.errors %}
+    <span class="field-error red-text">{{ error }}</span>
+  {% endfor %}
+</div>
