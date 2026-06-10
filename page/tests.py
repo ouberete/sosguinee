@@ -23,7 +23,7 @@ class PaymentCallbackTests(TestCase):
             donor_email="donor@example.com",
             transaction_id="tok_valid",
         )
-        url = reverse("paycard_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
@@ -36,7 +36,7 @@ class PaymentCallbackTests(TestCase):
             donor_email="donor@example.com",
             transaction_id="tok_valid",
         )
-        url = reverse("paycard_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
 
         response = self.client.get(f"{url}?token={donation.transaction_id}")
         self.assertEqual(response.status_code, 200)
@@ -51,7 +51,7 @@ class PaymentCallbackTests(TestCase):
             donor_email="donor@example.com",
             transaction_id="tok_funding",
         )
-        url = reverse("paycard_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
 
         first = self.client.get(f"{url}?token={payment.transaction_id}")
         second = self.client.get(f"{url}?token={payment.transaction_id}")
