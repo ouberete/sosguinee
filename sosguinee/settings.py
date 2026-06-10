@@ -15,11 +15,15 @@ from pathlib import Path
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+import dj_database_url
 
-try:
-    import django_heroku
-except ImportError:  # Local env may not have this optional package.
-    django_heroku = None
+# Récupère automatiquement la variable DATABASE_URL fournie par Heroku
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+DATABASES['default'].update(db_from_env)
+# try:
+#     import django_heroku
+# except ImportError:  # Local env may not have this optional package.
+#     django_heroku = None
 # pip install dj-database-url
 # pip install django_heroku
 
@@ -336,8 +340,8 @@ PAYCARD_API_KEY = config("PAYCARD_API_KEY", cast=str, default="your_api_key")
 PAYCARD_API_SECRET = config("PAYCARD_API_SECRET", cast=str, default="your_api_secret")
 PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.paycard.com")
 
-if django_heroku is not None:
-    django_heroku.settings(locals())
+# if django_heroku is not None:
+#     django_heroku.settings(locals())
 
 #Email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
