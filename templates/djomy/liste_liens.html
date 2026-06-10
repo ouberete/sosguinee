@@ -1,0 +1,92 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{% trans "Historique des Liens de Paiement Djomy" %}</h1>
+    
+    <div class="module">
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Montant" %}</th>
+                    <th>{% trans "Référence" %}</th>
+                    <th>{% trans "Statut" %}</th>
+                    <th>{% trans "Lien" %}</th>
+                    <th>{% trans "Action" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lien in liens %}
+                <tr>
+                    <td>{{ lien.createdAt|date:"d/m/Y H:i" }}</td>
+                    <td>{{ lien.amount }} {{ lien.currency }}</td>
+                    <td>{{ lien.merchantPaymentReference }}</td>
+                    <td>
+                        <span class="badge {% if lien.status == 'SUCCESS' %}badge-success{% else %}badge-info{% endif %}">
+                            {{ lien.status }}
+                        </span>
+                    </td>
+                    <td><a href="{{ lien.paymentUrl }}" target="_blank">Ouvrir</a></td>
+                    <td>
+                        <a href="{% url 'django_djomy:detail_transaction_check' lien.transactionId %}" class="button">Vérifier</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">{% trans "Aucun lien trouvé." %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if pagination %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if pagination.page > 1 %}
+                    <a href="?page=1">&laquo; première</a>
+                    <a href="?page={{ pagination.page|add:"-1" }}">précédente</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ pagination.page }} sur {{ pagination.totalPages }}.
+                </span>
+
+                {% if pagination.page < pagination.totalPages %}
+                    <a href="?page={{ pagination.page|add:"1" }}">suivante</a>
+                    <a href="?page={{ pagination.totalPages }}">dernière &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <br><br>
+    <h1>{% trans "Enregistrements Locaux (Modèle Django)" %}</h1>
+    <div class="module">
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Réf" %}</th>
+                    <th>{% trans "Montant" %}</th>
+                    <th>{% trans "Statut" %}</th>
+                    <th>{% trans "Transaction" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in local_payments %}
+                <tr>
+                    <td>{{ p.created_at }}</td>
+                    <td>{{ p.merchant_reference }}</td>
+                    <td>{{ p.amount }} {{ p.currency }}</td>
+                    <td>{{ p.get_status_display }}</td>
+                    <td>{{ p.transaction_id }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,64 +1,121 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Contact - SOS Guinée{% endblock %}
+{% block title %}{% trans "Contact" %} - SOS Guinée{% endblock %}
 {% block extra_head %}
-  <meta name="description" content="Contactez SOS Guinée pour toute question ou suggestion via notre formulaire de contact.">
+  {% trans "Contactez SOS Guinée pour toute question, suggestion, demande d'accompagnement ou partenariat." as meta_description %}
+  <meta name="description" content="{{ meta_description }}">
 {% endblock %}
 {% block extracss %}
   <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 {% block content %}
 
-  <main role="main">
-    <!-- Hero / Contact Intro -->
-    <section class="parallax-container valign-wrapper hero-section hero-details-page" role="banner" aria-label="Contactez-nous">
-      <div class="parallax">
-        <img src="{% static 'img/articles/img7.avif' %}" alt="Contact SOS Guinée" class="responsive-img" loading="lazy">
-      </div>
+  <main role="main" class="sos-form-page contact-page">
+    <section class="contact-hero-section hero-section hero-details-page" role="banner" aria-label="{% trans 'Contactez-nous' %}">
+      <div class="contact-hero-bg" aria-hidden="true"></div>
       <div class="container showcase-content">
         <div class="row center-align container center-align white-text hero-content">
           <div class="col s12">
-              <h1>Nous Contacter</h1>
-              <p>N'hésitez pas à nous envoyer vos questions ou suggestions. Nous vous répondrons rapidement.</p>
+            <h1>{% trans "Nous contacter" %}</h1>
+            <p>{% blocktrans %}Une question, une suggestion, un besoin d'accompagnement ou une demande de partenariat ? Notre équipe est à votre écoute.{% endblocktrans %}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Contact Form -->
-    <section class="section container" aria-labelledby="contact-form-heading">
-      <h2 id="contact-form-heading" class="center-align">Formulaire de Contact</h2>
-      <div class="row">
-        <div class="col s12 m8 offset-m2">
-          <form method="post" id="contact-form" novalidate>
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-              <div class="card-panel red lighten-2">
-                {% for error in form.non_field_errors %}
-                  <p class="white-text">{{ error }}</p>
-                {% endfor %}
-              </div>
-            {% endif %}
-            {% for field in form.visible_fields %}
-              <div class="input-field">
-                {{ field }}
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {% if field.help_text %}
-                  <span class="helper-text">{{ field.help_text }}</span>
-                {% endif %}
-                {% for error in field.errors %}
-                  <span class="red-text">{{ error }}</span>
-                {% endfor %}
-              </div>
-            {% endfor %}
+    <section class="section page-width-wide contact-page-shell" aria-labelledby="contact-page-heading">
+      <div class="home-section-heading center-align">
+        <span class="home-section-kicker">{% trans "Échange" %}</span>
+        <h2 id="contact-page-heading" class="light">{% trans "Parlons de votre besoin" %}</h2>
+        <p class="home-section-intro">{% blocktrans %}Nous répondons aux questions liées aux alertes, aux financements solidaires, aux signalements sensibles et aux collaborations avec la plateforme.{% endblocktrans %}</p>
+      </div>
 
-            <div class="row valign-wrapper">
-              <div class="col s2">
-                <button type="submit" class="btn-large blue waves-effect waves-light" role="button" aria-label="Envoyer le message" onclick="showLoader(event)">Envoyer</button>
+      <div class="row contact-page-grid">
+        <div class="col s12 l5">
+          <div class="contact-info-panel">
+            <div class="contact-info-card">
+              <div class="contact-info-icon"><i class="material-icons">mail</i></div>
+              <div>
+                <h5>{% trans "Email principal" %}</h5>
+                <p>contact@sosguinee.org</p>
+                <span>{% trans "Pour les demandes générales, les questions techniques et les retours d'usage." %}</span>
               </div>
-              <div class="col s10">
-                <div id="loader" style="display:none;">
+            </div>
+
+            <div class="contact-info-card">
+              <div class="contact-info-icon"><i class="material-icons">call</i></div>
+              <div>
+                <h5>{% trans "Téléphone" %}</h5>
+                <p>+224 655 368 588</p>
+                <span>{% trans "Pour un premier contact rapide ou un besoin d'orientation urgente." %}</span>
+              </div>
+            </div>
+
+            <div class="contact-info-card">
+              <div class="contact-info-icon"><i class="material-icons">place</i></div>
+              <div>
+                <h5>{% trans "Adresse" %}</h5>
+                <p>{% trans "Lambanyi, immeuble SHERBROOKE, Conakry, Guinée" %}</p>
+                <span>{% trans "Nous privilégions le contact numérique pour accélérer le traitement des demandes." %}</span>
+              </div>
+            </div>
+
+            <div class="contact-illustration-card">
+              <img src="{% static 'img/articles/img3.avif' %}" alt="{% trans 'Équipe et entraide' %}" loading="lazy">
+              <div class="contact-illustration-copy">
+                <h5>{% trans "Ce que vous pouvez nous écrire" %}</h5>
+                <ul class="browser-default">
+                  <li>{% trans "Question sur une alerte ou une demande de financement" %}</li>
+                  <li>{% trans "Signalement d'une information importante" %}</li>
+                  <li>{% trans "Proposition de partenariat ou d'appui institutionnel" %}</li>
+                  <li>{% trans "Retour d'expérience sur l'utilisation du site" %}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col s12 l7">
+          <div class="contact-form-panel">
+            <h3>{% trans "Formulaire de contact" %}</h3>
+            <p class="contact-form-intro">{% blocktrans %}Donnez-nous un maximum de contexte pour que nous puissions vous répondre clairement et rapidement.{% endblocktrans %}</p>
+
+            <form method="post" id="contact-form" class="row contact-form-grid" novalidate>
+              {% csrf_token %}
+              {% if error %}
+                <div class="col s12">
+                  <div class="card-panel red lighten-5 red-text text-darken-3" role="alert" aria-live="assertive">
+                    <p>{{ error }}</p>
+                  </div>
+                </div>
+              {% endif %}
+              {% if form.non_field_errors %}
+                <div class="col s12">
+                  <div class="card-panel red lighten-5 red-text text-darken-3" role="alert" aria-live="assertive">
+                    {% for error in form.non_field_errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              {% for field in form.visible_fields %}
+                {% include 'page/includes/form_field.html' with field=field field_width='m12' %}
+              {% endfor %}
+
+              {% if turnstile_site_key %}
+                <div class="col s12 payment-captcha contact-captcha">
+                  <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+                </div>
+              {% endif %}
+
+              <div class="col s12 contact-submit-row">
+                <button type="submit" class="btn-large blue darken-2 waves-effect waves-light" role="button" aria-label="{% trans 'Envoyer le message' %}">
+                  {% trans "Envoyer le message" %}
+                </button>
+                <div id="loader" class="contact-loader" style="display:none;">
+                  <span>{% trans "Patientez..." %}</span>
                   <div class="preloader-wrapper small active">
                     <div class="spinner-layer spinner-blue-only">
                       <div class="circle-clipper left"><div class="circle"></div></div>
@@ -68,14 +125,16 @@
                   </div>
                 </div>
               </div>
-            </div>
 
-            {% if success %}
-              <div class="card-panel green lighten-2">
-                <p class="white-text center-align">{{ success }}</p>
-              </div>
-            {% endif %}
-          </form>
+              {% if success %}
+                <div class="col s12">
+                  <div class="card-panel green lighten-5 green-text text-darken-4" role="status" aria-live="polite">
+                    <p class="center-align">{{ success }}</p>
+                  </div>
+                </div>
+              {% endif %}
+            </form>
+          </div>
         </div>
       </div>
     </section>
@@ -84,12 +143,20 @@
 {% endblock %}
 
 {% block extrajs %}
-<script src="{% static 'js/index.js' %}"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-  function showLoader(event) {
-    event.preventDefault();
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('contact-form').submit();
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof M !== 'undefined' && typeof M.updateTextFields === 'function') {
+      M.updateTextFields();
+    }
+
+    const form = document.getElementById('contact-form');
+    const loader = document.getElementById('loader');
+    if (form && loader) {
+      form.addEventListener('submit', function() {
+        loader.style.display = 'inline-flex';
+      });
+    }
+  });
 </script>
 {% endblock %}

@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Staatliches');
+:root{
+    --primary-color: #c72727;
+    --secondary-color: #f99500;
+    --light-color: #f3f3f3;
+    --dark-color: #333;
+    --max-width: 1100px;
+}
+
+body{
+    font-family: 'Lato',sans-serif;
+    line-height: 1.5;
+    background-color: var(--light-color);
+}
+
+.logo{
+    width: 100px;
+    height: 50px;
+}
+
+.category-sports{ background: var(--secondary-color);}
+.category-ent{ background: #a66bbe;}
+.category-tech{ background: #009cff;}
+
+.btn-primary{ background: var(--primary-color);}
+
+.parallax-container {
+  height: 500px;
+}
+
+.category-yellow{ background: #ffff00;}
+.category-red{ background: #ff0000;}    
+.category-done { background: #00ff00;}
+
+#products-catalog .card .card-image img {
+    height: 200px;
+    object-fit: cover;
+}
+
+#products-catalog .card .card-title {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 10px;
+}
+
+#products-catalog .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* .card-alert {
+    background-color: #ffeb3b;
+  } */
+  .card-alert .card-title {
+    color: #d32f2f;
+  }
+
+@media (max-width: 780px) {
+    .horizontal-card{
+        display: flex;
+        flex-direction: row !important; 
+    }    
+
+    .horizontal-card .card-image img{
+        margin-bottom: 0;
+    }
+}
+
+
+
+.a-link{
+    border: .5px solid var(--primary-color);
+    margin-top: .5rem;
+    margin-right: .5rem;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    height: 50px;
+}
+
+.bordered{
+    border: .5px solid var(--primary-color);
+}
+
+.category {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    z-index: 5;
+    padding: .2rem;
+}
+
+.card-image{
+    position: relative;
+}
+
+.m-02{
+    margin: .2rem !important;
+}
+
+.m-2{
+    margin: 2rem !important;
+}
+
+.p-2{
+    padding: 2rem !important;
+}
+
+.p-5{
+    padding: 5rem !important;
+}
+
+.p-05{
+    padding: .5rem !important;
+}
+
+.mt-02{
+    margin-top: .2rem;
+}
+
+.mt-2{
+    margin-top: 2rem;
+}
+
+
+.mt-05{
+    margin-top: .5rem;
+}
+
+.mt-5{
+    margin-top: 5rem;
+}
+
+.mt-010{
+    margin-top: .10rem;
+}
+
+.mt-10{
+    margin-top: 10rem;
+}
+
+
+.mb-02{
+    margin-bottom: .2rem;
+}
+
+.mb-2{
+    margin-bottom: 2rem;
+}
+
+
+.mb-05{
+    margin-bottom: .5rem;
+}
+
+.mb-5{
+    margin-bottom: 5rem;
+}
+
+.mb-010{
+    margin-bottom: .10rem;
+}
+
+.mb-10{
+    margin-bottom: 10rem;
+}
+
+.bordered-red{
+    border: .5px solid red;
+}
+
+.bordered-black{
+    border: .5px solid black;
+}
+
+@media screen and (min-width: 785px) {
+    .mgt-5{
+        margin-top: 5rem;
+    }
+
+    .mgt-10{
+        margin-top: 10rem;
+    }
+
+    .mgt-2{
+        margin-top: 2rem;
+    }
+}
+
+.toast-success {
+    background-color: #4caf50 !important; /* Couleur de fond verte */
+    color: white !important; /* Couleur du texte blanche */
+    font-size: 16px !important; /* Taille de police plus grande */
+  }
+
+  .toast-error {
+    background-color: #f44336 !important; /* Couleur de fond rouge */
+    color: white !important; /* Couleur du texte blanche */
+    font-size: 16px !important; /* Taille de police plus grande */
+  }
+
+  .grid-column {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 1rem;
+  }
+
+  .mr-2 {
+    margin-left: 2em;
+  }
+
+  .mr-5 {
+    margin-left: 5em;
+  }
+
+  .mr-10 {
+    margin-left: 10em;
+  }
+
+  .ml-2 {
+    margin-left: 2em;
+  }
+
+  .ml-5 {
+    margin-left: 5em;
+  }
+
+  .ml-10 {
+    margin-left: 10em;
+  }

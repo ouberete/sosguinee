@@ -4,48 +4,53 @@
 
 {% block title %}Mise à jour du profil - SOS Guinée{% endblock %}
 
-{% block extra_css %}
+{% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 
 {% block content %}
-<main class="container">
+<div class="container update-profile-page">
     <div class="row">
         <div class="col s12">
-            <div class="card">
+            <div class="card update-profile-card">
                 <div class="card-content">
                     <h5 class="center-align">Mise à jour de votre profil</h5>
-                    <p class="center flow-text">Étape actuelle : {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</p>
+                    {% include 'accounts/profile_stepper.html' %}
 
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ wizard.management_form }}
-                        {% for field in wizard.form.visible_fields %}
-                        {% if field.field.widget.input_type != 'file' %}
-                        <div class="input-field col s12 m12">
-                            {{ field }}
-                            {{ field.label_tag }}
-                            {% if field.errors %}
-                            <span class="red-text">{{ field.errors|join:", " }}</span>
-                            {% endif %}
-                        </div>
-                        {% else %}
-                        <div class="file-field input-field col s12 m12">
-                            <div class="btn">
-                                <span>{{ field.label_tag }}</span>
+                        <div class="row update-profile-fields">
+                            {% for field in wizard.form.visible_fields %}
+                            {% if field.field.widget.input_type != 'file' %}
+                            <div class="input-field col s12 m6{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
                                 {{ field }}
+                                {{ field.label_tag }}
+                                {% if field.field.required %}
+                                <span class="required-indicator" aria-hidden="true">*</span>
+                                {% endif %}
+                                {% if field.errors %}
+                                <span class="field-error red-text">{{ field.errors|join:", " }}</span>
+                                {% endif %}
                             </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text" placeholder="Aucune document sélectionné">
+                            {% else %}
+                            <div class="file-field input-field col s12 m12{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
+                                <div class="btn">
+                                    <span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>
+                                    {{ field }}
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text" placeholder="Aucun document sélectionné">
+                                </div>
+                                {% for error in field.errors %}
+                                <span class="field-error red-text">{{ error }}</span>
+                                {% endfor %}
                             </div>
-                            {% for error in field.errors %}
-                            <span class="red-text">{{ error }}</span>
+                            {% endif %}
                             {% endfor %}
                         </div>
-                        {% endif %}
-                        {% endfor %}
 
-                        <div class="row">
+                        <div class="row update-profile-actions">
                             <div class="col s6 left-align">
                                 {% if wizard.steps.prev %}
                                 <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn grey">
@@ -69,11 +74,11 @@
                 </div>
                 <div class="card-action">
                     <a href="{% url 'home' %}" class="btn-flat">
-                        <i class="material-icons left">home</i> Accueil
+                        <i class="material-icons left">home</i>Accueil
                     </a>
                 </div>
             </div>
         </div>
     </div>
-</main>
+</div>
 {% endblock %}

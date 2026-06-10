@@ -1,0 +1,465 @@
+/* Styles pour la section Hero */
+.hero-section {
+    min-height: 600px; /* Hauteur minimale pour le parallax */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Assure que le contenu ne déborde pas */
+}
+
+.hero-content {
+    z-index: 10; /* Assure que le texte est au-dessus de l'image parallax */
+    position: relative;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4); /* Overlay sombre pour la lisibilité du texte */
+    border-radius: 8px;
+}
+
+.hero-content h1,.hero-content h5 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.hero-content .btn-large {
+    margin: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+#impact-stats h4.light,
+#how-it-works h4.light,
+#home-alerts h4.light,
+#home-funding h4.light {
+    position: relative;
+    margin-bottom: 14px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+
+#impact-stats h4.light::after,
+#how-it-works h4.light::after,
+#home-alerts h4.light::after,
+#home-funding h4.light::after {
+    content: "";
+    display: block;
+    width: 82px;
+    height: 4px;
+    margin: 14px auto 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+}
+
+#home-alerts h4.light::after {
+    background: linear-gradient(90deg, #d32f2f 0%, #ef5350 100%);
+}
+
+#home-funding h4.light::after {
+    background: linear-gradient(90deg, #f57c00 0%, #ffb74d 100%);
+}
+
+/* Styles pour les sections d'alertes et de financement */
+.section {
+    padding: 40px 0; /* Espacement vertical pour toutes les sections */
+}
+
+.section h4.light {
+    font-weight: 300; /* Utilise la police légère de Materialize */
+    margin-bottom: 30px;
+}
+
+/* Cartes d'alertes et de financement */
+.alert-card,.funding-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribue l'espace verticalement */
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* CORRECTION: Sélecteurs pour les conteneurs d'images - Simplifié */
+/* Card image area for list cards: responsive 16:9 */
+.alert-card .card-image,
+.funding-card .card-image {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 */
+    overflow: hidden;
+}
+
+/* CORRECTION: Sélecteurs pour les images elles-mêmes */
+.alert-card .card-image img,
+.funding-card .card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .3s ease;
+}
+
+.alert-card .badge, .funding-card .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    z-index: 5;
+    font-weight: 600;
+    color: #111;
+    background: rgba(255,255,255,0.9);
+}
+
+.alert-card.card-content,.funding-card.card-content {
+    flex-grow: 1; /* Permet au contenu de prendre l'espace disponible */
+    padding-bottom: 10px; /* Réduit l'espace en bas du contenu */
+}
+
+.alert-card.card-title,.funding-card.card-title {
+    font-size: 1.4em;
+    line-height: 1.2em;
+    margin-bottom: 10px;
+}
+
+.alert-card.card-action,.funding-card.card-action {
+    padding-top: 10px;
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+}
+
+.card-highlight-title {
+    min-height: 120px;
+}
+
+.card-highlight-title p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.card-action-share {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.card-action-share .social-icon {
+    margin: 0 0 0 0.4rem;
+}
+
+.alert-card.card-action.btn-small,.funding-card.card-action.btn-small {
+    margin-right: 5px;
+}
+
+.funding-card.progress {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    height: 8px;
+    background-color: #e0e0e0;
+}
+
+.funding-card.progress.determinate {
+    background-color: #ff9800; /* Couleur orange pour la barre de progression */
+}
+
+.funding-card.social-icon {
+    margin-left: 10px;
+    color: #333; /* Couleur par défaut pour les icônes sociales */
+    transition: color 0.3s ease;
+}
+
+.funding-card.social-icon:hover {
+    color: #007bff; /* Exemple de couleur au survol */
+}
+
+/* Section Impact Stats */
+#impact-stats.card-panel {
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#impact-stats.card-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+#impact-stats.material-icons.large {
+    font-size: 4rem; /* Taille des icônes */
+    margin-bottom: 10px;
+}
+
+#impact-stats h5.count-up {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+#impact-stats p.flow-text {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+#impact-stats .card-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+#impact-stats .card-panel::before {
+    content: "";
+    position: absolute;
+    right: -26px;
+    bottom: -34px;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(25,118,210,0.12) 0%, rgba(25,118,210,0) 72%);
+}
+
+#impact-stats .flow-text {
+    color: #475569;
+    font-weight: 600;
+}
+
+/* Section Comment ça Marche */
+#how-it-works.icon-block {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#how-it-works.icon-block h2 {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+#how-it-works.icon-block h5 {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Section Témoignages */
+#testimonials.carousel {
+    height: 350px; /* Hauteur du carousel */
+    margin-top: 30px;
+}
+
+#testimonials.carousel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+}
+
+.testimonial-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.testimonial-avatar {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid white;
+}
+
+#testimonials.carousel-item p.flow-text {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+#testimonials.carousel-item h5.light {
+    font-weight: 300;
+    font-size: 1.5rem;
+}
+
+.carousel-fixed-item {
+    bottom: 20px!important; /* Ajuste la position des contrôles */
+    left: 50%!important;
+    transform: translateX(-50%)!important;
+    width: auto!important;
+    display: flex;
+    gap: 10px; /* Espace entre les boutons */
+}
+
+.carousel-fixed-item.btn {
+    background-color: rgba(255, 255, 255, 0.8)!important;
+    color: #333!important;
+}
+
+/* Section Donate */
+#donate {
+    padding: 60px 0;
+}
+
+#donate h5.light {
+    font-weight: 300;
+}
+
+#donate.btn-large {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#how-it-works .icon-block {
+    min-height: 100%;
+    padding: 28px 22px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(248,250,252,0.94) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+#how-it-works .icon-block h5 {
+    color: #0f172a;
+}
+
+#how-it-works .center-align > .btn,
+#home-alerts .center-align > .btn-flat,
+#home-funding .center-align > .btn-flat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+}
+
+#home-alerts .center-align > .btn-flat,
+#home-funding .center-align > .btn-flat {
+    color: #0f172a !important;
+}
+
+#how-it-works .center-align > .btn:hover,
+#home-alerts .center-align > .btn-flat:hover,
+#home-funding .center-align > .btn-flat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .hero-section {
+        min-height: 500px;
+    }
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    .hero-content h5 {
+        font-size: 1.5rem;
+    }
+    #impact-stats.material-icons.large {
+        font-size: 3rem;
+    }
+    #impact-stats h5.count-up {
+        font-size: 2rem;
+    }
+    #how-it-works.icon-block h2 {
+        font-size: 3rem;
+    }
+    #testimonials.carousel {
+        height: 300px;
+    }
+    #testimonials.carousel-item p.flow-text {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-section {
+        min-height: 400px;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    .hero-content h5 {
+        font-size: 1.2rem;
+    }
+    .hero-content .btn-large {
+        width: 100%;
+        margin: 5px 0;
+    }
+    #impact-stats.col.s12.m4 {
+        margin-bottom: 20px;
+    }
+    #testimonials.carousel {
+        height: 280px;
+    }
+    #testimonials.carousel-item p.flow-text {
+        font-size: 1rem;
+    }
+    .testimonial-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+#home-alerts .funding-grid,
+#home-funding .funding-grid {
+    align-items: stretch;
+}
+
+#home-alerts .bf-card,
+#home-funding .ws-card {
+    height: 100%;
+}
+
+#home-alerts .bf-card-socials,
+#home-funding .ws-card-socials {
+    margin-top: 14px;
+}
+
+#home-alerts .bf-card,
+#home-funding .ws-card {
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+#home-alerts .bf-card:hover,
+#home-funding .ws-card:hover {
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.14);
+}
+
+#contact-us {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
+}
+
+#contact-us h4,
+#contact-us h5,
+#contact-us p,
+#contact-us span,
+#contact-us label {
+    color: #e2e8f0;
+}
+
+#contact-us h4 {
+    color: #ffffff;
+}
+
+#contact-us .card-panel {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+}

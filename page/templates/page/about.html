@@ -1,85 +1,188 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}À propos - SOS Guinée{% endblock %}
+{% block title %}{% trans "À propos" %} - SOS Guinée{% endblock %}
 {% block extra_head %}
-  <meta name="description" content="En savoir plus sur la mission, le fonctionnement et l'engagement de SOS Guinée.">
-  <meta property="og:title" content="À propos de SOS Guinée">
-  <meta property="og:description" content="Découvrez comment SOS Guinée facilite la solidarité en Guinée à travers les alertes et financements.">
-  <meta property="og:image" content="{% static 'img/og-image.png' %}">
+  {% trans "En savoir plus sur la mission, les principes d'action et l'engagement de SOS Guinée." as meta_description %}
+  {% trans "À propos de SOS Guinée" as meta_title %}
+  {% trans "Découvrez comment SOS Guinée facilite la solidarité en Guinée à travers les alertes et les financements." as og_description %}
+  <meta name="description" content="{{ meta_description }}">
+  <meta property="og:title" content="{{ meta_title }}">
+  <meta property="og:description" content="{{ og_description }}">
 {% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 {% block content %}
   <main role="main">
-    <!-- Hero Section -->
-    <section class="parallax-container valign-wrapper hero-section hero-details-page" role="banner" aria-label="À propos">
+    <section class="parallax-container valign-wrapper hero-section hero-details-page" role="banner" aria-label="{% trans 'À propos' %}">
       <div class="parallax">
-        <img src="{% static 'img/articles/img7.avif' %}" alt="À propos de SOS Guinée" class="responsive-img" loading="lazy">
+        <img src="{% static 'img/articles/img5.avif' %}" alt="{% trans 'À propos de SOS Guinée' %}" class="responsive-img" loading="lazy">
       </div>
       <div class="container showcase-content">
         <div class="row center-align container center-align white-text hero-content">
           <div class="col s12">
-              <h3>À propos de SOS Guinée</h3>
-              <p>Facilitons la solidarité en Guinée : alertes de perte, découvertes de proches ou biens, et financement solidaire.</p>
+            <h1>{% trans "À propos de SOS Guinée" %}</h1>
+            <p>{% blocktrans %}Une plateforme citoyenne pour signaler, mobiliser, vérifier et soutenir, avec un objectif simple : rendre l'entraide plus visible et plus efficace.{% endblocktrans %}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Mission -->
-    <section class="section container" aria-labelledby="mission-heading">
-      <h2 id="mission-heading" class="center-align">Notre Mission</h2>
-      <div class="row">
-        <div class="col s12 m10 offset-m1">
-          <p>SOS Guinée a pour vocation de collaborer avec la communauté pour signaler et suivre les alertes de perte de biens ou de proches, permettre la notification des trouvailles, et faciliter le financement des besoins médicaux ou communautaires.</p>
+    <section class="section page-width-wide about-page-shell" aria-labelledby="about-page-heading">
+      <div class="home-section-heading center-align">
+        <span class="home-section-kicker">{% trans "Vision" %}</span>
+        <h2 id="about-page-heading" class="light">{% trans "Pourquoi SOS Guinée existe" %}</h2>
+        <p class="home-section-intro">{% blocktrans %}Dans de nombreuses situations, l'information circule mal, l'urgence n'est pas structurée et la solidarité manque d'outils fiables. SOS Guinée cherche à combler ce manque.{% endblocktrans %}</p>
+      </div>
+
+      <div class="row about-story-grid">
+        <div class="col s12 l6">
+          <div class="about-story-card">
+            <h3>{% trans "Notre mission" %}</h3>
+            <p>{% blocktrans %}SOS Guinée aide la communauté à publier et suivre les alertes de perte de biens ou de proches, à partager les informations utiles et à mobiliser un financement solidaire pour des besoins médicaux ou communautaires.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Notre rôle n'est pas seulement de diffuser une demande : nous voulons rendre les situations plus lisibles, plus partageables et plus crédibles afin d'augmenter les chances de réponse.{% endblocktrans %}</p>
+          </div>
+        </div>
+        <div class="col s12 l6">
+          <div class="about-story-visual">
+            <img src="{% static 'img/articles/img2.avif' %}" alt="{% trans 'Solidarité et accompagnement' %}" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <div class="row about-values-grid">
+        <div class="col s12 m6 l3">
+          <div class="about-value-card">
+            <i class="material-icons">campaign</i>
+            <h4>{% trans "Visibilité" %}</h4>
+            <p>{% trans "Rendre les alertes et les besoins visibles rapidement auprès du bon public." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-value-card">
+            <i class="material-icons">verified_user</i>
+            <h4>{% trans "Confiance" %}</h4>
+            <p>{% trans "Favoriser des informations mieux structurées et des parcours plus clairs." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-value-card">
+            <i class="material-icons">volunteer_activism</i>
+            <h4>{% trans "Solidarité" %}</h4>
+            <p>{% trans "Faciliter l'engagement des particuliers, des proches et des partenaires." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-value-card">
+            <i class="material-icons">lock</i>
+            <h4>{% trans "Respect" %}</h4>
+            <p>{% trans "Traiter les informations personnelles avec prudence et responsabilité." %}</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Fonctionnement -->
-    <section class="section grey lighten-4" aria-labelledby="how-it-works-heading">
-      <h2 id="how-it-works-heading" class="center-align">Comment ça fonctionne ?</h2>
-      <div class="row">
-        <div class="col s12 m8 offset-m2">
-          <ul class="collection with-header">
-            <li class="collection-header"><h5>Étapes clés</h5></li>
-            <li class="collection-item">1. Signalez la perte de votre bien ou proche et choisissez un statut.</li>
-            <li class="collection-item">2. Partagez les trouvailles pour aider à réunir les proches.</li>
-            <li class="collection-item">3. Ajoutez ou soutenez des demandes de financement pour la santé ou la communauté.</li>
-            <li class="collection-item">4. Validez les dons via une autorité compétente pour lever les fonds ou restituer les biens.</li>
-          </ul>
+    <section class="section grey lighten-4 page-width-wide" aria-labelledby="how-it-works-heading">
+      <div class="home-section-heading center-align">
+        <span class="home-section-kicker">{% trans "Fonctionnement" %}</span>
+        <h2 id="how-it-works-heading" class="light">{% trans "Comment la plateforme agit" %}</h2>
+        <p class="home-section-intro">{% blocktrans %}Un parcours simple, pensé pour passer plus vite de l'information à l'action.{% endblocktrans %}</p>
+      </div>
+
+      <div class="row about-steps-grid">
+        <div class="col s12 m6 l3">
+          <div class="about-step-card">
+            <span class="about-step-number">01</span>
+            <h5>{% trans "Publier" %}</h5>
+            <p>{% trans "Une alerte de perte ou une demande de financement est soumise avec les informations utiles." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-step-card">
+            <span class="about-step-number">02</span>
+            <h5>{% trans "Partager" %}</h5>
+            <p>{% trans "La communauté peut relayer, consulter et diffuser les informations importantes." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-step-card">
+            <span class="about-step-number">03</span>
+            <h5>{% trans "Mobiliser" %}</h5>
+            <p>{% trans "Les personnes concernées ou solidaires peuvent agir, contacter, soutenir ou financer." %}</p>
+          </div>
+        </div>
+        <div class="col s12 m6 l3">
+          <div class="about-step-card">
+            <span class="about-step-number">04</span>
+            <h5>{% trans "Suivre" %}</h5>
+            <p>{% trans "Le statut évolue avec la situation pour garder une information actuelle et utile." %}</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Engagement -->
-    <section class="section container" aria-labelledby="commitment-heading">
-      <h2 id="commitment-heading" class="center-align">Notre engagement</h2>
-      <div class="row">
-        <div class="col s12 m10 offset-m1">
-          <p>Nous garantissons la confidentialité et la sécurité de vos informations personnelles (nom, adresse, email, téléphone). Notre plateforme respecte les meilleures pratiques en matière de protection des données.</p>
+    <section class="section page-width-wide" aria-labelledby="commitment-heading">
+      <div class="home-section-heading center-align">
+        <span class="home-section-kicker">{% trans "Engagement" %}</span>
+        <h2 id="commitment-heading" class="light">{% trans "Nos principes d'action" %}</h2>
+      </div>
+
+      <div class="row about-commitment-grid">
+        <div class="col s12 l7">
+          <div class="about-story-card">
+            <p>{% blocktrans %}Nous attachons une attention particulière à la confidentialité, à la clarté des informations publiées et à la responsabilité dans les parcours de soutien. Certaines situations demandent de la discrétion, d'autres de la rapidité : la plateforme doit servir les deux.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Nous cherchons aussi à rendre les contributions solidaires plus lisibles, afin que les personnes qui aident comprennent mieux le contexte, les besoins et l'usage attendu des fonds.{% endblocktrans %}</p>
+          </div>
+        </div>
+        <div class="col s12 l5">
+          <div class="about-side-panel">
+            <h4>{% trans "Ce que nous voulons renforcer" %}</h4>
+            <ul class="browser-default">
+              <li>{% trans "la qualité des informations partagées" %}</li>
+              <li>{% trans "la rapidité de mise en relation" %}</li>
+              <li>{% trans "la transparence des demandes" %}</li>
+              <li>{% trans "la confiance dans l'entraide numérique" %}</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Contact Info -->
-    <section class="section grey lighten-4" aria-labelledby="contact-info-heading">
-      <h2 id="contact-info-heading" class="center-align">Contactez-nous</h2>
-      <div class="row center-align">
+    <section class="section grey lighten-4 page-width-wide" aria-labelledby="contact-info-heading">
+      <div class="home-section-heading center-align">
+        <span class="home-section-kicker">{% trans "Contact" %}</span>
+        <h2 id="contact-info-heading" class="light">{% trans "Échanger avec nous" %}</h2>
+        <p class="home-section-intro">{% blocktrans %}Pour une question, un partenariat ou une demande d'information, plusieurs canaux sont disponibles.{% endblocktrans %}</p>
+      </div>
+
+      <div class="row about-contact-grid center-align">
         <div class="col s12 m4">
-          <i class="material-icons large">email</i>
-          <p><strong>Email</strong><br>contact@sosguinee.org</p>
+          <div class="about-contact-card">
+            <i class="material-icons large">email</i>
+            <h5>{% trans "Email" %}</h5>
+            <p>contact@sosguinee.org</p>
+          </div>
         </div>
         <div class="col s12 m4">
-          <i class="material-icons large">phone</i>
-          <p><strong>Téléphone</strong><br>+224 655 368 588</p>
+          <div class="about-contact-card">
+            <i class="material-icons large">phone</i>
+            <h5>{% trans "Téléphone" %}</h5>
+            <p>+224 655 368 588</p>
+          </div>
         </div>
         <div class="col s12 m4">
-          <i class="material-icons large">location_on</i>
-          <p><strong>Adresse</strong><br>Lambanyi, Immeuble SHERBROOKE, Conakry, Guinée</p>
+          <div class="about-contact-card">
+            <i class="material-icons large">location_on</i>
+            <h5>{% trans "Adresse" %}</h5>
+            <p>{% trans "Lambanyi, immeuble SHERBROOKE, Conakry, Guinée" %}</p>
+          </div>
         </div>
+      </div>
+
+      <div class="center-align about-cta-row">
+        <a href="{% url 'contact' %}" class="btn-large blue darken-2 waves-effect waves-light">{% trans "Nous contacter" %}</a>
+        <a href="{% url 'add_loss_alert' %}" class="btn-large red darken-2 waves-effect waves-light">{% trans "Signaler une alerte" %}</a>
       </div>
     </section>
   </main>

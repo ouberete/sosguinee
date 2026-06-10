@@ -1,16 +1,21 @@
 from datetime import datetime
 from email.policy import default
 from random import choices
+import mimetypes
+import uuid
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from page.middleware import get_current_user
 
 
 class BaseEntity(models.Model):
+    # Final: enforce uniqueness and non-null after backfill
+    public_id = models.UUIDField(default=uuid.uuid4, db_index=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     #id = models.UUIDField(primary_key=True, )
@@ -41,6 +46,8 @@ class BaseEntity(models.Model):
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()
+        if not getattr(current_user, "is_authenticated", False):
+            current_user = None
         if not self.pk:  # Si c'est une création
             self.created_by = current_user
         else:  # Sinon, c'est une mise à jour
@@ -49,6 +56,8 @@ class BaseEntity(models.Model):
 
     def delete(self, *args, **kwargs):
         current_user = get_current_user()
+        if not getattr(current_user, "is_authenticated", False):
+            current_user = None
         self.isDeleted = True
         self.deleted_by = current_user
         self.save()
@@ -70,10 +79,132 @@ class AllObjectsManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()
 
+
+class UserActionLog(models.Model):
+    ACTION_CREATE = 'create'
+    ACTION_UPDATE = 'update'
+    ACTION_DELETE = 'delete'
+    ACTION_CLOSE = 'close'
+
+    ACTION_CHOICES = [
+        (ACTION_CREATE, 'Creation'),
+        (ACTION_UPDATE, 'Modification'),
+        (ACTION_DELETE, 'Suppression'),
+        (ACTION_CLOSE, 'Cloture'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='action_logs')
+    action = models.CharField(max_length=32, choices=ACTION_CHOICES)
+    model_name = models.CharField(max_length=100)
+    object_public_id = models.UUIDField(null=True, blank=True, db_index=True)
+    object_pk = models.CharField(max_length=64, blank=True)
+    object_label = models.CharField(max_length=255, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = 'user_action_log'
+        verbose_name = 'Journal action utilisateur'
+        verbose_name_plural = 'Journal actions utilisateurs'
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        username = self.user.username if self.user else 'system'
+        return f"{self.created_at:%Y-%m-%d %H:%M} - {username} - {self.action} - {self.model_name}"
+
+    @staticmethod
+    def client_ip(request):
+        forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '') if request else ''
+        if forwarded_for:
+            return forwarded_for.split(',')[0].strip()
+        return request.META.get('REMOTE_ADDR') if request else None
+
+    @classmethod
+    def record(cls, *, request=None, user=None, action, obj, metadata=None):
+        actor = user or (getattr(request, 'user', None) if request else None)
+        if not getattr(actor, 'is_authenticated', False):
+            actor = None
+
+        cls.objects.create(
+            user=actor,
+            action=action,
+            model_name=obj.__class__.__name__,
+            object_public_id=getattr(obj, 'public_id', None),
+            object_pk=str(getattr(obj, 'pk', '') or ''),
+            object_label=str(obj)[:255],
+            metadata=metadata or {},
+            ip_address=cls.client_ip(request),
+            user_agent=(request.META.get('HTTP_USER_AGENT', '')[:1000] if request else ''),
+        )
+
 Gender = (
     ('Male', 'Masculin'),
     ('Female', 'Feminin'),
 )
+
+# --- Location hierarchy: Region > Prefecture > Commune > Quarter ---
+class Region(BaseEntity):
+    name = models.CharField(max_length=255, unique=True, verbose_name='Région')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        verbose_name = 'Région'
+        verbose_name_plural = 'Régions'
+        db_table = 'region'
+
+    def __str__(self):
+        return self.name
+
+
+class Prefecture(BaseEntity):
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, related_name='prefectures', verbose_name='Région')
+    name = models.CharField(max_length=255, verbose_name='Préfecture')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('region', 'name')
+        verbose_name = 'Préfecture'
+        verbose_name_plural = 'Préfectures'
+        db_table = 'prefecture'
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Commune(BaseEntity):
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, related_name='communes', verbose_name='Préfecture')
+    name = models.CharField(max_length=255, verbose_name='Commune')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('prefecture', 'name')
+        verbose_name = 'Commune'
+        verbose_name_plural = 'Communes'
+        db_table = 'commune'
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Quarter(BaseEntity):
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, related_name='quarters', verbose_name='Commune')
+    name = models.CharField(max_length=255, verbose_name='Quartier')
+    objects = BaseManager()
+    all_objects = AllObjectsManager()
+
+    class Meta:
+        unique_together = ('commune', 'name')
+        verbose_name = 'Quartier'
+        verbose_name_plural = 'Quartiers'
+        db_table = 'quarter'
+
+    def __str__(self):
+        return f"{self.name}"
 
 class FundingType(BaseEntity):
     name = models.CharField(max_length=255, verbose_name='Type Financement', unique=True)
@@ -168,8 +299,10 @@ class LossAlert(BaseEntity):
     email = models.CharField(max_length=255, null=True, blank=True, verbose_name='Email')
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telephone')
     country = models.CharField(max_length=255, default="Guinée", blank=True, null=True, verbose_name='Pays')
-    city = models.CharField(max_length=255, verbose_name='Ville')
-    quarter = models.CharField(max_length=255, verbose_name='Quartier')
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Région')
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Préfecture')
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Commune')
+    quarter = models.ForeignKey('Quarter', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Quartier')
     address = models.CharField(max_length=255, verbose_name='Adresse')
     date_alert = models.DateField(verbose_name='Date alerte perte')
     hour_alert = models.TimeField(blank=True, null=True, verbose_name='Heure alerte perte')
@@ -189,7 +322,7 @@ class LossAlert(BaseEntity):
         if self.loss_alert_status:
             return self.loss_alert_status.name 
         else :
-            return "Statut non defini"
+            return "En attente"
         
     class Meta:
         verbose_name = 'Alerte perte'
@@ -202,7 +335,8 @@ class LossAlert(BaseEntity):
             dc = OptionalAlertDoc()
             dc.document = doc  # Assign the file directly to the document field
             dc.document_name = doc.name
-            dc.document_type = doc.content_type
+            guessed_content_type, _ = mimetypes.guess_type(doc.name)
+            dc.document_type = guessed_content_type or 'application/octet-stream'
             dc.document_size = doc.size
             dc.save()
             self.optional_docs.add(dc)
@@ -221,8 +355,8 @@ class OptionalFundingDoc(BaseEntity):
 class FundingRequest(BaseEntity):
     beneficiary_name = models.CharField(max_length=255, verbose_name='Nom Beneficiaire')
     title = models.CharField(max_length=255, verbose_name='Intitulé Financement', blank=True, null=True)
-    funding_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Montant Financement')
-    amount_received = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Montant reçu", default=0)
+    funding_amount = models.DecimalField(max_digits=18, decimal_places=2, verbose_name='Montant Financement')
+    amount_received = models.DecimalField(max_digits=18, decimal_places=2, verbose_name="Montant reçu", default=0)
     funding_request_status = models.ForeignKey(FundingRequestStatus, on_delete=models.PROTECT, blank=True, null=True)
     funding_request_type = models.ForeignKey(FundingType, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Type Financement')
     description_needs = models.TextField(verbose_name='Description besoins')
@@ -231,8 +365,10 @@ class FundingRequest(BaseEntity):
     email = models.CharField(max_length=255, null=True, blank=True, verbose_name='Email')
     phone = models.CharField(max_length=255, verbose_name='Telephone', blank=True, null=True)
     country = models.CharField(max_length=255, default="Guinée", blank=True, null=True)
-    city = models.CharField(max_length=255, verbose_name='Ville')
-    quarter = models.CharField(max_length=255, verbose_name='Quartier', blank=True, null=True)
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Région')
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Préfecture')
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Commune')
+    quarter = models.ForeignKey('Quarter', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Quartier')
     address = models.CharField(max_length=255, verbose_name='Adresse', blank=True, null=True)
     end_date = models.DateField(verbose_name='Date Fin Financement', blank=True, null=True)
     start_date = models.DateField(verbose_name='Date Debut Demande', default=timezone.now, blank=True, null=True)
@@ -249,11 +385,10 @@ class FundingRequest(BaseEntity):
     @property
     def days_remaining(self):
         today = datetime.today().date()
-        print(self.end_date)
-        if  self.end_date and self.end_date >= today:
+        if self.end_date and self.end_date >= today:
             return (self.end_date - today).days
         
-        return "N/A"
+        return None
     
     @property
     def funding_request_type_name(self):
@@ -267,7 +402,7 @@ class FundingRequest(BaseEntity):
         if self.funding_request_status:
             return self.funding_request_status.name
         else :
-            return "Non defini"
+            return "En attente"
     
     class Meta:
         verbose_name = 'Demande Financement'
@@ -280,7 +415,8 @@ class FundingRequest(BaseEntity):
             dc = OptionalFundingDoc()
             dc.document = doc  # Assign the file directly to the document field
             dc.document_name = doc.name
-            dc.document_type = doc.content_type
+            guessed_content_type, _ = mimetypes.guess_type(doc.name)
+            dc.document_type = guessed_content_type or 'application/octet-stream'
             dc.document_size = doc.size
             dc.save()
             self.optional_docs.add(dc)
@@ -402,6 +538,10 @@ class UserDetails(BaseEntity):
     nationality = models.CharField(max_length=100, blank=True, null=True, choices=COUNTRY_CHOICES)
     birth_city = models.CharField(max_length=100, blank=True, null=True)
     actual_city = models.CharField(max_length=100, blank=True, null=True)
+    region = models.ForeignKey('Region', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Région')
+    prefecture = models.ForeignKey('Prefecture', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Préfecture')
+    commune = models.ForeignKey('Commune', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Commune')
+    quarter = models.ForeignKey('Quarter', on_delete=models.PROTECT, blank=True, null=True, verbose_name='Quartier')
     zip_code = models.CharField(max_length=10, blank=True, null=True)
     linkedin = models.CharField(max_length=100, blank=True, null=True)
     twitter = models.CharField(max_length=100, blank=True, null=True)
@@ -409,7 +549,7 @@ class UserDetails(BaseEntity):
     instagram = models.CharField(max_length=100, blank=True, null=True)
     user_type = models.CharField(max_length=20, choices=[('Creator', 'Creator'), ('Backer', 'Backer')], default='Creator')
     user_category = models.CharField(max_length=20, choices=USER_CATEGORY_CHOICES, blank=True, null=True)
-    user_status = models.CharField(max_length=20, choices=[('Active', 'Active'), ('Inactive', 'Inactive')], default='Active')
+    user_status = models.CharField(max_length=20, choices=[('Active', 'Active'), ('Inactive', 'Inactive'), ('Blocked', 'Blocked')], default='Active')
     is_completed = models.BooleanField(default=False)
     
     class Meta:
@@ -430,6 +570,8 @@ class MessageContact(BaseEntity):
     message = models.TextField(verbose_name='Message')
     phone = models.CharField(max_length=255, null=True, blank=True, verbose_name='Telephone')
     date_contact = models.DateTimeField(default=timezone.now, verbose_name='Date de contact', blank=True, null=True)
+    is_read = models.BooleanField(default=False, verbose_name='Lu')
+
     class Meta:
         verbose_name = 'Message de contact'
         verbose_name_plural = 'Messages de contact'
@@ -458,7 +600,7 @@ class Donation(BaseEntity):
     donor_email = models.EmailField(verbose_name='Email Donateur', blank=True, null=True)
     donor_address = models.CharField(max_length=255, verbose_name='Adresse Donateur', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='donations', blank=True, null=True, verbose_name='Donateur')
-    amount = models.DecimalField(max_digits=10, decimal_places=0, verbose_name='Montant')
+    amount = models.DecimalField(max_digits=18, decimal_places=0, verbose_name='Montant')
     description = models.TextField(blank=True, null=True, verbose_name='Description')
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='paypal', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
@@ -480,7 +622,7 @@ class EmailContent(BaseEntity):
     subjet = models.TextField(blank=True, null=True, verbose_name="Object du message")
     plain_message = models.TextField(blank=True, null=True, verbose_name='Message Texte')
     sender_email = models.TextField(blank=True, null=True, verbose_name='Envoyeur')
-    receiver_email =  models.TextField(blank=True, null=True, verbose_name='Beneficiaire'), 
+    receiver_email = models.TextField(blank=True, null=True, verbose_name='Beneficiaire')
     html_message = models.TextField(blank=True, null=True, verbose_name='Message Html')
     is_sent = models.BooleanField(default=False)
     date_sent = models.DateTimeField(blank=True, null=True)
@@ -550,7 +692,7 @@ class FundPayment(BaseEntity):
     donor_address = models.CharField(max_length=255, verbose_name='Adresse Donateur', blank=True, null=True)
     transaction_id = models.CharField(max_length=255, verbose_name='ID Transaction', blank=True, null=True)
     funding_request = models.ForeignKey(FundingRequest, on_delete=models.CASCADE, related_name='payments', verbose_name='Demande de financement')
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Montant')
+    amount = models.DecimalField(max_digits=18, decimal_places=2, verbose_name='Montant')
     payment_method = models.CharField(max_length=20, choices=Donation.PAYMENT_METHODS, default='PayCard', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=Donation.STATUS_CHOICES, default='en_attente', verbose_name='Statut')
     reference = models.CharField(max_length=100, unique=True, verbose_name='Référence de paiement', help_text='Référence unique pour le paiement', blank=True, null=True)
@@ -599,3 +741,5 @@ class Report(models.Model):
 
     def __str__(self):
         return f"Signalement par {self.reporter.username} sur {self.comment.id}"
+
+
