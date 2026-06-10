@@ -34,6 +34,7 @@
         background-position: calc(100% - 8px) 9px;
     }
 
+<<<<<<< HEAD
     [dir="rtl"] .object-tools li {
         float: right;
     }
@@ -43,10 +44,20 @@
         margin-right: 15px;
     }
 
+=======
+>>>>>>> chore/security-design-hardening
     [dir="rtl"] .dashboard .module table td a {
         padding-left: 0;
         padding-right: 16px;
     }
+<<<<<<< HEAD
+=======
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 55px 10px 10px;
+        background-position-x: calc(100% - 30px);
+    }
+>>>>>>> chore/security-design-hardening
 }
 
 /* MOBILE */
@@ -67,6 +78,14 @@
         margin-left: 0;
         margin-right: 0;
     }
+<<<<<<< HEAD
+=======
+
+    [dir="rtl"] .object-tools {
+        text-align: right;
+    }
+
+>>>>>>> chore/security-design-hardening
     [dir="rtl"] .aligned .vCheckboxLabel {
         padding: 1px 5px 0 0;
     }
@@ -86,4 +105,12 @@
     [dir="rtl"] :enabled.selector-add:focus, :enabled.selector-add:hover {
         background-position: 0 -72px;
     }
+<<<<<<< HEAD
+=======
+
+    [dir="rtl"] ul.messagelist li {
+        padding: 10px 40px 10px 10px;
+        background-position-x: calc(100% - 15px);
+    }
+>>>>>>> chore/security-design-hardening
 }

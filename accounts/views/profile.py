@@ -45,6 +45,10 @@ def user_profile(request):
 
             categories = dict(UserDetails.USER_CATEGORY_CHOICES)
             category = categories.get(profile.user_category, 'Non renseigne')
+<<<<<<< HEAD
+=======
+            account_status = profile.user_status or 'Inactive'
+>>>>>>> chore/security-design-hardening
 
             context = {
                 'profile': profile,
@@ -53,6 +57,10 @@ def user_profile(request):
                 'profession': profession,
                 'nationality': nationality,
                 'category': category,
+<<<<<<< HEAD
+=======
+                'account_status': account_status,
+>>>>>>> chore/security-design-hardening
                 'alerts': alerts,
                 'funding_requests': funding_requests,
                 'donations': donations,
@@ -130,7 +138,15 @@ class UpdateUserProfileWizard(SessionWizardView):
 
         for form in form_list:
             for key, value in form.cleaned_data.items():
+<<<<<<< HEAD
                 setattr(user_details, key, value)
+=======
+                # Handle location fields specially (they are model FKs)
+                if key in ('region', 'prefecture', 'commune'):
+                    setattr(user_details, f'{key}_id', value.id if value else None)
+                else:
+                    setattr(user_details, key, value)
+>>>>>>> chore/security-design-hardening
 
         user_details.save()
         return redirect('/profile')

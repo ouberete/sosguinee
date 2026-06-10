@@ -1,30 +1,66 @@
-name: Django CI
+name: Django Quality CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["dev", "master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["dev", "master"]
 
 jobs:
-  build:
-
+  tests:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      fail-fast: false
       matrix:
-        python-version: ["3.13"]
+        python-version: ["3.11", "3.12"]
+
+    env:
+      DJANGO_SETTINGS_MODULE: sosguinee.settings_dev
+      SECRET_KEY: ci-test-secret-key
+      DEBUG: "True"
+      ENVIRONMENT: development
+      USE_POSTGRES: "False"
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run Tests
-      run: |
-        python manage.py test
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify Jazzmin import
+        run: python -c "import jazzmin; print('jazzmin import ok')"
+
+      - name: Django check
+        run: python manage.py check
+
+      - name: Run tests
+        run: python manage.py test page accounts
+
+  security:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit bandit
+
+      - name: Dependency vulnerability scan
+        run: pip-audit -r requirements.txt
+
+      - name: Static security scan
+        run: bandit -r accounts page sosguinee -x migrations,__pycache__,.venv

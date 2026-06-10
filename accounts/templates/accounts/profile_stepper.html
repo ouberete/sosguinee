@@ -1,0 +1,14 @@
+<div class="wizard-steps" aria-label="Progression de modification du profil">
+    <div class="wizard-step {% if wizard.steps.current == 'user_infos' %}active{% elif wizard.steps.current == 'user_document' or wizard.steps.current == 'user_link' %}completed{% endif %}">
+        <div class="step-circle">1</div>
+        <div class="step-text">Informations</div>
+    </div>
+    <div class="wizard-step {% if wizard.steps.current == 'user_document' %}active{% elif wizard.steps.current == 'user_link' %}completed{% endif %}">
+        <div class="step-circle">2</div>
+        <div class="step-text">Documents</div>
+    </div>
+    <div class="wizard-step {% if wizard.steps.current == 'user_link' %}active{% endif %}">
+        <div class="step-circle">3</div>
+        <div class="step-text">Réseaux</div>
+    </div>
+</div>

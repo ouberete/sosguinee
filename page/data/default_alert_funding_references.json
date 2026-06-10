@@ -1,0 +1,102 @@
+{
+  "loss_alert_types": [
+    {
+      "name": "Personne disparue",
+      "description": "Signalement d'une personne introuvable nécessitant diffusion urgente."
+    },
+    {
+      "name": "Enfant disparu",
+      "description": "Signalement spécifique pour enfant mineur disparu."
+    },
+    {
+      "name": "Document perdu",
+      "description": "Perte de pièce d'identité, passeport, permis ou autre document administratif."
+    },
+    {
+      "name": "Téléphone perdu",
+      "description": "Perte ou oubli d'un téléphone mobile."
+    },
+    {
+      "name": "Véhicule disparu",
+      "description": "Disparition d'un véhicule (moto, voiture, autre)."
+    },
+    {
+      "name": "Objet précieux perdu",
+      "description": "Perte d'objet de valeur matérielle ou sentimentale."
+    },
+    {
+      "name": "Autre perte",
+      "description": "Catégorie générique pour les signalements non couverts par les types existants."
+    }
+  ],
+  "loss_alert_statuses": [
+    {
+      "name": "En cours",
+      "description": "Le signalement est actif et en attente de résolution."
+    },
+    {
+      "name": "Trouvé",
+      "description": "L'élément ou la personne signalée a été retrouvé(e)."
+    },
+    {
+      "name": "Retrouvé",
+      "description": "Variante de statut indiquant une résolution positive."
+    },
+    {
+      "name": "Résolu",
+      "description": "Le dossier est résolu."
+    },
+    {
+      "name": "Clos",
+      "description": "Le dossier est clôturé."
+    }
+  ],
+  "funding_types": [
+    {
+      "name": "Urgence médicale",
+      "description": "Collecte destinée à une prise en charge médicale urgente."
+    },
+    {
+      "name": "Soutien humanitaire",
+      "description": "Aide matérielle ou financière pour situation de vulnérabilité."
+    },
+    {
+      "name": "Éducation / scolarité",
+      "description": "Financement lié aux frais de scolarité, fournitures ou formation."
+    },
+    {
+      "name": "Reconstruction / logement",
+      "description": "Aide à la réhabilitation d'un logement ou d'un abri."
+    },
+    {
+      "name": "Appui aux sinistrés",
+      "description": "Soutien aux victimes de catastrophe ou d'incident majeur."
+    },
+    {
+      "name": "Activité génératrice de revenus",
+      "description": "Financement d'un projet permettant de relancer une activité économique."
+    },
+    {
+      "name": "Autre besoin",
+      "description": "Catégorie générique pour les demandes de financement non standards."
+    }
+  ],
+  "funding_request_statuses": [
+    {
+      "name": "En cours",
+      "description": "La collecte est ouverte et peut recevoir des contributions."
+    },
+    {
+      "name": "Terminé",
+      "description": "La collecte a atteint son objectif ou sa date de fin."
+    },
+    {
+      "name": "Clôturé",
+      "description": "La collecte a été fermée manuellement."
+    },
+    {
+      "name": "Clos",
+      "description": "Variante de statut de fermeture."
+    }
+  ]
+}

@@ -1,55 +1,206 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
-{% block title %}Modification du Profil - SOS Guinée{% endblock %}
+{% block title %}{% trans "Modification du profil" %} - SOS Guinée{% endblock %}
 
-{% block extra_css %}
+{% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+<style>
+    .profile-page,
+    .profile-page main,
+    .profile-page section {
+        background: #f4f7fb !important;
+    }
+
+    .profile-shell {
+        max-width: 1280px;
+    }
+
+    .profile-page .card {
+        background: #ffffff !important;
+        color: #102030 !important;
+        border-radius: 12px;
+    }
+
+    .profile-page .card-content,
+    .profile-page .card-action {
+        background: #ffffff !important;
+        color: #102030 !important;
+    }
+
+    .profile-page .card-action {
+        border-top: 1px solid #e6edf5;
+        background: #f9fbfd !important;
+    }
+
+    .profile-page .grey-text {
+        color: #607085 !important;
+    }
+
+    .profile-page .btn-flat {
+        color: #0f4c81;
+        font-weight: 600;
+    }
+
+    .profile-page .wizard-summary {
+        border: 1px solid #e2eaf3;
+        border-radius: 10px;
+        padding: 1.1rem 1.2rem;
+        background: #f9fbfd;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-page .wizard-steps {
+        display: flex;
+        justify-content: space-between;
+        margin: 2rem 0 2.5rem;
+        position: relative;
+    }
+
+    .profile-page .wizard-steps::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #dbe5f0;
+        z-index: 1;
+    }
+
+    .profile-page .wizard-step {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 33.33%;
+    }
+
+    .profile-page .step-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #607085;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+        transition: all 0.3s;
+    }
+
+    .profile-page .step-text {
+        font-size: 0.85rem;
+        color: #607085;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .profile-page .wizard-step.active .step-circle {
+        background: #1976d2;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.15);
+    }
+
+    .profile-page .wizard-step.active .step-text {
+        color: #1976d2;
+        font-weight: 700;
+    }
+
+    .profile-page .wizard-step.completed .step-circle {
+        background: #4caf50;
+        color: white;
+    }
+
+    .profile-page .wizard-step.completed .step-text {
+        color: #4caf50;
+    }
+
+    .profile-page .input-field input,
+    .profile-page .input-field select,
+    .profile-page .input-field textarea {
+        background: #fff;
+        color: #102030;
+    }
+
+    .profile-page .input-field label {
+        color: #607085;
+    }
+
+    .profile-page .input-field input:focus + label,
+    .profile-page .input-field select:focus + label,
+    .profile-page .input-field textarea:focus + label {
+        color: #1976d2 !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<main role="main">
-    <section class="section container">
+<main role="main" class="profile-page">
+    <section class="section container profile-shell">
         <div class="row">
             <div class="col s12">
                 <div class="card">
                     <div class="card-content">
-                        <h5 class="center-align">Modifier Mon Profil</h5>
-                        <hr>
-                        <p class="flow-text center">Étape actuelle : {{ step }}</p>
+                        <h5 class="center-align">{% trans "Modifier mon profil" %}</h5>
+
+                        <div class="wizard-summary">
+                            <p class="grey-text" style="margin:0;">
+                                {% trans "Complétez vos informations étape par étape. Le style de cette page reprend celui de votre profil pour garder une lecture cohérente." %}
+                            </p>
+                        </div>
+
+                        <div class="wizard-steps">
+                            <div class="wizard-step {% if wizard.steps.current == '0' %}active{% elif wizard.steps.current > '0' %}completed{% endif %}">
+                                <div class="step-circle">1</div>
+                                <div class="step-text">{% trans "Infos basiques" %}</div>
+                            </div>
+                            <div class="wizard-step {% if wizard.steps.current == '1' %}active{% elif wizard.steps.current > '1' %}completed{% endif %}">
+                                <div class="step-circle">2</div>
+                                <div class="step-text">{% trans "Localisation" %}</div>
+                            </div>
+                            <div class="wizard-step {% if wizard.steps.current == '2' %}active{% endif %}">
+                                <div class="step-circle">3</div>
+                                <div class="step-text">{% trans "Bio et réseaux" %}</div>
+                            </div>
+                        </div>
+
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ wizard.management_form }}
 
                             {% if form.errors %}
-                            {% for error in form.non_field_errors %}
-                            <div class="card-panel red lighten-4 red-text">
-                                <strong>{{ error }}</strong>
-                            </div>
-                            {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <div class="card-panel red lighten-4 red-text">
+                                    <strong>{{ error }}</strong>
+                                </div>
+                                {% endfor %}
                             {% endif %}
 
                             {% if wizard.steps.current %}
-                            {{ wizard.form|crispy }}
+                                {{ wizard.form|crispy }}
                             {% endif %}
 
                             <div class="row">
                                 <div class="col s6 left-align">
                                     {% if wizard.steps.prev %}
                                     <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn grey">
-                                        <i class="material-icons left">chevron_left</i>Précédent
+                                        <i class="material-icons left">chevron_left</i>{% trans "Précédent" %}
                                     </button>
                                     {% endif %}
                                 </div>
                                 <div class="col s6 right-align">
                                     {% if wizard.steps.next %}
                                     <button type="submit" class="btn green">
-                                        Suivant<i class="material-icons right">chevron_right</i>
+                                        {% trans "Suivant" %}<i class="material-icons right">chevron_right</i>
                                     </button>
                                     {% else %}
                                     <button type="submit" class="btn green">
-                                        Enregistrer<i class="material-icons right">check</i>
+                                        {% trans "Enregistrer" %}<i class="material-icons right">check</i>
                                     </button>
                                     {% endif %}
                                 </div>
@@ -57,8 +208,11 @@
                         </form>
                     </div>
                     <div class="card-action">
-                        <a href="{% url 'home' %}" class="btn-flat">
-                            <i class="material-icons left">home</i>Accueil
+                        <a href="{% url 'profile' %}" class="btn-flat blue-text">
+                            <i class="material-icons left">person</i>{% trans "Voir mon profil" %}
+                        </a>
+                        <a href="{% url 'home' %}" class="btn-flat right">
+                            <i class="material-icons left">home</i>{% trans "Accueil" %}
                         </a>
                     </div>
                 </div>
@@ -68,6 +222,7 @@
 </main>
 {% endblock %}
 
-{% block extra_js %}
+{% block extrajs %}
 <script src="{% static 'profil/profil.js' %}"></script>
 {% endblock %}
+

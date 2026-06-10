@@ -1,5 +1,6 @@
 /* CHANGELISTS */
 
+<<<<<<< HEAD
 #changelist {
     display: flex;
     align-items: flex-start;
@@ -9,6 +10,25 @@
 #changelist .changelist-form-container {
     flex: 1 1 auto;
     min-width: 0;
+=======
+#changelist .changelist-form-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    width: 100%;
+}
+
+#changelist .changelist-form-container > div {
+    flex: 1 1 auto;
+}
+
+#changelist .changelist-form-container:not(:has(#changelist-filter)) > div {
+    width: 100%;
+}
+
+#changelist .changelist-form-container:has(#changelist-filter) > div {
+    max-width: calc(100% - 270px);
+>>>>>>> chore/security-design-hardening
 }
 
 #changelist table {
@@ -25,8 +45,13 @@
     min-height: 400px;
 }
 
+<<<<<<< HEAD
 .change-list .filtered .results, .change-list .filtered .paginator,
 .filtered #toolbar, .filtered div.xfull {
+=======
+.change-list .filtered .results, .filtered #toolbar,
+.filtered div.xfull {
+>>>>>>> chore/security-design-hardening
     width: auto;
 }
 
@@ -43,11 +68,38 @@
     border-bottom: 1px solid var(--hairline-color);
 }
 
+<<<<<<< HEAD
+=======
+#changelist .changelist-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+}
+
+#changelist .changelist-footer .paginator {
+    color: var(--body-quiet-color);
+    background: var(--body-bg);
+    border: none;
+    padding: 0;
+}
+
+>>>>>>> chore/security-design-hardening
 #changelist .paginator {
     color: var(--body-quiet-color);
     border-bottom: 1px solid var(--hairline-color);
     background: var(--body-bg);
+<<<<<<< HEAD
     overflow: hidden;
+=======
+}
+
+#changelist .paginator ul {
+    padding: 0;
+    white-space: nowrap;
+>>>>>>> chore/security-design-hardening
 }
 
 /* CHANGELIST TABLES */

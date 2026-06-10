@@ -1,20 +1,34 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 {% load custom_filters %}
-{% block title %}Financer via PayCard - {{ funding_request.title }}{% endblock %}
-{% block content %}
-{% if messages %}
-<div class="container">
 
-</div>
-{% endif %}
-<div class="container section">
-    <h4 class="center-align">Paiement via PayCard</h4>
+{% block title %}{% trans "Financer via Djomy" %} - {{ funding_request.title }}{% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="payment-page">
+  <section class="payment-shell">
+    <div class="payment-heading">
+      <a href="{% url 'funding_request_details_public' funding_request.public_id %}" class="payment-back-link">
+        <i class="material-icons">arrow_back</i>
+        {% trans "Retour à la demande" %}
+      </a>
+      <span class="payment-kicker">{% trans "Paiement sécurisé Djomy" %}</span>
+      <h1>{% trans "Participez à cette collecte" %}</h1>
+      <p>{% trans "Renseignez vos informations, choisissez un montant à droite, puis finalisez le paiement via Mobile Money ou carte." %}</p>
+    </div>
+
     {% for message in messages %}
-    <div class="card-panel {{ message.tags }} lighten-4">
-        <span class="{{ message.tags }}-text red-text ">{{ message }}</span>
+    <div class="payment-alert {{ message.tags }}">
+      <i class="material-icons">info</i>
+      <span>{{ message }}</span>
     </div>
     {% endfor %}
+<<<<<<< HEAD
     <div class="card-panel">
         <p><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</p>
         <p><strong>Description :</strong> {{ funding_request.title }}</p>
@@ -29,38 +43,157 @@
                 <label for="amount">Montant à financer</label>
             </div>
             {% endif %}
+=======
+>>>>>>> chore/security-design-hardening
 
-            {% if not request.user.is_authenticated %}
-            <h5 class="center-align">Informations du Donateur</h5>
-            <div class="row">
-                {% for field in form.visible_fields %}
-                <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' %}m12{% else %}m6{% endif %}">
-                    {{ field }}
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if form.non_field_errors %}
+    <div class="payment-alert error">
+      <i class="material-icons">error</i>
+      <div>
+        {% for err in form.non_field_errors %}
+        <p>{{ err }}</p>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
 
-                    {% if field.help_text %}
-                    <span class="helper-text">{{ field.help_text }}</span>
-                    {% endif %}
+    <form action="{% url 'djomy_funding_public' funding_request.public_id %}" method="post" class="djomy-form payment-form">
+      {% csrf_token %}
+      <div class="payment-layout payment-form-layout">
+        <section class="payment-form-card" aria-labelledby="payment-form-heading">
+          <div class="payment-form-head">
+            <div>
+              <span class="payment-step">Participant</span>
+              <h2 id="payment-form-heading">Vos informations</h2>
+            </div>
+            <i class="material-icons">person</i>
+          </div>
 
-                    {% for error in field.errors %}
-                    <span class="red-text">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% endfor %}
+          {% if user.is_authenticated %}
+          <div class="payment-alert info">
+            <i class="material-icons">person</i>
+            <span>{% trans "Vos informations sont préremplies à partir de votre compte." %}</span>
+          </div>
+          {% endif %}
+
+          <div class="payment-request-overview">
+            <p class="payment-summary-label">Collecte solidaire</p>
+            <h3>{{ funding_request.title }}</h3>
+            <p class="payment-beneficiary">
+              <i class="material-icons">person</i>
+              {{ funding_request.beneficiary_name }}
+            </p>
+            <p class="payment-description">{{ funding_request.description_needs|truncatechars:220 }}</p>
+          </div>
+
+          <div class="payment-fields row">
+            {% for field in form.visible_fields %}
+            {% if field.name != 'amount' %}
+            <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' %}m12{% else %}m6{% endif %}">
+              {{ field }}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.help_text %}
+              <span class="helper-text">{{ field.help_text }}</span>
+              {% endif %}
+              {% for error in field.errors %}
+              <span class="red-text">{{ error }}</span>
+              {% endfor %}
             </div>
             {% endif %}
+            {% endfor %}
+          </div>
 
-            <div class="center-align">
-                <button type="submit" class="btn green darken-2 waves-effect waves-light">
-                    <i class="material-icons left">payments</i> Financer avec PayCard
-                </button>
+          {% if turnstile_site_key %}
+          <div class="payment-captcha">
+            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+          </div>
+          {% endif %}
+
+          <div class="payment-assurance">
+            <span><i class="material-icons">verified_user</i> {% trans "Paiement redirigé vers Djomy" %}</span>
+            <span><i class="material-icons">receipt_long</i> {% trans "Confirmation après transaction" %}</span>
+          </div>
+        </section>
+
+        <aside class="payment-summary payment-choice-panel payment-amount-panel" aria-labelledby="payment-amount-heading">
+          <div class="payment-summary-body">
+            <p class="payment-summary-label">{% trans "Paiement" %}</p>
+            <h2 id="payment-amount-heading">{% trans "Statistiques de paiement" %}</h2>
+            <p class="payment-description payment-fee-note">{% trans "Djomy peut appliquer des frais variables selon le moyen de paiement. Le montant final affiché par le prestataire peut donc différer légèrement du montant saisi." %}</p>
+            <div class="payment-progress">
+              <div class="payment-progress-track">
+                <span style="width: {{ funding_request.progress }}%"></span>
+              </div>
+              <div class="payment-progress-meta">
+                <strong>{{ funding_request.progress }}% {% trans "collecté" %}</strong>
+                {% if funding_request.days_remaining != None %}
+                <span>{{ funding_request.days_remaining }} {% trans "jours restants" %}</span>
+                {% else %}
+                <span>{% trans "Échéance dépassée" %}</span>
+                {% endif %}
+              </div>
             </div>
-        </form>
-    </div>
-</div>
+
+            <dl class="payment-stats">
+              <div>
+                <dt>{% trans "Montant à payer" %}</dt>
+                <dd>{{ funding_request.funding_amount|format_fr }} GNF</dd>
+              </div>
+              <div>
+                <dt>{% trans "Montant payé" %}</dt>
+                <dd>{{ funding_request.amount_received|format_fr }} GNF</dd>
+              </div>
+              <div class="payment-stat-highlight">
+                <dt>{% trans "Reste à payer" %}</dt>
+                <dd>{{ funding_request.remaining_amount|format_fr }} GNF</dd>
+              </div>
+            </dl>
+
+            <div class="amount-presets payment-presets"
+                 data-mode="funding"
+                 data-total="{{ funding_request.funding_amount|stringformat:'f' }}"
+                 data-remaining="{{ funding_request.remaining_amount|stringformat:'f' }}">
+              <p class="amount-presets-title">{% trans "Choisir un montant" %}</p>
+              <div class="amount-presets-buttons"></div>
+            </div>
+
+            {% for field in form.visible_fields %}
+            {% if field.name == 'amount' %}
+            <div class="payment-amount-field">
+              <div class="input-field">
+                {{ field }}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.help_text %}
+                <span class="helper-text">{{ field.help_text }}</span>
+                {% endif %}
+                {% for error in field.errors %}
+                <span class="red-text">{{ error }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" onclick="this.innerHTML='<i class=\'material-icons left\'>autorenew</i> Redirection...'; this.classList.add('disabled'); this.form.submit();">
+              <i class="material-icons left">payments</i>
+              {% trans "Financer maintenant" %}
+            </button>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </section>
+</main>
 {% endblock %}
 
 {% block extrajs %}
-
-
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="{% static 'js/payment_amount_presets.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.updateTextFields();
+  });
+</script>
 {% endblock %}
+

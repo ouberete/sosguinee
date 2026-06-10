@@ -5,12 +5,13 @@
 {% block title %}{% trans "Accueil" %}{% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 {% block content %}
 
 <div class="parallax-container valign-wrapper hero-section">
   <div class="parallax">
-    <img src="{% static 'img/articles/img7.avif' %}" alt="Image de fond inspirante pour SOS Guinée">
+    <img src="{% static 'img/hero_1.png' %}" alt="Image de fond inspirante pour SOS Guinée">
   </div>
   <div class="container center-align white-text hero-content">
     <div class="row">
@@ -35,7 +36,7 @@
     <h4 class="light">{% trans "Notre Impact en Chiffres" %}</h4>
     {% endif %}
     <div class="row">
-      {% if total_impact and total_impact >   0 %}
+      {% if total_impact and total_impact > 0 %}
       <div class="col s12 m4">
         <div class="card-panel z-depth-1 hoverable">
           <i class="material-icons large blue-text text-darken-2">people</i>
@@ -63,7 +64,7 @@
           <p class="flow-text">{% trans "Cas Financés" %}</p>
         </div>
       </div>
-        {% endif %}
+      {% endif %}
     </div>
   </div>
 </section>
@@ -73,21 +74,21 @@
     <h4 class="center-align light">{% trans "Comment ça Marche?" %}</h4>
     <div class="row">
       <div class="col s12 m4">
-        <div class="icon-block center-align">
+        <div class="icon-block center-align card-panel z-depth-1">
           <h2 class="material-icons light-blue-text text-darken-4">create</h2>
           <h5>{% trans "1. Créez une Demande" %}</h5>
           <p class="light">{% trans "Signalez une alerte de perte ou soumettez une demande de financement en quelques étapes simples et sécurisées." %}</p>
         </div>
       </div>
       <div class="col s12 m4">
-        <div class="icon-block center-align">
+        <div class="icon-block center-align  card-panel z-depth-1">
           <h2 class="material-icons light-blue-text text-darken-4">share</h2>
           <h5>{% trans "2. Partagez et Mobilisez" %}</h5>
           <p class="light">{% trans "Votre demande est publiée sur la plateforme, atteignant une large communauté prête à aider et à partager." %}</p>
         </div>
       </div>
       <div class="col s12 m4">
-        <div class="icon-block center-align">
+        <div class="icon-block center-align card-panel z-depth-1">
           <h2 class="material-icons light-blue-text text-darken-4">handshake</h2>
           <h5>{% trans "3. Recevez de l'Aide" %}</h5>
           <p class="light">{% trans "Bénéficiez du soutien de la communauté, que ce soit pour retrouver un proche ou obtenir un financement vital." %}</p>
@@ -101,9 +102,10 @@
 </section>
 
 <section id="home-alerts" class="section grey lighten-4">
-  <div class="container">
+  <div class="container page-width-wide">
     {% if loss_alerts and loss_alerts.count > 0 %}
     <h4 class="center-align light">{% trans "Dernières Alertes de Perte" %}</h4>
+<<<<<<< HEAD
     <div class="row">
       {% for alert in loss_alerts %}
       <div class="col s12 m6 l4">
@@ -122,6 +124,41 @@
             <a href="{% url 'loss_alert_detail_public' alert.public_id %}" class="btn-small red waves-effect waves-light" aria-label="Voir détails de {{ alert.name }}">{% trans "Voir Détails" %}</a>
             <a href="#" class="btn-small blue right waves-effect waves-light" aria-label="Contacter pour {{ alert.name }}">{% trans "Contacter" %}</a>
           </div>
+=======
+    <div class="row funding-grid">
+      {% for alert in loss_alerts %}
+      <div class="col s12 m6 l4">
+        <article class="bf-card bf-alert-card" role="article" aria-labelledby="alert-title-{{ alert.id }}">
+          <a class="bf-card-image" href="{% url 'loss_alert_detail_public' alert.public_id %}" aria-label="{% trans 'Voir l alerte' %} {{ alert.name }}">
+            <img src="{% if alert.principal_image and alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ alert.name }}" loading="lazy">
+            <span class="bf-card-badge {% if alert.status_alert_name == 'Clos' or alert.status_alert_name == 'Trouvé' or alert.status_alert_name == 'Résolu' or alert.status_alert_name == 'Retrouvé' %}bf-status-closed{% else %}bf-status-open{% endif %}">
+              <i class="material-icons">campaign</i> {{ alert.status_alert_name }}
+            </span>
+          </a>
+          <div class="bf-card-body">
+            <h3 class="bf-card-title" id="alert-title-{{ alert.id }}">
+              <a href="{% url 'loss_alert_detail_public' alert.public_id %}">{{ alert.name }}</a>
+            </h3>
+            <p class="bf-card-subtitle">{{ alert.type_alert_name }}</p>
+            <p class="bf-card-description">{{ alert.description|truncatechars:120 }}</p>
+            <div class="bf-card-tags">
+              <span class="bf-card-tag"><i class="material-icons">event</i> {{ alert.date_alert|date:"d/m/Y"|default:"-" }}</span>
+              <span class="bf-card-tag"><i class="material-icons">schedule</i> {{ alert.hour_alert|default:"-" }}</span>
+              <span class="bf-card-tag"><i class="material-icons">place</i> {{ alert.quarter|default:alert.commune|default:alert.address|default:"Lieu non précisé" }}</span>
+            </div>
+            <div class="bf-card-actions">
+              <a href="{% url 'loss_alert_detail_public' alert.public_id %}" class="btn-small red waves-effect waves-light" aria-label="{% trans 'Voir détails de' %} {{ alert.name }}">{% trans "Voir l'alerte" %}</a>
+              {% if alert.phone %}
+              <a href="tel:{{ alert.phone }}" class="btn-small red lighten-1 waves-effect waves-light" aria-label="{% trans 'Contacter' %} {{ alert.name }}"><i class="material-icons left" style="margin-right:4px;font-size:1.1rem;">call</i> {% trans "Appeler" %}</a>
+              {% endif %}
+            </div>
+            <div class="bf-card-socials">
+              <a href="#" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+          </div>
+>>>>>>> chore/security-design-hardening
         </article>
       </div>
       {% endfor %}
@@ -140,9 +177,10 @@
 </section>
 
 <section id="home-funding" class="section">
-  <div class="container">
+  <div class="container page-width-wide">
     {% if funding_requests and funding_requests.count > 0 %}
     <h4 class="center-align light">{% trans "Demandes de Financement Récentes" %}</h4>
+<<<<<<< HEAD
     <div class="row">
       {% for req in funding_requests %}
       <div class="col s12 m6 l4">
@@ -166,6 +204,68 @@
             <a href="#" class="right social-icon" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="#" class="right social-icon" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
           </div>
+=======
+    <div class="row funding-grid">
+      {% for req in funding_requests %}
+      <div class="col s12 m12 l4">
+        <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-{{ req.id }}">
+          <a class="ws-card-image" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
+            <img src="{% if req.principal_image and req.principal_image %}{{ req.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ req.beneficiary_name }}" loading="lazy">
+          </a>
+          <div class="ws-card-body">
+            <div class="ws-card-status">
+              <span class="ws-card-status-label {% if req.funding_request_status_name == 'Clos' or req.funding_request_status_name == 'Terminé' or req.funding_request_status_name == 'Clôturé' %}status-closed{% elif req.days_remaining != None and req.days_remaining <= 7 %}status-urgent{% endif %}">
+                <i class="material-icons">bolt</i> {{ req.funding_request_status_name|default:"En attente" }}
+              </span>
+              <span class="ws-card-chip">{{ req.funding_request_type_name }}</span>
+            </div>
+            <h3 class="ws-card-title" id="fund-title-{{ req.id }}">
+              <a href="{% url 'funding_request_details_public' req.public_id %}">{{ req.title }}</a>
+            </h3>
+
+            <p class="ws-card-beneficiary"><i class="material-icons">person</i><span>{{ req.beneficiary_name }}</span></p>
+
+            <div class="ws-card-progress">
+              <div class="ws-card-progress-track">
+                <div class="ws-card-progress-fill {% if req.progress >= 100 %}high{% elif req.progress >= 50 %}mid{% else %}low{% endif %}" style="width: {{ req.progress }}%"></div>
+              </div>
+              <div class="ws-card-progress-meta">
+                <span>{{ req.progress }}% {% trans "collecté" %}</span>
+                <span>{% if req.days_remaining != None %}{{ req.days_remaining }} {% trans "jours restants" %}{% else %}{% trans "Date non définie" %}{% endif %}</span>
+              </div>
+            </div>
+
+            <p class="ws-card-desc">{{ req.description_needs|truncatechars:140 }}</p>
+
+            <div class="ws-card-stats">
+              <div class="ws-card-stat">
+                <div class="ws-card-stat-value">{{ req.funding_amount | format_fr}} GNF</div>
+                <div class="ws-card-stat-label">{% trans "Objectif" %}</div>
+              </div>
+              <div class="ws-card-stat">
+                <div class="ws-card-stat-value">{{ req.amount_received|format_fr }} GNF</div>
+                <div class="ws-card-stat-label">{% trans "Collecté" %}</div>
+              </div>
+              <div class="ws-card-stat">
+                <div class="ws-card-stat-value">{{ req.remaining_amount|format_fr }} GNF</div>
+                <div class="ws-card-stat-label">{% trans "Reste" %}</div>
+              </div>
+            </div>
+
+            <div class="ws-card-action">
+              <a href="{% url 'funding_request_details_public' req.public_id %}" class="btn-small orange darken-2 waves-effect waves-light" aria-label="Plus d'infos sur {{ req.title }}">{% trans "Voir détails" %}</a>
+              {% if req.funding_request_status_name == 'En cours' %}
+              <a href="{% url 'djomy_funding_public' req.public_id %}" class="btn-flat ws-card-secondary-action">{% trans "Financer" %}</a>
+              {% endif %}
+            </div>
+
+            <div class="ws-card-socials">
+              <a href="#" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            </div>
+          </div>
+>>>>>>> chore/security-design-hardening
         </article>
       </div>
       {% endfor %}
@@ -183,43 +283,6 @@
   </div>
 </section>
 
-<!--<section id="testimonials" class="section grey lighten-3">
-  <div class="container">
-    <h4 class="center-align light">Ce qu'ils disent de nous</h4>
-    <div class="carousel carousel-slider center" data-indicators="true">
-     &lt;!&ndash; <div class="carousel-fixed-item center">
-        <a class="btn waves-effect white grey-text darken-text-2 next-carousel">
-          <i class="material-icons">chevron_right</i>
-        </a>
-        <a class="btn waves-effect white grey-text darken-text-2 prev-carousel">
-          <i class="material-icons">chevron_left</i>
-        </a>
-      </div>&ndash;&gt;
-   &lt;!&ndash;   <div class="carousel-item blue white-text" href="#one!">
-        <div class="testimonial-content">
-          <img src="{% static 'img/avatar/avatar1.png' %}" alt  ="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
-          <p class="flow-text">"Grâce à SOS Guinée, j'ai pu retrouver mon enfant disparu en un temps record. Une plateforme indispensable pour notre communauté!"</p>
-          <h5 class="light">- Mariam Diallo</h5>
-        </div>
-      </div>&ndash;&gt;
-      &lt;!&ndash;<div class="carousel-item orange white-text" href="#two!">
-        <div class="testimonial-content">
-          <img src="{% static 'img/avatar/avatar2.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
-          <p class="flow-text">"Le soutien financier reçu via SOS Guinée a été vital pour le traitement de ma sœur. Un immense merci à tous les donateurs!"</p>
-          <h5 class="light">- Alpha Barry</h5>
-        </div>
-      </div>&ndash;&gt;
-      &lt;!&ndash;<div class="carousel-item red white-text" href="#three!">
-        <div class="testimonial-content">
-          <img src="{% static 'img/avatar/avatar3.png' %}" alt="Avatar de témoignage" class="circle responsive-img testimonial-avatar">
-          <p class="flow-text">"Je suis bénévole et je suis fier de faire partie de cette initiative qui apporte un réel changement dans la vie des Guinéens."</p>
-          <h5 class="light">- Fatoumata Camara</h5>
-        </div>
-      </div>&ndash;&gt;
-    </div>
-  </div>
-</section>-->
-
 {% include 'page/components/contact_form.html' %}
 
 <section id="donate" class="section blue darken-4 white-text">
@@ -227,7 +290,11 @@
     <div class="row valign-wrapper">
       <div class="col s12 m8">
         <h5 class="light">{% trans "Soutenez notre cause" %}</h5>
+<<<<<<< HEAD
         <p class="flow-text">{% trans "Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée." %}</p>
+=======
+        <p class="flow-text">{% trans "Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée." %}</p>
+>>>>>>> chore/security-design-hardening
       </div>
       <div class="col s12 m4 right-align">
         <a href="{% url 'donation' %}" class="btn-large white blue-text text-darken-4 waves-effect waves-light">{% trans "Faire un don" %}</a>
@@ -250,40 +317,18 @@
 <script src="{% static 'js/index.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialisation du Parallax
     var elemsParallax = document.querySelectorAll('.parallax');
     M.Parallax.init(elemsParallax);
 
-    // Initialisation du Carousel pour les témoignages
-    // var elemsCarousel = document.querySelectorAll('.carousel.carousel-slider');
-    // var instancesCarousel = M.Carousel.init(elemsCarousel, {
-    //   fullWidth: true,
-    //   indicators: true,
-    //   onCycleTo: function(item) {
-    //     // Optionnel: ajouter des animations ou des changements de style lors du cycle
-    //   }
-    // });
-    //
-    // // Contrôles de navigation du carousel
-    // document.querySelector('.next-carousel').addEventListener('click', function() {
-    //   instancesCarousel.next();
-    // });
-    // document.querySelector('.prev-carousel').addEventListener('click', function() {
-    //   instancesCarousel.prev();
-    // });
-
-    // Initialisation des Materialboxed images
     var elemsMaterialboxed = document.querySelectorAll('.materialboxed');
     M.Materialbox.init(elemsMaterialboxed);
 
-    // Initialisation des Tooltips pour les FAB
     var elemsTooltipped = document.querySelectorAll('.tooltipped');
     M.Tooltip.init(elemsTooltipped);
 
-    // Animation des chiffres d'impact (Count-up)
     const countUpElements = document.querySelectorAll('.count-up');
     const options = {
-      threshold: 0.5 // Déclenche quand 50% de l'élément est visible
+      threshold: 0.5
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
@@ -291,7 +336,7 @@
         if (entry.isIntersecting) {
           const target = parseInt(entry.target.dataset.target);
           let current = 0;
-          const increment = target / 100; // Ajustez la vitesse de l'animation ici
+          const increment = target / 100;
 
           const timer = setInterval(() => {
             current += increment;
@@ -300,9 +345,9 @@
               clearInterval(timer);
             }
             entry.target.textContent = Math.floor(current);
-          }, 20); // Vitesse de l'intervalle
+          }, 20);
 
-          observer.unobserve(entry.target); // Arrête d'observer une fois l'animation lancée
+          observer.unobserve(entry.target);
         }
       });
     }, options);
@@ -315,4 +360,3 @@
 {% endblock %}
 
 {% endblock %}
-

@@ -11,7 +11,13 @@ RUN apt-get update && \
 
 # Copier les fichiers de dépendances et installer les paquets Python
 COPY requirements.txt .
+<<<<<<< HEAD
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+=======
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir "celery[redis]==5.4.0" "sentry-sdk==2.29.1"
+>>>>>>> chore/security-design-hardening
 
 # Copier le script d'initialisation et lui donner les droits d'exécution
 COPY entrypoint.sh /app/entrypoint.sh

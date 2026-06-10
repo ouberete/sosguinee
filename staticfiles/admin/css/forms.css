@@ -36,12 +36,20 @@ form .form-row p {
 
 /* FORM LABELS */
 
+<<<<<<< HEAD
 label {
+=======
+legend, label {
+>>>>>>> chore/security-design-hardening
     font-weight: normal;
     color: var(--body-quiet-color);
     font-size: 0.8125rem;
 }
 
+<<<<<<< HEAD
+=======
+.required legend, legend.required,
+>>>>>>> chore/security-design-hardening
 .required label, label.required {
     font-weight: bold;
 }
@@ -91,6 +99,23 @@ fieldset .inline-heading,
 
 /* ALIGNED FIELDSETS */
 
+<<<<<<< HEAD
+=======
+.aligned fieldset {
+    width: 100%;
+    border-top: none;
+}
+
+.aligned fieldset > div {
+    width: 100%;
+}
+
+.aligned legend {
+    float: left;
+}
+
+.aligned legend,
+>>>>>>> chore/security-design-hardening
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
@@ -138,6 +163,13 @@ form .aligned div.radiolist {
     padding: 0;
 }
 
+<<<<<<< HEAD
+=======
+form .aligned fieldset div.help {
+    margin-left: 0;
+}
+
+>>>>>>> chore/security-design-hardening
 form .aligned p.help,
 form .aligned div.help {
     margin-top: 0;
@@ -338,7 +370,11 @@ body.popup .submit-row {
     width: 48em;
 }
 
+<<<<<<< HEAD
 .flatpages-flatpage #id_content {
+=======
+.app-flatpages.model-flatpage #id_content {
+>>>>>>> chore/security-design-hardening
     height: 40.2em;
 }
 
@@ -413,9 +449,18 @@ body.popup .submit-row {
     border: none;
 }
 
+<<<<<<< HEAD
 .inline-related.tabular fieldset.module table {
     width: 100%;
     overflow-x: scroll;
+=======
+.inline-related.tabular div.wrapper {
+    overflow-x: auto;
+}
+
+.inline-related.tabular fieldset.module table {
+    width: 100%;
+>>>>>>> chore/security-design-hardening
 }
 
 .last-related fieldset {
@@ -429,7 +474,10 @@ body.popup .submit-row {
 .inline-group .tabular tr td.original {
     padding: 2px 0 0 0;
     width: 0;
+<<<<<<< HEAD
     _position: relative;
+=======
+>>>>>>> chore/security-design-hardening
 }
 
 .inline-group .tabular th.original {
@@ -437,6 +485,7 @@ body.popup .submit-row {
     padding: 0;
 }
 
+<<<<<<< HEAD
 .inline-group .tabular td.original p {
     position: absolute;
     left: 0;
@@ -447,6 +496,21 @@ body.popup .submit-row {
     font-weight: bold;
     color: var(--body-quiet-color);
     _width: 700px;
+=======
+.inline-group .tabular td {
+    font-size: 1rem;
+}
+
+.inline-group .tabular td.original p {
+    position: absolute;
+    left: 0;
+    height: 1.2em;
+    padding: 2px 9px;
+    overflow: hidden;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: var(--body-quiet-color);
+>>>>>>> chore/security-design-hardening
 }
 
 .inline-group div.add-row,

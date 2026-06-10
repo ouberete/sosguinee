@@ -10,11 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import django_heroku
-import dj_database_url
+import os
 from pathlib import Path
 from decouple import config
+<<<<<<< HEAD
 from django.utils.translation import gettext_lazy as _
+=======
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import gettext_lazy as _
+
+try:
+    import django_heroku
+except ImportError:  # Local env may not have this optional package.
+    django_heroku = None
+>>>>>>> chore/security-design-hardening
 # pip install dj-database-url
 # pip install django_heroku
 
@@ -25,11 +34,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-nqbfqt50fhyj158=c)nmfiw6_-8sv9ffzd#l+k=ojy-a=o+hav"
+ENVIRONMENT = config("ENVIRONMENT", default="development")
+DEBUG = config("DEBUG", default=(ENVIRONMENT != "production"), cast=bool)
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config("SECRET_KEY", default="")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-only-insecure-key-change-me"
+    else:
+        raise ImproperlyConfigured("SECRET_KEY must be set in production.")
+
+<<<<<<< HEAD
 DEBUG = True #config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = ["18.170.114.4", "votre-domaine.com", "localhost", "127.0.0.1"]
+=======
+ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",") if h.strip()]
+>>>>>>> chore/security-design-hardening
 
 # --- STATIC & MEDIA ---
 
@@ -44,6 +65,10 @@ if DEBUG:
     MEDIA_ROOT = BASE_DIR / "media"
 else:
     MEDIA_ROOT = BASE_DIR / "mediafiles"
+<<<<<<< HEAD
+=======
+
+>>>>>>> chore/security-design-hardening
 import logging
 logger = logging.getLogger(__name__)
 logger.warning(f"MEDIA_ROOT actif : {MEDIA_ROOT}")
@@ -67,7 +92,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'formtools',
     'crispy_forms',
-    
+    'django_djomy',
+]
+
+# Exclude old_venv from gettext scanning
+IGNORE_PATTERNS = [
+    'old_venv/*',
 ]
 
 SITE_ID = 1
@@ -93,9 +123,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "page.middleware.CurrentUserMiddleware",
     "allauth.account.middleware.AccountMiddleware"
 ]
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
 ROOT_URLCONF = "sosguinee.urls"
 TEMPLATES = [
     {
@@ -121,14 +152,27 @@ WSGI_APPLICATION = "sosguinee.wsgi.application"
 
 # Database MongoDB for SOS Guineense
 # --- DATABASES ---
+<<<<<<< HEAD
 USE_POSTGRES = config("USE_POSTGRES", default=True)
+=======
+USE_POSTGRES = config("USE_POSTGRES", default=True, cast=bool)
+POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", default="")
+if USE_POSTGRES and not DEBUG and not POSTGRES_PASSWORD:
+
+    raise ImproperlyConfigured("POSTGRES_PASSWORD must be set in production.")
+
+>>>>>>> chore/security-design-hardening
 if USE_POSTGRES and not DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": config("POSTGRES_NAME", default="sosguinee"),
             "USER": config("POSTGRES_USER", default="postgres"),
+<<<<<<< HEAD
             "PASSWORD": config("POSTGRES_PASSWORD", default="SEREma@2025"),
+=======
+            "PASSWORD": POSTGRES_PASSWORD,
+>>>>>>> chore/security-design-hardening
             "HOST": config("POSTGRES_HOST", default="db"),  # service Docker
             "PORT": config("POSTGRES_PORT", default="5432"),
         }
@@ -138,6 +182,7 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
+<<<<<<< HEAD
         }
     }
 """ 
@@ -148,17 +193,11 @@ DATABASES = {
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
             'host': 'mongodb://localhost:27017'
+=======
+>>>>>>> chore/security-design-hardening
         }
     }
-}
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
-HOST = os.getenv("HOST")
-mongoengine.connect(db="djangoTutorial", host=f"mongodb+srv://{HOST}/",
-                    username=USERNAME, password=PASSWORD)
-mongoengine.connect(db="sosguinee", host="mongodb://localhost:27017/")
 
-"""
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -168,6 +207,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -183,6 +223,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "fr"
 
+<<<<<<< HEAD
 LANGUAGES = [
     ("fr", _("French")),
     ("en", _("English")),
@@ -194,6 +235,23 @@ LOCALE_PATHS = [
 
 TIME_ZONE = "UTC"
 
+=======
+USE_I18N = True
+>>>>>>> chore/security-design-hardening
+
+LANGUAGES = [
+    ("fr", _("Français")),
+    ("en", _("English")),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / "locale",
+]
+
+# Utiliser Babel au lieu de gettext
+USE_GETTEXT = False
+
+TIME_ZONE = "UTC"
 
 USE_TZ = True
 
@@ -309,6 +367,7 @@ JAZZMIN_SETTINGS = {
     "language_chooser": True,
 }
 
+<<<<<<< HEAD
 LANGUAGE_CODE = "fr"          # langue par défaut
 USE_I18N = True
 
@@ -321,13 +380,16 @@ LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
 
+=======
+>>>>>>> chore/security-design-hardening
 # Paycard configuration
 
 PAYCARD_API_KEY = config("PAYCARD_API_KEY", cast=str, default="your_api_key")
 PAYCARD_API_SECRET = config("PAYCARD_API_SECRET", cast=str, default="your_api_secret")
 PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.paycard.com")
 
-django_heroku.settings(locals())
+if django_heroku is not None:
+    django_heroku.settings(locals())
 
 #Email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
@@ -335,6 +397,7 @@ EMAIL_HOST = config("EMAIL_HOST", cast=str, default="smtp.gmail.com")
 EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
 EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)
+<<<<<<< HEAD
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default="contactdevsenior@gmail.com")  # Your Gmail address
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default="mjqk xujs higl cxaw")
 EMAIL_CLIENT_DOMAIN = config("EMAIL_CLIENT_DOMAIN", cast=str, default="localhost")
@@ -342,11 +405,25 @@ EMAIL_CLIENT_DOMAIN = config("EMAIL_CLIENT_DOMAIN", cast=str, default="localhost
 # Site URL used in emails and links
 SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=15)
+=======
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default="")
+EMAIL_CLIENT_DOMAIN = config("EMAIL_CLIENT_DOMAIN", cast=str, default="localhost")
+>>>>>>> chore/security-design-hardening
 
+# Site URL used in emails and links
+SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
+EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=5)
 
+if not DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
+    raise ImproperlyConfigured("EMAIL_HOST_USER and EMAIL_HOST_PASSWORD must be set in production.")
+
+<<<<<<< HEAD
 print("Email configuration loaded successfully.")
 print(f"EMAIL_HOST: {EMAIL_HOST}")
 print(f"EMAIL_PORT: {EMAIL_PORT}")
+=======
+>>>>>>> chore/security-design-hardening
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -362,16 +439,24 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+<<<<<<< HEAD
 # Paramètres allauth
 # Paramètres allauth (corrigés)
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
+=======
+# Paramètres allauth (API récente)
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+>>>>>>> chore/security-design-hardening
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
 
+<<<<<<< HEAD
 # Force http in dev to build callback URLs correctly
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 
@@ -381,6 +466,127 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:7400',
 ]
 
+=======
+# Use HTTPS outside development
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https' if DEBUG else 'https'
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in config(
+        "CSRF_TRUSTED_ORIGINS",
+        default="http://localhost:7400,http://127.0.0.1:7400,https://hypergenetical-haustorial-madisyn.ngrok-free.dev",
+    ).split(",")
+    if origin.strip()
+]
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    REFERRER_POLICY = "same-origin"
+
+# Djomy configuration
+DJOMY_CLIENT_ID = config("DJOMY_CLIENT_ID", default="votre_client_id")
+DJOMY_CLIENT_SECRET = config("DJOMY_CLIENT_SECRET", default="votre_secret_hmac")
+DJOMY_BASE_URL = config("DJOMY_BASE_URL", default="https://sandbox-api.djomy.africa/v1")
+DJOMY_RETURN_URL = config("DJOMY_RETURN_URL", default=f"{SITE_URL}/payment/success/")
+DJOMY_CANCEL_URL = config("DJOMY_CANCEL_URL", default=f"{SITE_URL}/payment/cancel/")
+DJOMY_WEBHOOK_SECRET = config("DJOMY_WEBHOOK_SECRET", default="")
+DJOMY_REQUEST_TIMEOUT = config("DJOMY_REQUEST_TIMEOUT", default=12, cast=int)
+
+# Async jobs (Celery/Redis)
+def _env_bool(name, default=False):
+    raw = os.getenv(name)
+    if raw is None or raw == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_int(name, default):
+    raw = os.getenv(name)
+    if raw is None or raw == "":
+        return default
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return default
+
+
+def _env_float(name, default):
+    raw = os.getenv(name)
+    if raw is None or raw == "":
+        return default
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return default
+
+
+ASYNC_EMAIL_ENABLED = _env_bool("ASYNC_EMAIL_ENABLED", False)
+CELERY_BROKER_URL = (os.getenv("CELERY_BROKER_URL", "") or "").strip() or "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = (os.getenv("CELERY_RESULT_BACKEND", "") or "").strip() or CELERY_BROKER_URL
+CELERY_TASK_DEFAULT_QUEUE = (os.getenv("CELERY_TASK_DEFAULT_QUEUE", "") or "").strip() or "default"
+CELERY_TASK_TIME_LIMIT = _env_int("CELERY_TASK_TIME_LIMIT", 120)
+CELERY_TASK_SOFT_TIME_LIMIT = _env_int("CELERY_TASK_SOFT_TIME_LIMIT", 90)
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = _env_int("CELERY_WORKER_PREFETCH_MULTIPLIER", 1)
+CELERY_TASK_ROUTES = {
+    "sosguinee.tasks.send_email_task": {"queue": "email"},
+    "sosguinee.tasks.send_funding_request_notification_task": {"queue": "email"},
+    "sosguinee.tasks.send_alert_notification_task": {"queue": "email"},
+    "sosguinee.tasks.send_donation_notification_task": {"queue": "email"},
+    "sosguinee.tasks.send_subscription_notification_task": {"queue": "email"},
+    "sosguinee.tasks.send_subscription_reminder_task": {"queue": "email"},
+}
+
+CELERY_BEAT_SCHEDULE = {
+    "send-subscription-reminders-daily": {
+        "task": "accounts.tasks.send_subscription_reminders",
+        "schedule": _env_int("SUBSCRIPTION_REMINDER_EVERY_SECONDS", 86400),
+    },
+    "cleanup-expired-subscriptions-daily": {
+        "task": "accounts.tasks.cleanup_expired_subscriptions",
+        "schedule": _env_int("SUBSCRIPTION_CLEANUP_EVERY_SECONDS", 86400),
+    },
+}
+
+# Error monitoring (Sentry)
+SENTRY_DSN = (os.getenv("SENTRY_DSN", "") or "").strip()
+SENTRY_ENVIRONMENT = (os.getenv("SENTRY_ENVIRONMENT", "") or "").strip() or ENVIRONMENT
+SENTRY_TRACES_SAMPLE_RATE = _env_float("SENTRY_TRACES_SAMPLE_RATE", 0.05 if not DEBUG else 0.0)
+
+if SENTRY_DSN:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            environment=SENTRY_ENVIRONMENT,
+            integrations=[DjangoIntegration()],
+            traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+            send_default_pii=False,
+        )
+    except Exception as sentry_exc:
+        logger.warning("Sentry non initialisé: %s", sentry_exc)
+
+# Turnstile CAPTCHA
+TURNSTILE_SITE_KEY = os.getenv("TURNSTILE_SITE_KEY", "").strip()
+TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY", "").strip()
+TURNSTILE_VERIFY_URL = (
+    os.getenv("TURNSTILE_VERIFY_URL", "").strip()
+    or "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+)
+
+>>>>>>> chore/security-design-hardening
 # Anciennes variables social-auth (non utilisées)
 # SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-google-client-id'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-google-client-secret'
