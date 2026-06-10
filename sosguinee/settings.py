@@ -17,15 +17,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 import dj_database_url
 
-# Récupère automatiquement la variable DATABASE_URL fournie par Heroku
-db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
-DATABASES['default'].update(db_from_env)
-# try:
-#     import django_heroku
-# except ImportError:  # Local env may not have this optional package.
-#     django_heroku = None
 # pip install dj-database-url
-# pip install django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -178,6 +170,12 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
+# Mise à jour avec DATABASE_URL (Render/Heroku)
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=False)
+if db_from_env:
+    DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
