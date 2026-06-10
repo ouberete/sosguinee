@@ -281,40 +281,36 @@ class UserInfosForm(forms.ModelForm):
         self.helper.form_show_errors = True
         self.helper.error_text_inline = True  # Très important
 
-        region_key = self.add_prefix('region')
-        prefecture_key = self.add_prefix('prefecture')
-        commune_key = self.add_prefix('commune')
+        region_id = self.data.get(self.add_prefix('region'))
+        prefecture_id = self.data.get(self.add_prefix('prefecture'))
+        commune_id = self.data.get(self.add_prefix('commune'))
 
-        # Peupler les dropdowns de localisation en tenant compte du prefixe du wizard.
-        if region_key in self.data:
-            try:
-                region_id = int(self.data.get(region_key))
-                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=region_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
+        if not region_id and self.initial.get('region'):
+            val = self.initial.get('region')
+            region_id = getattr(val, 'id', val)
+        if not prefecture_id and self.initial.get('prefecture'):
+            val = self.initial.get('prefecture')
+            prefecture_id = getattr(val, 'id', val)
+        if not commune_id and self.initial.get('commune'):
+            val = self.initial.get('commune')
+            commune_id = getattr(val, 'id', val)
 
-        if prefecture_key in self.data:
-            try:
-                prefecture_id = int(self.data.get(prefecture_key))
-                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
+        if not region_id and self.instance and self.instance.pk:
+            region_id = self.instance.region_id
+        if not prefecture_id and self.instance and self.instance.pk:
+            prefecture_id = self.instance.prefecture_id
+        if not commune_id and self.instance and self.instance.pk:
+            commune_id = self.instance.commune_id
 
-        if commune_key in self.data:
-            try:
-                commune_id = int(self.data.get(commune_key))
-                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=commune_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
-
-        # Pour une instance existante
-        if self.instance and self.instance.pk:
-            if self.instance.region_id:
-                self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
-            if self.instance.prefecture_id:
-                self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
-            if self.instance.commune_id:
-                self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
+        try:
+            if region_id:
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=int(region_id)).order_by('name')
+            if prefecture_id:
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=int(prefecture_id)).order_by('name')
+            if commune_id:
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=int(commune_id)).order_by('name')
+        except (ValueError, TypeError):
+            pass
 
     # def clean(self):
     #         cleaned_data = super().clean()
@@ -417,31 +413,37 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.fields['birth_date'].required = True  # Rendre le champ obligatoire
-        if 'region' in self.data:
-            try:
-                region_id = int(self.data.get('region'))
-                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=region_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
-        if 'prefecture' in self.data:
-            try:
-                prefecture_id = int(self.data.get('prefecture'))
-                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=prefecture_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
-        if 'commune' in self.data:
-            try:
-                commune_id = int(self.data.get('commune'))
-                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=commune_id).order_by('name')
-            except (ValueError, TypeError):
-                pass
-        if self.instance and self.instance.pk:
-            if self.instance.region_id:
-                self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
-            if self.instance.prefecture_id:
-                self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
-            if self.instance.commune_id:
-                self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
+        
+        region_id = self.data.get(self.add_prefix('region'))
+        prefecture_id = self.data.get(self.add_prefix('prefecture'))
+        commune_id = self.data.get(self.add_prefix('commune'))
+
+        if not region_id and self.initial.get('region'):
+            val = self.initial.get('region')
+            region_id = getattr(val, 'id', val)
+        if not prefecture_id and self.initial.get('prefecture'):
+            val = self.initial.get('prefecture')
+            prefecture_id = getattr(val, 'id', val)
+        if not commune_id and self.initial.get('commune'):
+            val = self.initial.get('commune')
+            commune_id = getattr(val, 'id', val)
+
+        if not region_id and self.instance and self.instance.pk:
+            region_id = self.instance.region_id
+        if not prefecture_id and self.instance and self.instance.pk:
+            prefecture_id = self.instance.prefecture_id
+        if not commune_id and self.instance and self.instance.pk:
+            commune_id = self.instance.commune_id
+
+        try:
+            if region_id:
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=int(region_id)).order_by('name')
+            if prefecture_id:
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=int(prefecture_id)).order_by('name')
+            if commune_id:
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=int(commune_id)).order_by('name')
+        except (ValueError, TypeError):
+            pass
 
 
 

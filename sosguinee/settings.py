@@ -33,15 +33,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 DEBUG = config("DEBUG", default=(ENVIRONMENT != "production"), cast=bool)
 
+#Generate secret key
+def generate_secret_key():
+    import string
+    import random
+    return ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=50))
+
+
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY", default="")
-if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = "dev-only-insecure-key-change-me"
-    else:
-        raise ImproperlyConfigured("SECRET_KEY must be set in production.")
+
+if SECRET_KEY == "dev-only-insecure-key-change-me" or SECRET_KEY == "":
+    SECRET_KEY = generate_secret_key()
+
+
 
 ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",") if h.strip()]
+
 
 # --- STATIC & MEDIA ---
 
