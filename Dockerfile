@@ -17,7 +17,8 @@ RUN pip install --upgrade pip && \
 
 # Copier le script d'initialisation et lui donner les droits d'exécution
 COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh && \
+    sed -i 's/\r$//' /app/entrypoint.sh
 
 # Copier tout le reste du projet
 COPY . .
