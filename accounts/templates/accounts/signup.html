@@ -1,68 +1,82 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load socialaccount %}
-{% block title %}Inscription - SOS Guinée{% endblock %}
-{% block extra_css %}
-  <!-- Styles spécifiques à la page de connexion -->
-  <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+{% load i18n %}
+
+{% block title %}{% trans "Inscription" %} - SOS Guinée{% endblock %}
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 
 {% block content %}
-
-<main class="grey lighten-4 section">
+<main class="grey lighten-4 section signup-page sos-form-page">
   <div class="container">
     <div class="row">
       <div class="col s12 m8 offset-m2 l6 offset-l3">
-        <div class="card">
+        <div class="card signup-card">
           <div class="card-content">
-            <span class="card-title center">Créer un compte</span>
+            <span class="card-title center">{% trans "Créer un compte" %}</span>
+            <p class="form-required-note center-align"><span class="required-mark">*</span> Champs obligatoires</p>
 
-            <form method="post" action="{% url 'register' %}" id="signup-form" novalidate>
+            <form method="post" action="{% url 'register' %}" id="signup-form" class="sos-form-grid row" novalidate>
               {% csrf_token %}
 
-              {# Civilité personnalisé #}
-              <div class="input-field">
+              {% if form.non_field_errors %}
+                <div class="card-panel red lighten-4 red-text text-darken-4" role="alert" aria-live="assertive">
+                  {% for err in form.non_field_errors %}
+                    <p>{{ err }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <div class="input-field form-field{% if form.civility.errors %} has-error{% endif %}{% if form.civility.field.required %} is-required{% endif %}">
+                <label for="id_civility" class="active">
+                  {% trans "Civilité" %}{% if form.civility.field.required %}<span class="required-mark" aria-hidden="true">*</span>{% endif %}
+                </label>
                 <select id="id_civility" name="civility" class="browser-default" required>
-                  <option value="" disabled selected>Choisir votre civilité</option>
+                  <option value="" disabled {% if not form.civility.value %}selected{% endif %}>{% trans "Choisir votre civilité" %}</option>
                   {% for value, label in form.civility.field.choices %}
-                    <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% if value %}
+                      <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
                   {% endfor %}
                 </select>
-                <label for="id_civility" class="active">Civilité</label>
                 {% for error in form.civility.errors %}
-                  <span class="helper-text red-text">{{ error }}</span>
+                  <span class="field-error red-text">{{ error }}</span>
                 {% endfor %}
               </div>
 
-              {# Boucle sur les autres champs sauf civility #}
               {% for field in form.visible_fields %}
                 {% if field.name != 'civility' %}
-                  <div class="input-field {% if field.errors %}invalid{% endif %}">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% for error in field.errors %}
-                      <span class="helper-text red-text">{{ error }}</span>
-                    {% endfor %}
-                  </div>
+                  {% include 'page/includes/form_field.html' with field=field field_width='' %}
                 {% endif %}
               {% endfor %}
-                <p>
+
+              {% if turnstile_site_key %}
+                <div class="input-field">
+                  <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+                </div>
+              {% endif %}
+
+              <p class="signup-password-toggle">
                 <label>
                   <input type="checkbox" id="show-password" />
-                  <span>Afficher le mot de passe</span>
+                  <span>{% trans "Afficher le mot de passe" %}</span>
                 </label>
               </p>
-              <div class="center" style="margin-top:2rem;">
-                <button type="submit" class="btn waves-effect waves-light blue" id="signup-btn">S'inscrire</button>
+
+              <div class="center form-submit-row">
+                <button type="submit" class="btn waves-effect waves-light blue" id="signup-btn">{% trans "S'inscrire" %}</button>
                 <button class="btn waves-effect waves-light blue hide" id="loading-btn" type="button" disabled>
-                  <i class="material-icons left">hourglass_empty</i>Inscription...
+                  <i class="material-icons left">hourglass_empty</i>{% trans "Inscription..." %}
                 </button>
               </div>
             </form>
 
             <div class="divider" style="margin:2rem 0;"></div>
-             <div class="center">
-              <p>Ou inscrivez-vous avec :</p>
+            <div class="center">
+              <p>{% trans "Ou inscrivez-vous avec :" %}</p>
               {% providers_media_js %}
               {% get_providers as providers %}
               {% for provider in providers %}
@@ -81,7 +95,7 @@
             </div>
 
             <div class="card-action center">
-              <p>Déjà membre ? <a href="{% url 'login' %}">Se connecter</a></p>
+              <p>{% trans "Déjà membre ?" %} <a href="{% url 'login' %}">{% trans "Se connecter" %}</a></p>
             </div>
           </div>
         </div>
@@ -92,8 +106,13 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    if (typeof M !== 'undefined' && typeof M.updateTextFields === 'function') {
+      M.updateTextFields();
+    }
+
     const chk = document.getElementById('show-password');
     const pwdFields = document.querySelectorAll('#signup-form input[type=password]');
     const signupBtn = document.getElementById('signup-btn');
@@ -109,10 +128,6 @@
       signupBtn.classList.add('hide');
       loadingBtn.classList.remove('hide');
     });
-    
   });
-  
 </script>
 {% endblock %}
-
-

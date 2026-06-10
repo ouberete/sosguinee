@@ -21,10 +21,13 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from page import views as page_views
 
 urlpatterns = [
     # Pour le changement de langue (set_language)
     path("i18n/", include("django.conf.urls.i18n")),
+    # Webhook externe: hors i18n pour garder une URL stable côté PSP.
+    path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
 ]
 
 
@@ -36,8 +39,8 @@ urlpatterns  += i18n_patterns(
     path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('login')), name='password_reset_confirm'),
     path('password/reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    # Retiré: python-social-auth; on utilise allauth uniquement
     path('accounts/', include('allauth.urls')),
+    path('', include('django_djomy.urls')),
 )
 
 if settings.DEBUG:

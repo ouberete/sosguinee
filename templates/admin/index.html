@@ -200,18 +200,21 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var ctx = document.getElementById('monthlyStats').getContext('2d');
+    var chartLabels = JSON.parse('{{ chart_labels_json|default:"[]"|escapejs }}');
+    var alertsData = JSON.parse('{{ alerts_monthly_json|default:"[]"|escapejs }}');
+    var fundingData = JSON.parse('{{ funding_monthly_json|default:"[]"|escapejs }}');
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+            labels: chartLabels,
             datasets: [{
                 label: 'Alertes',
-                data: [12, 19, 3, 5, 2, 3, 7, 8, 9, 10, 11, 4],
+                data: alertsData,
                 borderColor: '#1976d2',
                 tension: 0.1
             }, {
                 label: 'Demandes',
-                data: [7, 11, 5, 8, 3, 7, 9, 11, 13, 12, 9, 6],
+                data: fundingData,
                 borderColor: '#ff6d00',
                 tension: 0.1
             }]

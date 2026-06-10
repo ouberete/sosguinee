@@ -25,3 +25,4 @@ staticfiles/
 *.log
 Thumbs.db
 .DS_Store
+.claude/

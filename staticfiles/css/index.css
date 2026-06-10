@@ -21,7 +21,7 @@
     margin-bottom: 15px;
 }
 
-.hero-content.btn-large {
+.hero-content .btn-large {
     margin: 10px;
     font-weight: bold;
     text-transform: uppercase;
@@ -29,6 +29,37 @@
 
 .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+#impact-stats h4.light,
+#how-it-works h4.light,
+#home-alerts h4.light,
+#home-funding h4.light {
+    position: relative;
+    margin-bottom: 14px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+
+#impact-stats h4.light::after,
+#how-it-works h4.light::after,
+#home-alerts h4.light::after,
+#home-funding h4.light::after {
+    content: "";
+    display: block;
+    width: 82px;
+    height: 4px;
+    margin: 14px auto 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+}
+
+#home-alerts h4.light::after {
+    background: linear-gradient(90deg, #d32f2f 0%, #ef5350 100%);
+}
+
+#home-funding h4.light::after {
+    background: linear-gradient(90deg, #f57c00 0%, #ffb74d 100%);
 }
 
 /* Styles pour les sections d'alertes et de financement */
@@ -103,6 +134,27 @@
     border-top: 1px solid rgba(160, 160, 160, 0.2);
 }
 
+.card-highlight-title {
+    min-height: 120px;
+}
+
+.card-highlight-title p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+}
+
+.card-action-share {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.card-action-share .social-icon {
+    margin: 0 0 0 0.4rem;
+}
+
 .alert-card.card-action.btn-small,.funding-card.card-action.btn-small {
     margin-right: 5px;
 }
@@ -155,6 +207,31 @@
 #impact-stats p.flow-text {
     font-size: 1.2rem;
     margin-top: 0;
+}
+
+#impact-stats .card-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+#impact-stats .card-panel::before {
+    content: "";
+    position: absolute;
+    right: -26px;
+    bottom: -34px;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(25,118,210,0.12) 0%, rgba(25,118,210,0) 72%);
+}
+
+#impact-stats .flow-text {
+    color: #475569;
+    font-weight: 600;
 }
 
 /* Section Comment ça Marche */
@@ -240,6 +317,48 @@
     text-transform: uppercase;
 }
 
+#how-it-works .icon-block {
+    min-height: 100%;
+    padding: 28px 22px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(248,250,252,0.94) 100%);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+#how-it-works .icon-block h5 {
+    color: #0f172a;
+}
+
+#how-it-works .center-align > .btn,
+#home-alerts .center-align > .btn-flat,
+#home-funding .center-align > .btn-flat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+}
+
+#home-alerts .center-align > .btn-flat,
+#home-funding .center-align > .btn-flat {
+    color: #0f172a !important;
+}
+
+#how-it-works .center-align > .btn:hover,
+#home-alerts .center-align > .btn-flat:hover,
+#home-funding .center-align > .btn-flat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
     .hero-section {
@@ -278,7 +397,7 @@
     .hero-content h5 {
         font-size: 1.2rem;
     }
-    .hero-content.btn-large {
+    .hero-content .btn-large {
         width: 100%;
         margin: 5px 0;
     }
@@ -295,4 +414,52 @@
         width: 80px;
         height: 80px;
     }
+}
+
+#home-alerts .funding-grid,
+#home-funding .funding-grid {
+    align-items: stretch;
+}
+
+#home-alerts .bf-card,
+#home-funding .ws-card {
+    height: 100%;
+}
+
+#home-alerts .bf-card-socials,
+#home-funding .ws-card-socials {
+    margin-top: 14px;
+}
+
+#home-alerts .bf-card,
+#home-funding .ws-card {
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+#home-alerts .bf-card:hover,
+#home-funding .ws-card:hover {
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.14);
+}
+
+#contact-us {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #e2e8f0;
+}
+
+#contact-us h4,
+#contact-us h5,
+#contact-us p,
+#contact-us span,
+#contact-us label {
+    color: #e2e8f0;
+}
+
+#contact-us h4 {
+    color: #ffffff;
+}
+
+#contact-us .card-panel {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
 }

@@ -17,7 +17,7 @@ def send_subscription_reminders():
     
     for profile in users_to_remind:
         try:
-            EmailService.send_subscription_reminder(profile.user)
+            EmailService.send_subscription_reminder(profile.user, queue=False)
             profile.subscription_reminder_sent = True
             profile.save()
         except Exception as e:

@@ -1,67 +1,84 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load socialaccount %}
-{% block title %}Connexion - SOS Guinée{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Connexion" %} - SOS Guinée{% endblock %}
 {% block extracss %}
-  <!-- Styles spécifiques à la page de connexion -->
   <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
-<meta name="robots" content="noindex">
+  <meta name="robots" content="noindex">
 {% endblock %}
 
 {% block content %}
-
-<main class="grey lighten-4 section">
+<main class="grey lighten-4 section valign-wrapper" style="min-height: 70vh;">
   <div class="container">
-    <div class="row">
-      <div class="col s12 m6 offset-m3">
-        <div class="card">
-          <div class="card-content">
-            <span class="card-title center">Se connecter</span>
+    <div class="row" style="margin-bottom: 0;">
+      <div class="col s12 m8 offset-m2 l6 offset-l3">
+        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 30px; margin-top: 20px;">
+          <h4 style="font-weight: 600; color: #2e7d32; margin-bottom: 30px;">{% trans "Se connecter" %}</h4>
 
-            <form method="post" action="{% url 'login' %}" id="login-form" novalidate>
-              {% csrf_token %}
-
-              {% if form.non_field_errors %}
-                <div class="card-panel red lighten-4 red-text text-darken-4">
-                  {% for err in form.non_field_errors %}
-                    <p>{{ err }}</p>
-                  {% endfor %}
-                </div>
-              {% endif %}
-
-              {% for field in form.visible_fields %}
-                <div class="input-field {% if field.errors %}invalid{% endif %}">
-                  {{ field.label_tag }}
-                  {{ field }}
-                  {% for error in field.errors %}
-                    <span class="helper-text red-text">{{ error }}</span>
-                  {% endfor %}
-                </div>
-              {% endfor %}
-
-              <p>
-                <label>
-                  <input type="checkbox" id="show-password" />
-                  <span>Afficher le mot de passe</span>
-                </label>
-              </p>
-
-              <div class="center" style="margin-top:2rem;">
-                <button type="submit" class="btn waves-effect waves-light blue" id="login-btn">Se connecter</button>
-                <button class="btn waves-effect waves-light blue hide" id="loading-btn" type="button" disabled>
-                  <i class="material-icons left">hourglass_empty</i>Connexion...
-                </button>
+          {% if messages %}
+            {% for message in messages %}
+              <div class="card-panel {{ message.tags }}">
+                {{ message }}
               </div>
-            </form>
+            {% endfor %}
+          {% endif %}
 
-            <div class="divider" style="margin:2rem 0;"></div>
-           <div class="center">
-              <p>Ou connectez-vous avec :</p>
-              {% providers_media_js %}
-              {% get_providers as providers %}
+          <form method="post" action="{% url 'login' %}" id="login-form" novalidate style="text-align: left;">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="card-panel red lighten-4 red-text text-darken-4">
+                {% for err in form.non_field_errors %}
+                  <p>{{ err }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% for field in form.visible_fields %}
+              <div class="input-field {% if field.errors %}invalid{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}
+                  <span class="helper-text red-text">{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% endfor %}
+
+            {% if turnstile_site_key %}
+              <div class="input-field center-align">
+                <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+              </div>
+            {% endif %}
+
+            <p style="margin-bottom: 20px;">
+              <label>
+                <input type="checkbox" id="show-password" />
+                <span>{% trans "Afficher le mot de passe" %}</span>
+              </label>
+            </p>
+
+            <div class="center-align">
+              <button type="submit" class="btn-large waves-effect waves-light blue darken-2" id="login-btn" style="border-radius: 30px; padding: 0 35px; width: 100%;">
+                <i class="material-icons left">login</i> {% trans "Se connecter" %}
+              </button>
+              <button class="btn-large waves-effect waves-light blue darken-2 hide" id="loading-btn" type="button" disabled style="border-radius: 30px; padding: 0 35px; width: 100%;">
+                <i class="material-icons left">hourglass_empty</i>{% trans "Connexion..." %}
+              </button>
+            </div>
+          </form>
+
+          <div class="divider" style="margin:2rem 0;"></div>
+          
+          <div class="center-align">
+            <p style="color: #555; margin-bottom: 15px;">{% trans "Ou connectez-vous avec :" %}</p>
+            {% providers_media_js %}
+            {% get_providers as providers %}
+            <div style="display: flex; flex-direction: column; gap: 10px;">
               {% for provider in providers %}
-                <a href="{% provider_login_url "google" %}"
-                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="margin-bottom:.5rem; display:block;">
+                <a href="{% provider_login_url provider.id %}"
+                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="border-radius: 25px; display:block;">
                   <i class="material-icons left">
                     {% if provider.id == 'google' %}account_circle
                     {% elif provider.id == 'facebook' %}facebook
@@ -73,11 +90,12 @@
                 </a>
               {% endfor %}
             </div>
+          </div>
 
-            <div class="card-action center">
-              <a href="{% url 'reset-password' %}">Mot de passe oublié ?</a> |
-              <a href="{% url 'register' %}">Pas encore de compte ? Inscription</a>
-            </div>
+          <div style="margin-top: 30px;">
+            <p><a href="{% url 'reset-password' %}" style="color: #1976d2;">{% trans "Mot de passe oublié ?" %}</a></p>
+            <p><a href="{% url 'resend_activation' %}" style="color: #1976d2;">{% trans "Renvoyer le lien d'activation" %}</a></p>
+            <p style="margin-top: 15px;">{% trans "Pas encore de compte ?" %} <a href="{% url 'register' %}" style="font-weight: bold; color: #f57c00;">{% trans "S'inscrire" %}</a></p>
           </div>
         </div>
       </div>
@@ -87,6 +105,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const chk = document.getElementById('show-password');
@@ -103,5 +122,3 @@
   });
 </script>
 {% endblock %}
-
-

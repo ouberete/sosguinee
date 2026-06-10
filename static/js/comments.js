@@ -40,9 +40,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: data
             })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.comment_html) {
-                        \n                        if (typeof initDropdowns === 'function') { initDropdowns(); }
+                    .then(data => {
+                        if (data.success && data.comment_html) {
+                        if (commentsList) {
+                            commentsList.insertAdjacentHTML('afterbegin', data.comment_html);
+                        }
+                        this.reset();
+                        const textarea = this.querySelector('textarea');
+                        if (textarea) {
+                            textarea.value = '';
+                            if (window.M && M.textareaAutoResize) {
+                                M.textareaAutoResize(textarea);
+                            }
+                        }
+                        if (typeof initDropdowns === 'function') { initDropdowns(); }
                         showToast('Commentaire ajouté', 'green');
                     } else {
                         showToast('Erreur: ' + (data.errors || 'Inconnue'), 'red');
@@ -60,7 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Delegation pour actions des commentaires
-    commentsList.addEventListener('click', function (e) {
+    if (commentsList) {
+        commentsList.addEventListener('click', function (e) {
         const target = e.target;
 
         // Signaler
@@ -102,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            commentText.textContent = newText;
+                            commentText.textContent = newText.trim();
                             showToast('Commentaire modifié', 'green');
                         } else {
                             showToast('Erreur lors de la modification', 'red');
@@ -134,7 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             }
         }
-    });
+        });
+    }
 
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;

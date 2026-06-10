@@ -31,7 +31,7 @@ class Utilities():
        content_email.subjet=subject
        content_email.plain_message =plain_message
        content_email.sender_email=settings.EMAIL_HOST_USER
-       content_email.receiver_email=to
+       content_email.receiver_email=",".join(to or [])
        content_email.html_message=message
        content_email.save()
 

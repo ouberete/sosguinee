@@ -45,6 +45,7 @@ def user_profile(request):
 
             categories = dict(UserDetails.USER_CATEGORY_CHOICES)
             category = categories.get(profile.user_category, 'Non renseigne')
+            account_status = profile.user_status or 'Inactive'
 
             context = {
                 'profile': profile,
@@ -53,6 +54,7 @@ def user_profile(request):
                 'profession': profession,
                 'nationality': nationality,
                 'category': category,
+                'account_status': account_status,
                 'alerts': alerts,
                 'funding_requests': funding_requests,
                 'donations': donations,
@@ -130,7 +132,11 @@ class UpdateUserProfileWizard(SessionWizardView):
 
         for form in form_list:
             for key, value in form.cleaned_data.items():
-                setattr(user_details, key, value)
+                # Handle location fields specially (they are model FKs)
+                if key in ('region', 'prefecture', 'commune'):
+                    setattr(user_details, f'{key}_id', value.id if value else None)
+                else:
+                    setattr(user_details, key, value)
 
         user_details.save()
         return redirect('/profile')

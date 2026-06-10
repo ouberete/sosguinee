@@ -139,12 +139,37 @@ footer.page-footer-custom {
 }
 
 .footer-logo {
-    height: 48px;
-    margin-bottom: 16px;
+    height: 36px;
+    max-width: 140px;
+    margin-bottom: 12px;
+    object-fit: contain;
+}
+
+footer.page-footer-custom .footer-logo {
+    display: block;
+    width: auto;
+    max-width: 140px;
+    height: 36px;
+}
+
+footer.page-footer-custom p {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+footer.page-footer-custom h5 {
+    font-size: 1.15rem;
+    margin: 0 0 14px;
+}
+
+footer.page-footer-custom li {
+    margin-bottom: 8px;
 }
 
 .footer-link {
     color: #dce6f0;
+    font-size: 0.95rem;
 }
 
 .footer-link:hover {
@@ -154,5 +179,14 @@ footer.page-footer-custom {
 @media (max-width: 992px) {
     nav.page-nav .brand-logo {
         left: 54%;
+    }
+
+    footer.page-footer-custom .footer-logo {
+        max-width: 124px;
+        height: 32px;
+    }
+
+    footer.page-footer-custom p {
+        font-size: 0.94rem;
     }
 }

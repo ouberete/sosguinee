@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
 {% load custom_filters %}
@@ -17,53 +17,88 @@
 <main role="main">
   <section class="parallax-container valign-wrapper hero-section hero-details-page" aria-label="Bannière détails demande de financement">
     <div class="parallax">
-      <img src="{% static 'img/articles/img7.avif' %}" alt="Image de fond pour les détails de demande de financement">
+      <img src="{% static 'img/hero_2.png' %}" alt="Image de fond pour les détails de demande de financement">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
         <div class="col s12">
-          <h3 class="header light text-shadow">Détails de la demande</h3>
-          <h5 class="light text-shadow truncate-3">{{ funding_request.title }}</h5>
+          <h1 class="header light text-shadow">Détails de la demande</h1>
+          <h5 class="light text-shadow truncate-3">{{ funding_request.title|default:funding_request.beneficiary_name }}</h5>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section container" aria-labelledby="detail-fund-heading">
+  <section class="section container details-content-section" aria-labelledby="detail-fund-heading">
     <div class="row">
       <div class="col s12 m6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-            <span class="yellow category">{{ funding_request.funding_request_status }}</span>
+            <span class="yellow category">{{ funding_request.funding_request_status_name }}</span>
             <img src="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
           </div>
         </div>
         <div class="social-share-buttons">
-          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"><i class="fab fa-facebook-square"></i></a>
-          <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text=Demande%20de%20financement%20SOS%20Guinée:%20{{ funding_request.title|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter"><i class="fab fa-twitter-square"></i></a>
-          <a href="mailto:?subject=Demande%20de%20financement%20SOS%20Guinée:%20{{ funding_request.title|urlencode }}&body=Consultez%20cette%20demande%20de%20financement%20sur%20SOS%20Guinée:%20{{ request.build_absolute_uri }}" aria-label="Partager par Email"><i class="material-icons">email</i></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"><i class="fab fa-facebook-square"></i></a>
+          <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text=Demande%20de%20financement%20SOS%20Guinée:%20{{ funding_request.title|default:funding_request.beneficiary_name|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter"><i class="fab fa-twitter-square"></i></a>
+          <a href="mailto:?subject=Demande%20de%20financement%20SOS%20Guinée:%20{{ funding_request.title|default:funding_request.beneficiary_name|urlencode }}&body=Consultez%20cette%20demande%20de%20financement%20sur%20SOS%20Guinée:%20{{ request.build_absolute_uri|urlencode }}" aria-label="Partager par Email"><i class="material-icons">email</i></a>
         </div>
       </div>
       <div class="col s12 m6 card-main-details">
         <div class="card-panel">
           <ul class="collection with-header">
-            <li class="collection-header"><h5>Informations sur la Demande</h5></li>
+            <li class="collection-header"><h5 id="detail-fund-heading">Informations sur la Demande</h5></li>
+            {% if funding_request.title %}
+            <li class="collection-item"><strong>Titre :</strong> {{ funding_request.title }}</li>
+            {% endif %}
             <li class="collection-item"><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</li>
-            <li class="collection-item"><strong>Montant Cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</li>
+            {% if funding_request.funding_request_type %}
+            <li class="collection-item"><strong>Type de financement :</strong> {{ funding_request.funding_request_type }}</li>
+            {% endif %}
+            <li class="collection-item"><strong>Montant cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</li>
             <li class="collection-item">
               <div class="progress" role="progressbar" aria-valuenow="{{ funding_request.progress }}" aria-valuemin="0" aria-valuemax="100">
                 <div class="determinate" style="width: {{ funding_request.progress }}%"></div>
               </div>
-              <p>{{ funding_request.progress }}% collecté • {{ funding_request.days_remaining }} jours restants</p>
+              <p>
+                {{ funding_request.progress }}% collecté
+                {% if funding_request.days_remaining != None %}
+                • {{ funding_request.days_remaining }} jours restants
+                {% else %}
+                • Échéance dépassée
+                {% endif %}
+              </p>
             </li>
-            <li class="collection-item"><strong>Région :</strong> {{ funding_request.region|default:"-" }}</li>
-            <li class="collection-item"><strong>Préfecture :</strong> {{ funding_request.prefecture|default:"-" }}</li>
-            <li class="collection-item"><strong>Commune :</strong> {{ funding_request.commune|default:"-" }}</li>
-            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter|default:"-" }}</li>
+            {% if funding_request.start_date %}
+            <li class="collection-item"><strong>Date de début :</strong> {{ funding_request.start_date|date:"d F Y" }}</li>
+            {% endif %}
+            {% if funding_request.end_date %}
+            <li class="collection-item"><strong>Date de fin :</strong> {{ funding_request.end_date|date:"d F Y" }}</li>
+            {% endif %}
+            {% if funding_request.region %}
+            <li class="collection-item"><strong>Région :</strong> {{ funding_request.region }}</li>
+            {% endif %}
+            {% if funding_request.prefecture %}
+            <li class="collection-item"><strong>Préfecture :</strong> {{ funding_request.prefecture }}</li>
+            {% endif %}
+            {% if funding_request.commune %}
+            <li class="collection-item"><strong>Commune :</strong> {{ funding_request.commune }}</li>
+            {% endif %}
+            {% if funding_request.quarter %}
+            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter }}</li>
+            {% endif %}
+            {% if funding_request.address %}
             <li class="collection-item"><strong>Adresse :</strong> {{ funding_request.address }}</li>
-            <li class="collection-item"><strong>Téléphone :</strong> {{ funding_request.phone }} {{ funding_request.funding_request_status }}</li>
-            <li class="collection-item"><strong>Email :</strong> {{ funding_request.email|default:"Non fourni" }} </li>
+            {% endif %}
+            <li class="collection-item"><strong>{% trans "Montant payé" %} :</strong> {{ funding_request.amount_received|format_fr }} GNF</li>
+            <li class="collection-item"><strong>{% trans "Reste à financer" %} :</strong> {{ funding_request.remaining_amount|format_fr }} GNF</li>
+            {% if funding_request.phone %}
+            <li class="collection-item"><strong>Téléphone :</strong> {{ funding_request.phone }}</li>
+            {% endif %}
+            {% if funding_request.email %}
+            <li class="collection-item"><strong>Email :</strong> {{ funding_request.email }}</li>
+            {% endif %}
           </ul>
           <div class="card-action center-align">
             <div class="action-buttons-wrapper">
@@ -75,8 +110,8 @@
                 <i class="material-icons left">call</i> Contacter
               </a>
               {% endif %}
-              {% if funding_request.funding_request_status.name == "En cours" %}
-              <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
+              {% if funding_request.funding_request_status and funding_request.funding_request_status.name == "En cours" and funding_request.remaining_amount > 0 %}
+              <a href="{% url 'djomy_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
                 <i class="material-icons left">payments</i> Financer
               </a>
               {% endif %}
@@ -108,13 +143,13 @@
     {% if funding_request.optional_docs.exists %}
     <div class="row">
       <div class="col s12">
-        <h4>Autres Documents et Preuves</h4>
+        <h4>Autres documents et preuves</h4>
         <div class="row">
           {% for doc in funding_request.optional_docs.all %}
           <div class="col s12 m6 l4">
             <div class="card">
               <div class="card-image">
-                {% if doc.document_type|startswith:"image" %}
+                {% if doc.document|is_image_file %}
                 <img src="{{ doc.document.url }}" alt="Document image" class="materialboxed" loading="lazy">
                 {% else %}
                 <div class="document-preview center-align">
@@ -161,3 +196,4 @@
 </script>
 <script src="{% static 'js/comments.js' %}"></script>
 {% endblock %}
+
