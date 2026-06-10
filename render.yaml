@@ -1,0 +1,91 @@
+databases:
+  - name: sosguinee-db
+    databaseName: sosguinee
+    user: postgres
+    plan: starter # Change if you need more DB resources
+
+services:
+  - type: redis
+    name: sosguinee-redis
+    plan: free # Change if you need a paid redis
+
+  - type: web
+    name: sosguinee-web
+    env: docker
+    plan: starter # Django often needs more than the free tier RAM
+    numInstances: 1
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: 0
+      - key: USE_POSTGRES
+        value: True
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sosguinee-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
+      - key: ASYNC_EMAIL_ENABLED
+        value: True
+      - key: ALLOWED_HOSTS
+        value: sosguinee-web.onrender.com # You will add your custom domain here later
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://sosguinee-web.onrender.com
+
+  - type: worker
+    name: sosguinee-celery-worker
+    env: docker
+    plan: starter
+    dockerCommand: "celery -A sosguinee worker -l info -Q default,email"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sosguinee-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
+      - key: ASYNC_EMAIL_ENABLED
+        value: True
+
+  - type: worker
+    name: sosguinee-celery-beat
+    env: docker
+    plan: free
+    dockerCommand: "celery -A sosguinee beat -l info"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sosguinee-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: redis
+          name: sosguinee-redis
+          property: connectionString
