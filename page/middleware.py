@@ -8,8 +8,11 @@ class CurrentUserMiddleware:
 
     def __call__(self, request):
         _thread_local.user = request.user  # Enregistre l'utilisateur actuel dans un contexte local
-        response = self.get_response(request)
-        return response
+        try:
+            response = self.get_response(request)
+            return response
+        finally:
+            _thread_local.user = None  # Nettoie pour éviter les fuites entre les requêtes/tests
 
 def get_current_user():
     return getattr(_thread_local, 'user', None)
