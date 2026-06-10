@@ -148,9 +148,6 @@ WSGI_APPLICATION = "sosguinee.wsgi.application"
 # --- DATABASES ---
 USE_POSTGRES = config("USE_POSTGRES", default=True, cast=bool)
 POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", default="")
-if USE_POSTGRES and not DEBUG and not POSTGRES_PASSWORD:
-
-    raise ImproperlyConfigured("POSTGRES_PASSWORD must be set in production.")
 
 if USE_POSTGRES and not DEBUG:
     DATABASES = {
@@ -356,7 +353,7 @@ SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=5)
 
 if not DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
-    raise ImproperlyConfigured("EMAIL_HOST_USER and EMAIL_HOST_PASSWORD must be set in production.")
+    logger.warning("EMAIL_HOST_USER et EMAIL_HOST_PASSWORD ne sont pas définis. L'envoi d'emails échouera.")
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
