@@ -1,20 +1,41 @@
-# utils/custom_email_backend.py
 from django.core.mail.backends.smtp import EmailBackend
-from smtplib import SMTP
+from smtplib import SMTP, SMTP_SSL
+from django.conf import settings
+
 
 class CustomEmailBackend(EmailBackend):
     def open(self):
-        """Override to fix Invalid domain name (HELO)"""
+        """Open a network connection with proper TLS/SSL and HELO.
+
+        - Uses implicit SSL when EMAIL_USE_SSL is True (e.g., port 465).
+        - Uses STARTTLS when EMAIL_USE_TLS is True.
+        - Sends a valid local_hostname (HELO) using EMAIL_CLIENT_DOMAIN if provided.
+        """
         if self.connection:
             return False
         try:
-            self.connection = SMTP(
-                self.host,
-                self.port,
-                local_hostname="sosguinee.org"  # <- Forcer un nom d’hôte valide ici
-            )
-            if self.use_tls:
-                self.connection.starttls(context=self.ssl_context)
+            local_hostname = getattr(settings, "EMAIL_CLIENT_DOMAIN", None) or "localhost"
+
+            if getattr(self, "use_ssl", False):
+                # Implicit SSL (e.g., Hostinger on port 465)
+                self.connection = SMTP_SSL(
+                    self.host,
+                    self.port,
+                    local_hostname=local_hostname,
+                    timeout=self.timeout,
+                    context=self.ssl_context,
+                )
+            else:
+                # Plain SMTP, optionally upgraded with STARTTLS
+                self.connection = SMTP(
+                    self.host,
+                    self.port,
+                    local_hostname=local_hostname,
+                    timeout=self.timeout,
+                )
+                if getattr(self, "use_tls", False):
+                    self.connection.starttls(context=self.ssl_context)
+
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
             return True
@@ -22,3 +43,4 @@ class CustomEmailBackend(EmailBackend):
             if not self.fail_silently:
                 raise
             return False
+

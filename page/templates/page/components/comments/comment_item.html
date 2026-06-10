@@ -1,28 +1,48 @@
 <div class="card-panel" id="comment-{{ comment.id }}">
-  <p><strong>{{ comment.user.username }}</strong> — {{ comment.created_at|date:"d/m/Y H:i" }}</p>
-  <p>{{ comment.text }}</p>
-
-  <div class="comment-actions">
-    <a href="#" class="reply-link" data-parent-id="{{ comment.id }}">Répondre</a>
-    <a href="#" class="report-link" data-id="{{ comment.id }}">Signaler</a>
-
-    {% if user == comment.user %}
-    <a href="#" class="edit-link" data-id="{{ comment.id }}">Modifier</a>
-    <a href="#" class="delete-link" data-id="{{ comment.id }}">Supprimer</a>
+  <div class="comment-header" style="display:flex; align-items:center; justify-content:space-between;">
+    <p style="margin:0;">
+      <strong>{{ comment.user.username }}</strong>
+      <small class="grey-text">— {{ comment.created_at|date:"d/m/Y H:i" }}</small>
+    </p>
+    {% if user.is_authenticated %}
+    <a href="#" aria-label="Actions du commentaire">
+      <i class="material-icons dropdown-trigger comment-menu-trigger" data-target="dropdown-{{ comment.id }}">more_vert</i>
+    </a>
+    <ul id="dropdown-{{ comment.id }}" class="dropdown-content">
+      {% if user != comment.user %}
+      <li><a href="#" class="comment-report" data-id="{{ comment.id }}">Signaler</a></li>
+      {% endif %}
+      {% if user == comment.user %}
+      <li><a href="#" class="comment-edit" data-id="{{ comment.id }}">Modifier</a></li>
+      <li><a href="#" class="comment-delete" data-id="{{ comment.id }}">Supprimer</a></li>
+      {% endif %}
+    </ul>
     {% endif %}
   </div>
+  <p id="comment-text-{{ comment.id }}" style="margin-top:.5rem;">{{ comment.text }}</p>
 
   <div class="reply-form-container" id="reply-form-{{ comment.id }}"></div>
 
   {% for reply in comment.replies.all %}
-  <div class="card grey lighten-4" style="margin-left: 30px;" id="comment-{{ reply.id }}">
-    <p><strong>{{ reply.user.username }}</strong> — {{ reply.created_at|date:"d/m/Y H:i" }}</p>
-    <p>{{ reply.text }}</p>
-
-    {% if user == reply.user %}
-    <a href="#" class="edit-link" data-id="{{ reply.id }}">Modifier</a>
-    <a href="#" class="delete-link" data-id="{{ reply.id }}">Supprimer</a>
-    {% endif %}
+  <div class="card grey lighten-4" style="margin-left: 30px; padding: 8px 12px;" id="comment-{{ reply.id }}">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <p style="margin:0;"><strong>{{ reply.user.username }}</strong> <small class="grey-text">— {{ reply.created_at|date:"d/m/Y H:i" }}</small></p>
+      {% if user.is_authenticated %}
+      <a href="#" aria-label="Actions du commentaire">
+        <i class="material-icons dropdown-trigger comment-menu-trigger" data-target="dropdown-{{ reply.id }}">more_vert</i>
+      </a>
+      <ul id="dropdown-{{ reply.id }}" class="dropdown-content">
+        {% if user != reply.user %}
+        <li><a href="#" class="comment-report" data-id="{{ reply.id }}">Signaler</a></li>
+        {% endif %}
+        {% if user == reply.user %}
+        <li><a href="#" class="comment-edit" data-id="{{ reply.id }}">Modifier</a></li>
+        <li><a href="#" class="comment-delete" data-id="{{ reply.id }}">Supprimer</a></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+    <p id="comment-text-{{ reply.id }}" style="margin-top:.5rem;">{{ reply.text }}</p>
   </div>
   {% endfor %}
 </div>

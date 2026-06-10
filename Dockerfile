@@ -1,21 +1,30 @@
-FROM ubuntu:latest
-LABEL authors="ouber"
+FROM python:3.11-slim
 
-ENTRYPOINT ["top", "-b"]
-#Dockerfile to run django python application in a container
-# Use the official Python image from the Docker Hub
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
-# Set the working directory in the container
+# Définir le répertoire de travail
 WORKDIR /app
-# Copy the requirements file into the container
+
+# Installer les dépendances système nécessaires (inclut gettext pour i18n)
+RUN apt-get update && \
+    apt-get install -y build-essential libpq-dev netcat-openbsd gettext && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Copier les fichiers de dépendances et installer les paquets Python
 COPY requirements.txt .
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-# Copy the rest of the application code into the container
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir "celery[redis]==5.4.0" "sentry-sdk==2.29.1"
+
+# Copier le script d'initialisation et lui donner les droits d'exécution
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Copier tout le reste du projet
 COPY . .
-# Expose the port that the Django application will run on
+
+# Exposer le port sur lequel Gunicorn écoutera
 EXPOSE 8000
-# Run the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-# Use the official Ubuntu image from the Docker Hub
+
+# Utiliser le script comme point d'entrée
+ENTRYPOINT ["/app/entrypoint.sh"]
+

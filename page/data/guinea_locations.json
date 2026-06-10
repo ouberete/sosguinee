@@ -1,0 +1,419 @@
+{
+  "Conakry": {
+    "Préfectures": {
+      "Conakry": {
+        "Communes": {
+          "Kaloum": ["Tombo", "Almamya", "Boulbinet", "Centre administratif"],
+          "Dixinn": ["Taouyah", "Bellevue", "Minière", "Dixinn-Centre", "Cameroun"],
+          "Matam": ["Bonfi", "Madina", "Lansébougny", "Matam-Centre"],
+          "Kassa": ["Kassa Centre", "Room", "Fotoba", "Tamara"],
+          "Ratoma": ["Kipé", "Kaporo", "Hamdallaye", "Bambéto", "Ratoma-Centre"],
+          "Lambanyi": ["Lambanyi", "Nongo", "Kobaya", "Yattaya", "Coléah"],
+          "Sonfonia": ["Sonfonia Centre", "Foulamadina", "Cimenterie", "Sonfonia Gare"],
+          "Matoto": ["Matoto Centre", "Yimbaya", "Simbaya", "Kissosso", "Sangoyah", "Cosa"],
+          "Gbessia": ["Gbessia Centre", "Aéroport", "Dabondy", "Camp Carrefour"],
+          "Tombolia": ["Tombolia", "Entag", "Dabompa", "Gbessia Port"],
+          "Kagbélén": ["Kagbélén Centre", "Ansoumania", "Bailobaya", "Wonkifong"],
+          "Sanoyah": ["Sanoyah Km36", "Sanoyah Textile", "Dixinn Gare"],
+          "Manéah": ["Manéah Centre", "Fassia", "Wonkifong", "Kilometer 36"]
+        }
+      }
+    }
+  },
+
+  "Kindia": {
+    "Préfectures": {
+      "Kindia": {
+        "Communes": {
+          "Kindia-Centre": ["Coronthie", "Abattoir", "Sambaya", "Carrefour", "Grandes Maisons"],
+          "Bangouya": ["Bangouya Centre", "Saréa"],
+          "Friguiagbé": ["Friguiagbé Centre", "Koliabonyi"],
+          "Kollet": ["Kollet Centre", "Konkouré"],
+          "Madina-Oula": ["Madina-Oula Centre", "Kouraya"],
+          "Mambia": ["Mambia Centre", "Konsankoro"],
+          "Molota": ["Molota Centre", "Tanènè"],
+          "Souguéta": ["Souguéta Centre", "Yérèya"],
+          "Khorira": ["Khorira Centre", "Samaya"]
+        }
+      },
+      "Coyah": {
+        "Communes": {
+          "Coyah-Centre": ["Coyah Ville", "Dar es Salam", "Carrefour Toyota"],
+          "Manéah": ["Manéah Centre", "Fassia", "Km 36"],
+          "Wonkifong": ["Wonkifong Centre", "Tanènè"],
+          "Kouriah": ["Kouriah Centre", "Sangaréyah"],
+          "Dogomet": ["Dogomet Centre", "Fotoba"]
+        }
+      },
+      "Dubréka": {
+        "Communes": {
+          "Dubréka-Centre": ["Dubréka Ville", "Khorira", "Tanènè"],
+          "Khorira": ["Khorira Centre", "Bouramayah"],
+          "Tanènè": ["Tanènè Centre", "Kolèah"],
+          "Moussayah": ["Moussayah Centre", "Kountaya"],
+          "Kolèah": ["Kolèah Centre", "Konsankoro"],
+          "Sinta": ["Sinta Centre", "Boké-Gare"]
+        }
+      },
+      "Forécariah": {
+        "Communes": {
+          "Forécariah-Centre": ["Forécariah Ville", "Gbèrèya", "Yillah"],
+          "Benty": ["Benty Centre", "Kapèche"],
+          "Farmoriah": ["Farmoriah Centre", "Soya"],
+          "Kaback": ["Kaback Centre", "Thia"],
+          "Moussayah": ["Moussayah Centre", "Konsankoro"],
+          "Sikhourou": ["Sikhourou Centre", "Tobasso"]
+        }
+      },
+      "Télimélé": {
+        "Communes": {
+          "Télimélé-Centre": ["Télimélé Ville", "Sangaréyah", "Koba"],
+          "Bourouwal-Tapé": ["Bourouwal Centre", "Tapé"],
+          "Gougoudjé": ["Gougoudjé Centre", "Saala"],
+          "Hamdalaye": ["Hamdalaye Centre", "Matakaali"],
+          "Mambiya": ["Mambiya Centre", "Douprou"],
+          "Missira": ["Missira Centre", "Tanènè"],
+          "Saguilé": ["Saguilé Centre", "Wora"]
+        }
+      }
+    }
+  },
+
+  "Boké": {
+    "Préfectures": {
+      "Boké": {
+        "Communes": {
+          "Boké-Centre": ["Boké Ville", "Tanènè", "Kassogna"],
+          "Bintimodiya": ["Bintimodiya Centre", "Kiringana"],
+          "Dabiss": ["Dabiss Centre", "Kokolima"],
+          "Kamsar": ["Kamsar Centre", "CBK", "Port de Kamsar"],
+          "Kanfarande": ["Kanfarande Centre", "Koumbaya"],
+          "Kolaboui": ["Kolaboui Centre", "Malapouyah"],
+          "Malapouyah": ["Malapouyah Centre", "Sansalé"],
+          "Sangaredi": ["Sangaredi Centre", "CBG", "Katougouma"],
+          "Sansalé": ["Sansalé Centre", "Fello"],
+          "Tanène": ["Tanène Centre", "Kassaye"]
+        }
+      },
+      "Boffa": {
+        "Communes": {
+          "Boffa-Centre": ["Boffa Ville", "Koba", "Tamonï"],
+          "Colia": ["Colia Centre", "Doupro"],
+          "Doupro": ["Doupro Centre", "Mankountan"],
+          "Koba-Tatema": ["Koba-Tatema Centre", "Tamita"],
+          "Lisso": ["Lisso Centre", "Tougnifili"],
+          "Mankountan": ["Mankountan Centre", "Tamita"],
+          "Tamita": ["Tamita Centre", "Kolèah"],
+          "Tougnifili": ["Tougnifili Centre", "Colia"]
+        }
+      },
+      "Fria": {
+        "Communes": {
+          "Fria-Centre": ["Fria Ville", "Banguingny", "Tabossy", "Cité Friguia"],
+          "Banguingny": ["Banguingny Centre", "Tabossy"],
+          "Tormelin": ["Tormelin Centre", "Konsankoro"]
+        }
+      },
+      "Gaoual": {
+        "Communes": {
+          "Gaoual-Centre": ["Gaoual Ville", "Koumbia", "Fafaya"],
+          "Gallou": ["Gallou Centre", "Touba"],
+          "Kamaby": ["Kamaby Centre", "Wendou"],
+          "Koumbia": ["Koumbia Centre", "Wendou Mbour"],
+          "Malanta": ["Malanta Centre", "Thianguel Bori"],
+          "Touba": ["Touba Centre", "Diari"],
+          "Wendou-Mbour": ["Wendou-Mbour Centre", "Fello"]
+        }
+      },
+      "Koundara": {
+        "Communes": {
+          "Koundara-Centre": ["Koundara Ville", "Sambailo", "Saréboïdo"],
+          "Manda": ["Manda Centre", "Termessé"],
+          "Sambailo": ["Sambailo Centre", "Sarekoye"],
+          "Saréboïdo": ["Saréboïdo Centre", "Guémé"],
+          "Termessé": ["Termessé Centre", "Binoya"],
+          "Youkounkoun": ["Youkounkoun Centre", "Thianguel"]
+        }
+      }
+    }
+  },
+
+  "Mamou": {
+    "Préfectures": {
+      "Mamou": {
+        "Communes": {
+          "Mamou-Centre": ["Horè Fello", "Poudrière", "Mamou Gare", "Dar Salam", "Soumbalako"],
+          "Konkouré": ["Konkouré Centre", "Sombili"],
+          "Porédaka": ["Porédaka Centre", "Pellel"],
+          "Saramoussayah": ["Saramoussayah Centre", "Timbo"],
+          "Timbo": ["Timbo Centre", "Missira"],
+          "Tolo": ["Tolo Centre", "Diari"]
+        }
+      },
+      "Dalaba": {
+        "Communes": {
+          "Dalaba-Centre": ["Konko Sylla", "Kébaly", "Dalaba Ville", "Plateau"],
+          "Daralabé": ["Daralabé Centre", "Ditinn"],
+          "Ditinn": ["Ditinn Centre", "Hafia"],
+          "Kaalan": ["Kaalan Centre", "Boundou"],
+          "Mombeyah": ["Mombeyah Centre", "Pellel"],
+          "Sannou": ["Sannou Centre", "Bouliwel"]
+        }
+      },
+      "Pita": {
+        "Communes": {
+          "Pita-Centre": ["Timbi Madina", "Ley Miro", "Pita Gare", "Pellel"],
+          "Donghol-Sigon": ["Donghol-Sigon Centre", "Kollet"],
+          "Gongoré": ["Gongoré Centre", "Dounkimao"],
+          "Maci": ["Maci Centre", "Kahel"],
+          "Pas": ["Pas Centre", "Pellel"],
+          "Timbi-Madina": ["Timbi-Madina Centre", "Diari"],
+          "Timbi-Touni": ["Timbi-Touni Centre", "Hoore Tigui"]
+        }
+      }
+    }
+  },
+
+  "Labé": {
+    "Préfectures": {
+      "Labé": {
+        "Communes": {
+          "Labé-Centre": ["Daka", "Mosquée", "Noussy", "Kouramangui", "Hafia", "Tata"],
+          "Hafia": ["Hafia Centre", "Koumbia"],
+          "Kouramangui": ["Kouramangui Centre", "Touba"],
+          "Noussy": ["Noussy Centre", "Wora"],
+          "Popodara": ["Popodara Centre", "Pellel"],
+          "Sannou": ["Sannou Centre", "Boundou"],
+          "Thianguel-Bori": ["Thianguel-Bori Centre", "Diari"],
+          "Tountouroun": ["Tountouroun Centre", "Kollet"]
+        }
+      },
+      "Koubia": {
+        "Communes": {
+          "Koubia-Centre": ["Koubia Ville", "Fafaya", "Lambayi"],
+          "Hidayatou": ["Hidayatou Centre", "Diari"],
+          "Hamdalaye": ["Hamdalaye Centre", "Kollet"],
+          "Mombeyah": ["Mombeyah Centre", "Diao"],
+          "Pilimini": ["Pilimini Centre", "Touba"]
+        }
+      },
+      "Lélouma": {
+        "Communes": {
+          "Nzébéla-Centre": ["Djountou", "Labessé", "Nzébéla Ville"],
+          "Donghol-Touma": ["Donghol-Touma Centre", "Hoore Tigui"],
+          "Fétoré": ["Fétoré Centre", "Diari"],
+          "Kourounsi": ["Kourounsi Centre", "Pellel"],
+          "Maci": ["Maci Centre", "Wora"],
+          "Pellel": ["Pellel Centre", "Donghol"]
+        }
+      },
+      "Mali": {
+        "Communes": {
+          "Mali-Centre": ["Touba", "Sigon", "Mali Ville"],
+          "Daralabé": ["Daralabé Centre", "Lébékéré"],
+          "Fello-Koundoua": ["Fello-Koundoua Centre", "Diari"],
+          "Hidayatou": ["Hidayatou Centre", "Pellan"],
+          "Yembereng": ["Yembereng Centre", "Kankama"]
+        }
+      },
+      "Tougué": {
+        "Communes": {
+          "Tougué-Centre": ["Tougué Ville", "Fello Koundoua", "Kollet"],
+          "Diari": ["Diari Centre", "Missira"],
+          "Kollet": ["Kollet Centre", "Diari"],
+          "Missidougou": ["Missidougou Centre", "Fello"]
+        }
+      }
+    }
+  },
+
+  "Faranah": {
+    "Préfectures": {
+      "Faranah": {
+        "Communes": {
+          "Faranah-Centre": ["Fodéhadji", "Hèrèmakono", "Faranah Ville", "Sandenia", "Tiro"],
+          "Banian": ["Banian Centre", "Tiro"],
+          "Bindo": ["Bindo Centre", "Sanko"],
+          "Brouval": ["Brouval Centre", "Konsankoro"],
+          "Gbérédou-Baranama": ["Gbérédou Centre", "Baranama"],
+          "Sandenia": ["Sandenia Centre", "Hèrèmakono"]
+        }
+      },
+      "Dabola": {
+        "Communes": {
+          "Dabola-Centre": ["Kabiné", "Bissikrima", "Dabola Ville"],
+          "Arfamoussaya": ["Arfamoussaya Centre", "Dogomet"],
+          "Banko": ["Banko Centre", "Kankama"],
+          "Bissikrima": ["Bissikrima Centre", "Konindou"],
+          "Dogomet": ["Dogomet Centre", "N'Dema"],
+          "Kindoye": ["Kindoye Centre", "Daro"],
+          "Konindou": ["Konindou Centre", "Kindoye"],
+          "N'Dema": ["N'Dema Centre", "Koro"]
+        }
+      },
+      "Dinguiraye": {
+        "Communes": {
+          "Dinguiraye-Centre": ["Banora", "Gagnakaly", "Dinguiraye Ville"],
+          "Banora": ["Banora Centre", "Konsankoro"],
+          "Gagnakaly": ["Gagnakaly Centre", "Lansanaya"],
+          "Kalinko": ["Kalinko Centre", "Mitty"],
+          "Lansanaya": ["Lansanaya Centre", "Mitty"],
+          "Mitty": ["Mitty Centre", "Diari"]
+        }
+      },
+      "Kissidougou": {
+        "Communes": {
+          "Kissidougou-Centre": ["Kissidougou Ville", "Bardou", "Fermessadou"],
+          "Bardou": ["Bardou Centre", "Moribaya"],
+          "Fermessadou": ["Fermessadou Centre", "Passaya"],
+          "Koundou": ["Koundou Centre", "Nongoa"],
+          "Manfamoriah": ["Manfamoriah Centre", "Nongoabe"],
+          "Passaya": ["Passaya Centre", "Tiro"],
+          "Yendé-Millimou": ["Yendé-Millimou Centre", "Booro"]
+        }
+      }
+    }
+  },
+
+  "Kankan": {
+    "Préfectures": {
+      "Kankan": {
+        "Communes": {
+          "Kankan-Centre": ["Banankoro", "Missiran", "Kankan Ville", "Kourousa Route", "Lafiabou"],
+          "Balandougou": ["Balandougou Centre", "Tokounou"],
+          "Baté-Nafadji": ["Baté-Nafadji Centre", "Moribayah"],
+          "Boula": ["Boula Centre", "Missamana"],
+          "Gberedou-Baranama": ["Gberedou Centre", "Baranama"],
+          "Karifamoriyah": ["Karifamoriyah Centre", "Koumban"],
+          "Koumban": ["Koumban Centre", "Mamouroudou"],
+          "Mamouroudou": ["Mamouroudou Centre", "Sabadou"],
+          "Missamana": ["Missamana Centre", "Tinti-Oulen"],
+          "Moribayah": ["Moribayah Centre", "Tokounou"],
+          "Sabadou-Baranama": ["Sabadou Centre", "Baranama"],
+          "Tinti-Oulen": ["Tinti-Oulen Centre", "Tokounou"],
+          "Tokounou": ["Tokounou Centre", "Balanfa"]
+        }
+      },
+      "Kérouané": {
+        "Communes": {
+          "Kérouané-Centre": ["Soromaya", "Komodou", "Kérouané Ville"],
+          "Banankoro": ["Banankoro Centre", "Damaro"],
+          "Damaro": ["Damaro Centre", "Sanguiana"],
+          "Komodou": ["Komodou Centre", "Soromaya"],
+          "Sanguiana": ["Sanguiana Centre", "Balandougou"],
+          "Soromaya": ["Soromaya Centre", "Komodou"]
+        }
+      },
+      "Kouroussa": {
+        "Communes": {
+          "Kouroussa-Centre": ["Sanguiana", "Diariba Koro", "Kouroussa Ville"],
+          "Baro": ["Baro Centre", "Doura"],
+          "Cissela": ["Cissela Centre", "Komola"],
+          "Doura": ["Doura Centre", "Kiniero"],
+          "Kiniero": ["Kiniero Centre", "Tinti"],
+          "Komola": ["Komola Centre", "Cissela"],
+          "Sanguiana": ["Sanguiana Centre", "Tinti"],
+          "Tinti": ["Tinti Centre", "Diariba Koro"]
+        }
+      },
+      "Mandiana": {
+        "Communes": {
+          "Mandiana-Centre": ["Koundjan", "Kouremalé", "Mandiana Ville"],
+          "Dialakoro": ["Dialakoro Centre", "Faralako"],
+          "Faralako": ["Faralako Centre", "Koundjan"],
+          "Franwalia": ["Franwalia Centre", "Niani"],
+          "Koundjan": ["Koundjan Centre", "Kouremalé"],
+          "Kouremalé": ["Kouremalé Centre", "Morodou"],
+          "Morodou": ["Morodou Centre", "Niani"],
+          "Niani": ["Niani Centre", "Morodou"]
+        }
+      },
+      "Siguiri": {
+        "Communes": {
+          "Siguiri-Centre": ["Doko", "Niani", "Siguiri Ville", "Sissédougou"],
+          "Doko": ["Doko Centre", "Niandankoro"],
+          "Franwalia": ["Franwalia Centre", "Kiniero"],
+          "Kintinian": ["Kintinian Centre", "Norassoba"],
+          "Kiniero": ["Kiniero Centre", "Doko"],
+          "Niandankoro": ["Niandankoro Centre", "Siguirini"],
+          "Niagassola": ["Niagassola Centre", "Kintinian"],
+          "Norassoba": ["Norassoba Centre", "Franwalia"],
+          "Siguirini": ["Siguirini Centre", "Niandankoro"]
+        }
+      }
+    }
+  },
+
+  "Nzérékoré": {
+    "Préfectures": {
+      "Nzérékoré": {
+        "Communes": {
+          "Nzérékoré-Centre": ["Gbanghana", "Simbaya", "Nzérékoré Ville", "Diézou", "Samoé"],
+          "Bèlè": ["Bèlè Centre", "Galaye"],
+          "Bounouma": ["Bounouma Centre", "Womey"],
+          "Galaye": ["Galaye Centre", "Lainé"],
+          "Gouécké": ["Gouécké Centre", "Nzébéla"],
+          "Lainé": ["Lainé Centre", "Gouécké"],
+          "Nzébéla": ["Nzébéla Centre", "Bounouma"],
+          "Womey": ["Womey Centre", "Bèlè"]
+        }
+      },
+      "Beyla": {
+        "Communes": {
+          "Beyla-Centre": ["Gbèssoba", "Boola", "Beyla Ville"],
+          "Boola": ["Boola Centre", "Sinko"],
+          "Diassodou": ["Diassodou Centre", "Samana"],
+          "Gbèssoba": ["Gbèssoba Centre", "Beyla Ville"],
+          "Koundou": ["Koundou Centre", "Sérédou"],
+          "Samana": ["Samana Centre", "Sinko"],
+          "Sérédou": ["Sérédou Centre", "Sinko"],
+          "Sinko": ["Sinko Centre", "Gbèssoba"]
+        }
+      },
+      "Guéckédou": {
+        "Communes": {
+          "Guéckédou-Centre": ["Tékoulo", "Katkama", "Guéckédou Ville", "Marché Central"],
+          "Fangamadou": ["Fangamadou Centre", "Nongoa"],
+          "Kassadou": ["Kassadou Centre", "Ourémai"],
+          "Katkama": ["Katkama Centre", "Tékoulo"],
+          "Nongoa": ["Nongoa Centre", "Kassadou"],
+          "Ourémai": ["Ourémai Centre", "Fangamadou"],
+          "Tékoulo": ["Tékoulo Centre", "Guendembou"]
+        }
+      },
+      "Lola": {
+        "Communes": {
+          "Lola-Centre": ["Bossou", "Guessou", "Lola Ville"],
+          "Bossou": ["Bossou Centre", "Nzo"],
+          "Foumbadou": ["Foumbadou Centre", "Koulé"],
+          "Guessou-Sud": ["Guessou-Sud Centre", "Tounkarata"],
+          "Koulé": ["Koulé Centre", "Foumbadou"],
+          "Nzo": ["Nzo Centre", "Bossou"],
+          "Tounkarata": ["Tounkarata Centre", "Nzo"]
+        }
+      },
+      "Macenta": {
+        "Communes": {
+          "Macenta-Centre": ["Balizia", "Koyamah", "Macenta Ville", "Watta"],
+          "Balizia": ["Balizia Centre", "Panziazou"],
+          "Gbatama": ["Gbatama Centre", "Womey"],
+          "Kouankan": ["Kouankan Centre", "Sengbédou"],
+          "Koyamah": ["Koyamah Centre", "Balizia"],
+          "Panziazou": ["Panziazou Centre", "Sengbédou"],
+          "Sengbédou": ["Sengbédou Centre", "Kouankan"],
+          "Womey": ["Womey Centre", "Gbatama"]
+        }
+      },
+      "Yomou": {
+        "Communes": {
+          "Yomou-Centre": ["Bowé", "Péla", "Yomou Ville"],
+          "Banie": ["Banie Centre", "Diécké"],
+          "Bowé": ["Bowé Centre", "Péla"],
+          "Diécké": ["Diécké Centre", "Banie"],
+          "Péla": ["Péla Centre", "Bowé"],
+          "Zéfédou": ["Zéfédou Centre", "Banie"]
+        }
+      }
+    }
+  }
+}

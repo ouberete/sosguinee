@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
+{% load custom_filters %}
 
 {% block title %}Profil Utilisateur - SOS Guinée{% endblock %}
 
-{% block extracss %}
-<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
-{% endblock %}
-
 {% block content %}
-<main role="main">
-    <section class="section container">
+<main role="main" class="profile-page">
+    <section class="section container profile-shell">
         <div class="row">
             <div class="col s12">
                 <h6 class="center-align">Mon Profil</h6>
@@ -20,10 +18,18 @@
                                 {% if profile.photo %}
                                 <img src="{{ profile.photo.url }}" alt="Photo de profil" class="circle responsive-img z-depth-2" style="width: 150px; height: 150px; object-fit: cover;">
                                 {% else %}
-                                <i class="material-icons large grey-text">account_circle</i>
+                                <div class="circle z-depth-2 valign-wrapper center-align blue darken-2 white-text" style="width: 150px; height: 150px; margin: 0 auto; display: flex; justify-content: center; align-items: center; font-size: 3rem;">
+                                    {{ user.first_name|make_list|first|default:""|upper }}{{ user.last_name|make_list|first|default:""|upper }}
+                                    {% if not user.first_name and not user.last_name %}{{ user.username|make_list|first|upper }}{% endif %}
+                                </div>
                                 {% endif %}
                                 <h5 class="mt-2">{{ user.get_full_name }}</h5>
                                 <p class="grey-text">@{{ user.username }}</p>
+                                <p>
+                                    <span class="chip {{ account_status|chip_class }}">
+                                        Statut du compte: {{ account_status|default:"Inactive" }}
+                                    </span>
+                                </p>
                             </div>
                             <div class="col s12 m8">
                                 <ul class="collection with-header">
@@ -37,6 +43,18 @@
                                     <li class="collection-item"><strong>Adresse actuelle:</strong> {{ profile.address }}</li>
 <!--                                    <li class="collection-item"><strong>Pays actuel:</strong> {{ profile.actual_country }}</li>-->
                                     <li class="collection-item"><strong>Ville actuelle:</strong> {{ profile.actual_city }}</li>
+                                    {% if profile.region %}
+                                    <li class="collection-item"><strong>Région:</strong> {{ profile.region.name }}</li>
+                                    {% endif %}
+                                    {% if profile.prefecture %}
+                                    <li class="collection-item"><strong>Préfecture:</strong> {{ profile.prefecture.name }}</li>
+                                    {% endif %}
+                                    {% if profile.commune %}
+                                    <li class="collection-item"><strong>Commune:</strong> {{ profile.commune.name }}</li>
+                                    {% endif %}
+                                    {% if profile.quarter %}
+                                    <li class="collection-item"><strong>Quartier:</strong> {{ profile.quarter.name }}</li>
+                                    {% endif %}
                                     <li class="collection-item"><strong>Code Postal:</strong> {{ profile.zip_code }}</li>
                                     <li class="collection-item"><strong>Diplôme le plus récent:</strong> {{ profile.high_education }}</li>
                                     <li class="collection-item"><strong>Secteur d'activité:</strong> {{ profile.activity_sector }}</li>
@@ -55,10 +73,22 @@
                             <div class="col s12">
                                 <h5 class="mt-4">Réseaux Sociaux</h5>
                                 <ul class="collection">
-                                    <li class="collection-item"><strong>Facebook:</strong> {{ profile.facebook|default:"Non renseigné" }}</li>
-                                    <li class="collection-item"><strong>Twitter:</strong> {{ profile.twitter|default:"Non renseigné" }}</li>
-                                    <li class="collection-item"><strong>Linkedin:</strong> {{ profile.linkedin|default:"Non renseigné" }}</li>
-                                    <li class="collection-item"><strong>Instagram:</strong> {{ profile.instagram|default:"Non renseigné" }}</li>
+                                    <li class="collection-item">
+                                        <i class="fab fa-facebook blue-text text-darken-3"></i> <strong>Facebook:</strong> 
+                                        {% if profile.facebook %}<a href="{{ profile.facebook }}" target="_blank" rel="noopener noreferrer">{{ profile.facebook }}</a>{% else %}Non renseigné{% endif %}
+                                    </li>
+                                    <li class="collection-item">
+                                        <i class="fab fa-twitter blue-text"></i> <strong>Twitter:</strong> 
+                                        {% if profile.twitter %}<a href="{{ profile.twitter }}" target="_blank" rel="noopener noreferrer">{{ profile.twitter }}</a>{% else %}Non renseigné{% endif %}
+                                    </li>
+                                    <li class="collection-item">
+                                        <i class="fab fa-linkedin blue-text text-darken-1"></i> <strong>Linkedin:</strong> 
+                                        {% if profile.linkedin %}<a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer">{{ profile.linkedin }}</a>{% else %}Non renseigné{% endif %}
+                                    </li>
+                                    <li class="collection-item">
+                                        <i class="fab fa-instagram pink-text"></i> <strong>Instagram:</strong> 
+                                        {% if profile.instagram %}<a href="{{ profile.instagram }}" target="_blank" rel="noopener noreferrer">{{ profile.instagram }}</a>{% else %}Non renseigné{% endif %}
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -80,9 +110,551 @@
             </div>
         </div>
     </section>
+    <section class="section container profile-sections">
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">report_problem</i> Mes Alertes</span>
+                        {% if alerts %}
+                        <div class="profile-item-grid">
+                            {% for a in alerts %}
+                            <article class="profile-mini-card alert-mini-card">
+                                <a class="profile-mini-media" href="{% url 'loss_alert_detail_public' a.public_id %}" aria-label="Voir {{ a.name }}">
+                                    <img src="{% if a.principal_image %}{{ a.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ a.name }}" loading="lazy">
+                                    <span class="profile-mini-badge {{ a.status_alert_name|chip_class }}">{{ a.status_alert_name }}</span>
+                                </a>
+                                <div class="profile-mini-body">
+                                    <h6>{{ a.name }}</h6>
+                                    <p class="profile-mini-desc">{{ a.description|truncatechars:95 }}</p>
+                                    <div class="profile-mini-meta">
+                                        <span><i class="material-icons">event</i>{{ a.date_alert|date:"d/m/Y"|default:"-" }}</span>
+                                        <span><i class="material-icons">place</i>{{ a.quarter|default:a.commune|default:a.address|default:"Lieu non précisé" }}</span>
+                                    </div>
+                                    <div class="profile-mini-actions">
+                                        <a class="btn-small red darken-2 waves-effect waves-light" href="{% url 'loss_alert_detail_public' a.public_id %}">Voir</a>
+                                        <a class="btn-flat" href="{% url 'edit_loss_alert' a.public_id %}">Modifier</a>
+                                        <a class="btn-flat red-text" href="{% url 'delete_loss_alert' a.public_id %}" onclick="return confirm('Voulez-vous vraiment supprimer cette alerte ? Cette action est irréversible.');">Supprimer</a>
+                                    </div>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucune alerte créée.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">request_quote</i> Mes Demandes de financement</span>
+                        {% if funding_requests %}
+                        <div class="profile-item-grid">
+                            {% for fr in funding_requests %}
+                            <article class="profile-mini-card funding-mini-card">
+                                <a class="profile-mini-media" href="{% url 'funding_request_details_public' fr.public_id %}" aria-label="Voir {{ fr.title|default:fr.beneficiary_name }}">
+                                    <img src="{% if fr.principal_image %}{{ fr.principal_image.url }}{% else %}{% static 'img/articles/img2.avif' %}{% endif %}" alt="{{ fr.title|default:fr.beneficiary_name }}" loading="lazy">
+                                    <span class="profile-mini-badge {{ fr.funding_request_status_name|chip_class }}">{{ fr.funding_request_status_name }}</span>
+                                </a>
+                                <div class="profile-mini-body">
+                                    <h6>{{ fr.title|default:fr.beneficiary_name }}</h6>
+                                    <p class="profile-mini-desc">{{ fr.description_needs|truncatechars:95 }}</p>
+                                    <div class="profile-funding-progress">
+                                        <div class="profile-progress-track">
+                                            <span style="width: {{ fr.progress }}%"></span>
+                                        </div>
+                                        <div class="profile-progress-meta">
+                                            <strong>{{ fr.progress }}%</strong>
+                                            <span>{{ fr.amount_received|format_fr }} / {{ fr.funding_amount|format_fr }} GNF</span>
+                                        </div>
+                                    </div>
+                                    <div class="profile-mini-meta">
+                                        <span><i class="material-icons">payments</i>{{ fr.remaining_amount|format_fr }} GNF restant</span>
+                                        <span><i class="material-icons">schedule</i>{% if fr.days_remaining != None %}{{ fr.days_remaining }} j restants{% else %}Échéance passée{% endif %}</span>
+                                    </div>
+                                    <div class="profile-mini-actions">
+                                        <a class="btn-small orange darken-2 waves-effect waves-light" href="{% url 'funding_request_details_public' fr.public_id %}">Voir</a>
+                                        <a class="btn-flat" href="{% url 'edit_funding_request' fr.public_id %}">Modifier</a>
+                                        <a class="btn-flat red-text" href="{% url 'delete_funding_request' fr.public_id %}" onclick="return confirm('Voulez-vous vraiment supprimer cette demande de financement ? Cette action est irréversible.');">Supprimer</a>
+                                    </div>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucune demande de financement créée.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">volunteer_activism</i> Mes Dons</span>
+                        {% if donations %}
+                        <div class="profile-compact-grid">
+                            {% for d in donations %}
+                            <article class="profile-compact-card">
+                                <div class="profile-compact-icon donation-icon">
+                                    <i class="material-icons">volunteer_activism</i>
+                                </div>
+                                <div class="profile-compact-body">
+                                    <div class="profile-compact-head">
+                                        <strong>{{ d.amount|format_fr }} GNF</strong>
+                                        <span class="chip {{ d.get_status_display|default:d.status|chip_class }}">{{ d.get_status_display|default:d.status }}</span>
+                                    </div>
+                                    <p><i class="material-icons">event</i> Le {{ d.created_at|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucun don effectué.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">account_balance_wallet</i> Mes Financements</span>
+                        {% if fundings %}
+                        <div class="profile-compact-grid">
+                            {% for fp in fundings %}
+                            <article class="profile-compact-card">
+                                <div class="profile-compact-icon funding-icon">
+                                    <i class="material-icons">account_balance_wallet</i>
+                                </div>
+                                <div class="profile-compact-body">
+                                    <div class="profile-compact-head">
+                                        <strong>{{ fp.amount|format_fr }} GNF</strong>
+                                        <span class="chip {{ fp.get_status_display|default:fp.status|chip_class }}">{{ fp.get_status_display|default:fp.status }}</span>
+                                    </div>
+                                    {% if fp.funding_request %}
+                                    <p class="profile-compact-title">{{ fp.funding_request.title|default:fp.funding_request.beneficiary_name }}</p>
+                                    {% endif %}
+                                    <p><i class="material-icons">event</i> Le {{ fp.created_at|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucun financement effectué.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">mail</i> Mes Messages</span>
+                        {% if messages_sent %}
+                        <div class="profile-compact-grid">
+                            {% for m in messages_sent %}
+                            <article class="profile-compact-card">
+                                <div class="profile-compact-icon message-icon">
+                                    <i class="material-icons">mail</i>
+                                </div>
+                                <div class="profile-compact-body">
+                                    <div class="profile-compact-head">
+                                        <strong>{{ m.subject|default:"Message" }}</strong>
+                                    </div>
+                                    <p class="profile-compact-title">{{ m.message|truncatechars:140 }}</p>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucun message envoyé.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title"><i class="material-icons left">chat_bubble_outline</i> Mes Commentaires</span>
+                        {% if comments %}
+                        <div class="profile-compact-grid">
+                            {% for c in comments %}
+                            <article class="profile-compact-card">
+                                <div class="profile-compact-icon comment-icon">
+                                    <i class="material-icons">chat_bubble_outline</i>
+                                </div>
+                                <div class="profile-compact-body">
+                                    <div class="profile-compact-head">
+                                        <strong>Commentaire</strong>
+                                        <span>{{ c.created_at|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                    <p class="profile-compact-title">{{ c.text|truncatechars:140 }}</p>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="grey-text">Aucun commentaire.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 {% endblock %}
 
 {% block extrajs %}
 <script src="{% static 'profil/profil.js' %}"></script>
+{% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+<style>
+    .profile-page {
+        background: #f4f7fb;
+    }
+    .profile-shell {
+        max-width: 1280px;
+    }
+    .profile-page .card {
+        background: #ffffff;
+        color: #102030;
+    }
+    .profile-page .card-content,
+    .profile-page .card-action,
+    .profile-page .collection,
+    .profile-page .collection .collection-item {
+        background: #ffffff;
+        color: #102030;
+    }
+    .profile-page .collection.with-header .collection-header {
+        background: #eaf1f8;
+        color: #102030;
+    }
+    .profile-page .profile-username,
+    .profile-page .card-content p,
+    .profile-page .card-content li,
+    .profile-page .card-content strong {
+        color: #102030;
+    }
+    .profile-page .grey-text {
+        color: #607085 !important;
+    }
+    .profile-page .chip {
+        background: #eef3f8;
+        color: #0f172a;
+        font-weight: 700;
+    }
+    .profile-page .btn-flat {
+        color: #0f4c81;
+        font-weight: 600;
+    }
+    .profile-page .profile-card-action {
+        border-top: 1px solid #e6edf5;
+        background: #f9fbfd;
+    }
+    .profile-sections .card .card-title { display:flex; align-items:center; gap:.5rem; }
+    .profile-sections .collection .collection-item { display:block; }
+    .profile-sections .collection .item-title { font-weight:600; }
+    .profile-sections .collection .item-meta { font-size:.9rem; }
+    .profile-sections .chip { background:#eef3f8; color:#0f172a; }
+    .profile-item-grid {
+        display: grid;
+        gap: 16px;
+        margin-top: 16px;
+    }
+    .profile-mini-card {
+        display: grid;
+        grid-template-columns: 132px minmax(0, 1fr);
+        overflow: hidden;
+        border: 1px solid #e3ebf4;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 35, 55, 0.06);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .profile-mini-card:hover {
+        transform: translateY(-2px);
+        border-color: #c9d8e8;
+        box-shadow: 0 18px 38px rgba(15, 35, 55, 0.11);
+    }
+    .profile-mini-media {
+        position: relative;
+        display: block;
+        min-height: 100%;
+        background: #e8eef5;
+    }
+    .profile-mini-media img {
+        width: 100%;
+        height: 100%;
+        min-height: 190px;
+        display: block;
+        object-fit: cover;
+    }
+    .profile-mini-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        max-width: calc(100% - 20px);
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.94);
+        color: #0f172a;
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-shadow: 0 6px 16px rgba(15, 35, 55, .14);
+    }
+    .profile-mini-body {
+        min-width: 0;
+        padding: 16px;
+    }
+    .profile-mini-body h6 {
+        margin: 0 0 8px;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .profile-mini-desc {
+        min-height: 42px;
+        margin: 0 0 12px;
+        color: #64748b !important;
+        line-height: 1.5;
+        font-size: .9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .profile-mini-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .profile-mini-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        max-width: 100%;
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: #f4f7fb;
+        color: #475569;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+    .profile-mini-meta .material-icons {
+        font-size: 15px;
+        color: #7890a8;
+    }
+    .profile-funding-progress {
+        margin: 10px 0 12px;
+    }
+    .profile-progress-track {
+        height: 7px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e5eaf0;
+    }
+    .profile-progress-track span {
+        display: block;
+        height: 100%;
+        max-width: 100%;
+        background: linear-gradient(90deg, #f97316 0%, #16a34a 100%);
+        border-radius: inherit;
+    }
+    .profile-progress-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 7px;
+        color: #64748b;
+        font-size: .78rem;
+    }
+    .profile-progress-meta strong {
+        color: #0f172a;
+    }
+    .profile-mini-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid #edf2f7;
+    }
+    .profile-mini-actions .btn-small,
+    .profile-mini-actions .btn-flat {
+        height: 34px;
+        line-height: 34px;
+        margin: 0;
+        border-radius: 8px;
+        text-transform: none;
+        font-weight: 800;
+    }
+    .profile-mini-actions .btn-flat {
+        padding: 0 8px;
+        background: #f8fafc;
+    }
+    .profile-compact-grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+    }
+    .profile-compact-card {
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 14px;
+        padding: 14px;
+        border: 1px solid #e3ebf4;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 10px 24px rgba(15, 35, 55, 0.055);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .profile-compact-card:hover {
+        transform: translateY(-2px);
+        border-color: #cbd9e8;
+        box-shadow: 0 16px 34px rgba(15, 35, 55, 0.1);
+    }
+    .profile-compact-icon {
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        background: #edf6ff;
+        color: #1976d2;
+    }
+    .profile-compact-icon .material-icons {
+        font-size: 24px;
+    }
+    .profile-compact-icon.donation-icon {
+        background: #ecfdf5;
+        color: #15803d;
+    }
+    .profile-compact-icon.funding-icon {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+    .profile-compact-icon.message-icon {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+    .profile-compact-icon.comment-icon {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+    .profile-compact-body {
+        min-width: 0;
+    }
+    .profile-compact-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    .profile-compact-head strong {
+        min-width: 0;
+        color: #0f172a !important;
+        font-weight: 800;
+        line-height: 1.35;
+    }
+    .profile-compact-head > span:not(.chip) {
+        color: #64748b;
+        font-size: .78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .profile-compact-card .chip {
+        margin: 0;
+        height: 26px;
+        line-height: 26px;
+        font-size: .72rem;
+        flex-shrink: 0;
+    }
+    .profile-compact-card p {
+        margin: 0;
+        color: #64748b !important;
+        line-height: 1.5;
+        font-size: .88rem;
+    }
+    .profile-compact-card p .material-icons {
+        margin-right: 4px;
+        font-size: 15px;
+        vertical-align: text-bottom;
+        color: #94a3b8;
+    }
+    .profile-compact-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 6px !important;
+    }
+    .valign-wrapper .item-primary { flex:1; }
+    .valign-wrapper .secondary-content { margin-left: .5rem; }
+    @media (max-width: 600px) {
+        .profile-sections .card .card-title { font-size:1.1rem; }
+        .profile-mini-card {
+            grid-template-columns: 1fr;
+        }
+        .profile-mini-media img {
+            min-height: 180px;
+            aspect-ratio: 16 / 9;
+        }
+        .profile-mini-actions {
+            align-items: stretch;
+        }
+        .profile-mini-actions .btn-small,
+        .profile-mini-actions .btn-flat {
+            flex: 1 1 100%;
+            text-align: center;
+        }
+        .profile-compact-card {
+            grid-template-columns: 42px minmax(0, 1fr);
+            gap: 12px;
+            padding: 12px;
+        }
+        .profile-compact-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+        }
+        .profile-compact-head {
+            flex-direction: column;
+            gap: 6px;
+        }
+        .valign-wrapper .secondary-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-top: 10px;
+        }
+        .valign-wrapper .secondary-content a {
+            padding: 0 10px;
+            text-align: right;
+            width: 100%;
+        }
+        .profile-sections .collection-item.valign-wrapper {
+            align-items: flex-start;
+        }
+    }
+</style>
 {% endblock %}

@@ -9,29 +9,42 @@
 {% endblock %}
 
 {% block content %}
-<main class="container">
+<div class="container update-profile-page">
     <div class="row">
         <div class="col s12">
-            <div class="card">
+            <div class="card update-profile-card">
                 <div class="card-content">
-                    <h5 class="center-align">Mise à jour de votre profil</h5>
-                    <p class="center flow-text">Étape actuelle : {{ wizard.steps.step1 }} / {{ wizard.steps.count }}</p>
+                    <h5 class="center-align">Compléter votre profil</h5>
+                    {% include 'accounts/profile_stepper.html' %}
 
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ wizard.management_form }}
-                        {% for field in wizard.form.visible_fields %}
-                        <div class="input-field">
-                            {{ field }}
-                            {{ field.label_tag }}
-                            {% if field.errors %}
-                            <span class="red-text">{{ field.errors|join:", " }}</span>
-                            {% endif %}
+
+                        {% if form.errors %}
+                            {% for error in form.non_field_errors %}
+                            <div class="card-panel red lighten-4 red-text">
+                                <strong>{{ error }}</strong>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="row update-profile-fields">
+                            {% for field in wizard.form.visible_fields %}
+                            <div class="input-field col s12 m6{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
+                                {{ field }}
+                                {{ field.label_tag }}
+                                {% if field.field.required %}
+                                <span class="required-indicator" aria-hidden="true">*</span>
+                                {% endif %}
+                                {% if field.errors %}
+                                <span class="field-error red-text">{{ field.errors|join:", " }}</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
 
-
-                        <div class="row">
+                        <div class="row update-profile-actions">
                             <div class="col s6 left-align">
                                 {% if wizard.steps.prev %}
                                 <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn grey">
@@ -52,17 +65,16 @@
                             </div>
                         </div>
                     </form>
-
                 </div>
                 <div class="card-action">
                     <a href="{% url 'home' %}" class="btn-flat">
-                        <i class="material-icons left">home</i> Accueil
+                        <i class="material-icons left">home</i>Accueil
                     </a>
                 </div>
             </div>
         </div>
     </div>
-</main>
+</div>
 {% endblock %}
 
 {% block extrajs %}
@@ -70,6 +82,73 @@
     document.addEventListener('DOMContentLoaded', function() {
         const elems = document.querySelectorAll('select');
         M.FormSelect.init(elems);
+
+        function populateSelect(select, items, placeholder) {
+            const currentInstance = M.FormSelect.getInstance(select);
+            if (currentInstance) {
+                currentInstance.destroy();
+            }
+
+            select.innerHTML = '';
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = placeholder;
+            opt.disabled = true;
+            opt.selected = true;
+            select.appendChild(opt);
+
+            items.forEach(it => {
+                const o = document.createElement('option');
+                o.value = it.id;
+                o.textContent = it.name;
+                select.appendChild(o);
+            });
+
+            M.FormSelect.init(select);
+        }
+
+        async function fetchJSON(url) {
+            const r = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+            if (!r.ok) return {results: []};
+            return r.json();
+        }
+
+        const regionSel = document.getElementById('id_user_infos-region') || document.getElementById('id_region');
+        const prefSel = document.getElementById('id_user_infos-prefecture') || document.getElementById('id_prefecture');
+        const comSel = document.getElementById('id_user_infos-commune') || document.getElementById('id_commune');
+        const quarterSel = document.getElementById('id_user_infos-quarter') || document.getElementById('id_quarter');
+
+        if (regionSel && prefSel && comSel && quarterSel) {
+            regionSel.addEventListener('change', async function() {
+                const region = this.value;
+                populateSelect(prefSel, [], 'Sélectionnez une préfecture');
+                populateSelect(comSel, [], 'Sélectionnez une commune');
+                populateSelect(quarterSel, [], 'Sélectionnez un quartier');
+                if (region) {
+                    const data = await fetchJSON(`/api/locations/prefectures/?region=${region}`);
+                    populateSelect(prefSel, data.results || [], 'Sélectionnez une préfecture');
+                }
+            });
+
+            prefSel.addEventListener('change', async function() {
+                const pref = this.value;
+                populateSelect(comSel, [], 'Sélectionnez une commune');
+                populateSelect(quarterSel, [], 'Sélectionnez un quartier');
+                if (pref) {
+                    const data = await fetchJSON(`/api/locations/communes/?prefecture=${pref}`);
+                    populateSelect(comSel, data.results || [], 'Sélectionnez une commune');
+                }
+            });
+
+            comSel.addEventListener('change', async function() {
+                const commune = this.value;
+                populateSelect(quarterSel, [], 'Sélectionnez un quartier');
+                if (commune) {
+                    const data = await fetchJSON(`/api/locations/quarters/?commune=${commune}`);
+                    populateSelect(quarterSel, data.results || [], 'Sélectionnez un quartier');
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
