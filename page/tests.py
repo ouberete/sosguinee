@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from page.models import Comment, Donation, FundPayment, FundingRequest
+from page.models import Comment, Donation, FundPayment, FundingRequest, LossAlert
 
 
 class PaymentCallbackTests(TestCase):
@@ -72,6 +72,13 @@ class CommentEndpointTests(TestCase):
             principal_image="img/Fundings/test.png",
             amount_received=Decimal("0.00"),
         )
+        self.alert = LossAlert.objects.create(
+            name="Test Alert",
+            description="Need help",
+            principal_image="img/alerts/test.png",
+            address="Test Address",
+            date_alert="2025-01-01",
+        )
 
     def test_add_comment_requires_authentication(self):
         url = reverse("add_comment", kwargs={"model_name": "fundingrequest", "object_id": self.funding.id})
@@ -94,3 +101,46 @@ class CommentEndpointTests(TestCase):
         self.assertEqual(Comment.objects.count(), 1)
         payload = response.json()
         self.assertTrue(payload.get("success"))
+        self.assertIn("comment_html", payload)
+
+    def test_add_comment_works_for_loss_alert(self):
+        self.client.login(username="user1", password="pass1234")
+        url = reverse("add_comment", kwargs={"model_name": "lossalert", "object_id": self.alert.id})
+        response = self.client.post(url, {"text": "Commentaire alerte"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Comment.objects.count(), 1)
+        payload = response.json()
+        self.assertTrue(payload.get("success"))
+        self.assertIn("comment_html", payload)
+
+    def test_edit_comment_updates_text(self):
+        self.client.login(username="user1", password="pass1234")
+        comment = Comment.objects.create(
+            user=self.user,
+            content_object=self.funding,
+            text="Texte initial",
+        )
+        url = reverse("js_edit_comment", kwargs={"comment_id": comment.id})
+        response = self.client.post(url, data='{"text":"Texte modifie"}', content_type="application/json")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload.get("success"))
+        comment.refresh_from_db()
+        self.assertEqual(comment.text, "Texte modifie")
+
+    def test_delete_comment_removes_comment(self):
+        self.client.login(username="user1", password="pass1234")
+        comment = Comment.objects.create(
+            user=self.user,
+            content_object=self.funding,
+            text="Texte a supprimer",
+        )
+        url = reverse("js_delete_comment", kwargs={"comment_id": comment.id})
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload.get("success"))
+        self.assertFalse(Comment.objects.filter(id=comment.id).exists())

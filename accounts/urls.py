@@ -13,6 +13,7 @@ from .views.subscription_views import (
 urlpatterns = [
     path(r'login', views.signin, name="login"),
     path(r'register', views.register, name="register"),
+    path(r'resend-activation', views.resend_activation, name="resend_activation"),
     path(r'reset-password', views.reset_password, name="reset-password"),
     path(r'change-password', views.change_password, name="change_password"),
     path(r'logout', views.user_logout, name="logout"),

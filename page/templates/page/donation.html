@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
+{% load custom_filters %}
 
-{% block title %}Faire un Don - SOS Guinée{% endblock %}
+{% block title %}{% trans "Faire un Don" %} - SOS Guinée{% endblock %}
 
 {% block meta %}
 <meta name="description" content="Faites un don pour soutenir les actions de SOS Guinée en aidant les personnes en détresse, les cas de disparition et les demandes de financement humanitaire.">
@@ -13,102 +15,161 @@
 <meta property="og:type" content="website" />
 {% endblock %}
 
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
 {% block content %}
-<!-- Parallax Section -->
-<!--<div class="parallax-container">
-  <div class="parallax"><img src="{% static 'img/articles/img7.avif' %}" alt="Faire un don à SOS Guinée"></div>
-  <div class="container showcase-content white-text center-align">
-    <div class="row">
-      <div class="col s12 m10 offset-m1">
-        <div class="card-panel transparent z-depth-0">
-          <h4 class="white-text">Faites un don à SOS Guinée</h4>
-          <p class="white-text">Votre contribution peut sauver des vies et changer des destinées.</p>
-        </div>
+<main class="payment-page donation-payment-page">
+  <section class="payment-shell">
+    <div class="payment-heading">
+      <a href="{% url 'home' %}" class="payment-back-link">
+        <i class="material-icons">arrow_back</i>
+        {% trans "Retour à l'accueil" %}
+      </a>
+      <span class="payment-kicker">{% trans "Don sécurisé Djomy" %}</span>
+      <h1>{% trans "Soutenir SOS Guinée" %}</h1>
+      <p>{% trans "Renseignez vos informations, choisissez un montant à droite, puis finalisez votre don de manière sécurisée." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="payment-alert error">
+      <i class="material-icons">error</i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% for message in messages %}
+    <div class="payment-alert {{ message.tags }}">
+      <i class="material-icons">info</i>
+      <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+    <div class="payment-alert error">
+      <i class="material-icons">error</i>
+      <div>
+        {% for err in form.non_field_errors %}
+        <p>{{ err }}</p>
+        {% endfor %}
       </div>
     </div>
-  </div>
-</div>-->
+    {% endif %}
 
-<!-- Donation Form Section -->
-<section class="section">
-  <div class="container">
-    <div class="row">
-      <div class="col s12 m12 ">
-        <div class="card-panel">
-
-          {% if error %}
-          <div class="card-panel red lighten-2 white-text">{{ error }}</div>
-          {% endif %}
-          <form method="post" action="{% url 'donation' %}">
-            {% csrf_token %}
-
-            {% if request.user.is_authenticated %}
-
-            <div class="input-field">
-              <input type="number" name="amount" id="amount">
-              <label for="amount">Montant à financer</label>
+    <form method="post" action="{% url 'donation' %}" class="payment-form">
+      {% csrf_token %}
+      <div class="payment-layout payment-form-layout">
+        <section class="payment-form-card" aria-labelledby="donation-form-heading">
+          <div class="payment-form-head">
+            <div>
+              <span class="payment-step">Donateur</span>
+              <h2 id="donation-form-heading">Vos informations</h2>
             </div>
+            <i class="material-icons">person</i>
+          </div>
 
+          {% if user.is_authenticated %}
+          <div class="payment-alert info">
+            <i class="material-icons">person</i>
+            <span>{% trans "Vos informations sont préremplies à partir de votre compte." %}</span>
+          </div>
+          {% endif %}
+
+          <div class="payment-fields row">
+            {% for field in form.visible_fields %}
+            {% if field.name != 'amount' %}
+            <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' or field.name == 'description' %}m12{% else %}m6{% endif %}">
+              {{ field }}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.help_text %}
+              <span class="helper-text">{{ field.help_text }}</span>
+              {% endif %}
+              {% for error in field.errors %}
+              <span class="red-text">{{ error }}</span>
+              {% endfor %}
+            </div>
             {% endif %}
-            {% if not request.user.is_authenticated %}
-            <h5 class="center-align">Veuillez remplir les informations ci-dessous pour finaliser votre don.</h5>
-            <span class="helper-text center-align"> Soutenez notre cause en faisant un don. Votre générosité nous aide à continuer notre mission d'aide humanitaire en Guinée. </span>
+            {% endfor %}
+          </div>
 
-            <div class="row">
-              {% for field in form.visible_fields %}
-              <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' or field.name == 'description' %}m12{% else %}m6{% endif %}">
+          {% if turnstile_site_key %}
+          <div class="payment-captcha">
+            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+          </div>
+          {% endif %}
+
+          <div class="payment-assurance">
+            <span><i class="material-icons">verified_user</i> {% trans "Don traité via Djomy" %}</span>
+            <span><i class="material-icons">mail</i> {% trans "Confirmation envoyée par email" %}</span>
+          </div>
+        </section>
+
+        <aside class="payment-summary payment-choice-panel donation-summary">
+          <div class="payment-summary-body">
+            <p class="payment-summary-label">{% trans "Don général" %}</p>
+            <h2>{% trans "Choisir le montant du don" %}</h2>
+            <p class="payment-description">{% trans "Votre contribution aide la plateforme à accompagner les alertes, les collectes solidaires et les familles en difficulté." %}</p>
+            <p class="payment-description payment-fee-note">{% trans "Djomy peut appliquer des frais variables selon le moyen de paiement. Le montant final affiché par le prestataire peut donc différer légèrement du montant saisi." %}</p>
+
+            {% for field in form.visible_fields %}
+            {% if field.name == 'amount' %}
+            <div class="payment-amount-field">
+              <div class="input-field">
                 {{ field }}
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-
                 {% if field.help_text %}
                 <span class="helper-text">{{ field.help_text }}</span>
                 {% endif %}
-
                 {% for error in field.errors %}
                 <span class="red-text">{{ error }}</span>
                 {% endfor %}
               </div>
-              {% endfor %}
             </div>
             {% endif %}
-            <div class="center-align">
-              <button type="submit" class="btn waves-effect waves-light">
-                Faire un Don
-                <i class="material-icons right">send</i>
-              </button>
+            {% endfor %}
+
+            <div class="amount-presets payment-presets" data-mode="donation">
+              <p class="amount-presets-title">{% trans "Montants proposés" %}</p>
+              <div class="amount-presets-buttons"></div>
             </div>
-          </form>
 
-        </div>
+            <div class="payment-impact-list">
+              <div>
+                <i class="material-icons">campaign</i>
+                <span>{% trans "Diffusion des alertes importantes" %}</span>
+              </div>
+              <div>
+                <i class="material-icons">volunteer_activism</i>
+                <span>{% trans "Appui aux collectes solidaires" %}</span>
+              </div>
+              <div>
+                <i class="material-icons">shield</i>
+                <span>{% trans "Paiement sécurisé via Djomy" %}</span>
+              </div>
+            </div>
+
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" onclick="this.innerHTML='<i class=\'material-icons left\'>autorenew</i> Redirection...'; this.classList.add('disabled'); this.form.submit();">
+              <i class="material-icons left">favorite</i>
+              {% trans "Faire un don sécurisé" %}
+            </button>
+          </div>
+        </aside>
       </div>
-    </div>
-  </div>
-</section>
-
+    </form>
+  </section>
+</main>
 {% endblock %}
 
 {% block extrajs %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/payment_amount_presets.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const radios = document.querySelectorAll('input[name="amount"]');
-    const otherAmountInput = document.getElementById('other_amount');
-
-    radios.forEach(radio => {
-      radio.addEventListener('change', function () {
-        if (this.value === 'other') {
-          otherAmountInput.disabled = false;
-          otherAmountInput.focus();
-        } else {
-          otherAmountInput.disabled = true;
-          otherAmountInput.value = '';
-        }
-      });
-    });
-  });
-    document.addEventListener('DOMContentLoaded', function () {
-    const elems = document.querySelectorAll('select');
-    M.FormSelect.init(elems);
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.updateTextFields();
   });
 </script>
 {% endblock %}
+

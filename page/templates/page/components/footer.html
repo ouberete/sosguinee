@@ -1,28 +1,29 @@
 <!-- footer.html -->
 {% load static %}
+{% load i18n %}
 <footer class="page-footer page-footer-custom" role="contentinfo">
   <div class="container">
     <div class="row">
       <div class="col s12 m6">
         <img src="{% static 'img/mylogo.png' %}" alt="SOS Guinée logo" class="responsive-img footer-logo">
         <p class="grey-text text-lighten-4">
-          SOS Guinée est une plateforme pour gérer les alertes de perte de biens et proches, et mobiliser des financements solidaires.
+          {% trans "SOS Guinée est une plateforme pour gérer les alertes de perte de biens et proches, et mobiliser des financements solidaires." %}
         </p>
       </div>
       <div class="col s12 m4 offset-m2">
-        <h5 class="white-text">Liens utiles</h5>
+        <h5 class="white-text">{% trans "Liens utiles" %}</h5>
         <ul>
-          <li><a class="footer-link" href="{% url 'help_support' %}">Aide & Support</a></li>
-          <li><a class="footer-link" href="{% url 'policy_privacy' %}">Politique de Confidentialité</a></li>
-          <li><a class="footer-link" href="{% url 'about_us' %}">À propos</a></li>
-          <li><a class="footer-link" href="{% url 'contact' %}">Contact</a></li>
+          <li><a class="footer-link" href="{% url 'help_support' %}">{% trans "Aide & Support" %}</a></li>
+          <li><a class="footer-link" href="{% url 'policy_privacy' %}">{% trans "Politique de Confidentialité" %}</a></li>
+          <li><a class="footer-link" href="{% url 'about_us' %}">{% trans "À propos" %}</a></li>
+          <li><a class="footer-link" href="{% url 'contact' %}">{% trans "Contact" %}</a></li>
         </ul>
       </div>
     </div>
   </div>
   <div class="footer-copyright">
     <div class="container center-align grey-text text-lighten-3">
-      © 2025 SOS Guinée. Tous droits réservés.
+      © {% now "Y" %} SOS Guinée. {% trans "Tous droits réservés." %}
     </div>
   </div>
 </footer>

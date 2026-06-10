@@ -22,6 +22,7 @@ class CustomEmailBackend(EmailBackend):
                     self.host,
                     self.port,
                     local_hostname=local_hostname,
+                    timeout=self.timeout,
                     context=self.ssl_context,
                 )
             else:
@@ -30,6 +31,7 @@ class CustomEmailBackend(EmailBackend):
                     self.host,
                     self.port,
                     local_hostname=local_hostname,
+                    timeout=self.timeout,
                 )
                 if getattr(self, "use_tls", False):
                     self.connection.starttls(context=self.ssl_context)

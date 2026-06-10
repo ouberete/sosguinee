@@ -1,4 +1,5 @@
 from django import template
+import os
 
 register = template.Library()
 
@@ -41,6 +42,10 @@ def chip_class(value):
         return any(k in s for k in keys)
     if contains('réussi', 'reussi', 'success'):
         return 'green white-text'
+    if contains('blocked', 'bloqu'):
+        return 'red white-text'
+    if contains('inactive', 'inactif'):
+        return 'grey white-text'
     if contains('attente', 'pending'):
         return 'orange white-text'
     if contains('échou', 'echou', 'failed', 'echec'):
@@ -52,3 +57,16 @@ def chip_class(value):
     if contains('trouv'):
         return 'teal white-text'
     return 'blue white-text'
+
+
+@register.filter
+def is_image_file(value):
+    """
+    Détermine si un fichier est une image selon son extension.
+    """
+    if not value:
+        return False
+
+    filename = getattr(value, "name", str(value))
+    extension = os.path.splitext(filename)[1].lower()
+    return extension in {".jpg", ".jpeg", ".png", ".webp", ".avif"}
