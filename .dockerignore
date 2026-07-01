@@ -1,0 +1,45 @@
+# Dossiers temporaires et verrouillés
+.tmp
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Environnements virtuels
+.venv
+.venv_local
+old_venv
+venv
+env
+
+# Fichiers de dev local
+.env
+.env.*
+!.env.example
+db.sqlite3
+
+# Médias uploadés (gérés séparément)
+media/
+mediafiles/
+
+# Fichiers Git et IDE
+.git
+.gitignore
+.github
+.idea
+.vscode
+.claude
+
+# Docs et tests
+docs/
+*.md
+
+# Fichiers de log
+*.log
+
+# Fichiers statiques collectés (regénérés dans le container)
+staticfiles/
+
+# Fichiers Windows
+Thumbs.db
+desktop.ini
