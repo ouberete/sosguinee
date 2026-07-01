@@ -16,27 +16,33 @@ def handle_djomy_payment_success(sender, reference, transaction_id, amount, **kw
     # Recherche dans Donation
     donation = Donation.objects.filter(reference=reference).first()
     if donation:
-        donation.status = 'réussi'
-        donation.transaction_id = transaction_id
-        donation.save()
-        logger.info(f"Donation {reference} marquée comme réussie.")
+        if donation.status != 'réussi':
+            donation.status = 'réussi'
+            donation.transaction_id = transaction_id
+            donation.save()
+            logger.info(f"Donation {reference} marquée comme réussie via signal.")
+        else:
+            logger.info(f"Donation {reference} déjà marquée comme réussie. (Idempotence)")
         return
 
     # Recherche dans FundPayment (Financement)
     fund_payment = FundPayment.objects.filter(reference=reference).first()
     if fund_payment:
-        fund_payment.status = 'réussi'
-        fund_payment.transaction_id = transaction_id
-        fund_payment.save()
-        
-        # Mise à jour du montant reçu sur la demande de financement
-        if fund_payment.funding_request:
-            funding_request = fund_payment.funding_request
-            funding_request.amount_received += fund_payment.amount
-            funding_request.save()
-            logger.info(f"FundPayment {reference} marqué comme réussi. FundingRequest mise à jour.")
+        if fund_payment.status != 'réussi':
+            fund_payment.status = 'réussi'
+            fund_payment.transaction_id = transaction_id
+            fund_payment.save()
+            
+            # Mise à jour du montant reçu sur la demande de financement
+            if fund_payment.funding_request:
+                funding_request = fund_payment.funding_request
+                funding_request.amount_received += fund_payment.amount
+                funding_request.save()
+                logger.info(f"FundPayment {reference} marqué comme réussi via signal. FundingRequest mise à jour.")
+            else:
+                logger.warning(f"FundPayment {reference} n'a pas de demande de financement associée.")
         else:
-            logger.warning(f"FundPayment {reference} n'a pas de demande de financement associée.")
+            logger.info(f"FundPayment {reference} déjà marqué comme réussi. (Idempotence)")
         return
     
     logger.warning(f"Référence de paiement {reference} introuvable dans Donation et FundPayment.")

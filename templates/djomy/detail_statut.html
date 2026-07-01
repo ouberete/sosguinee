@@ -1,64 +1,193 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
-{% block content %}
-<div id="content-main">
-    <h1>{% trans "Détails de la Transaction Djomy" %}</h1>
-    
-    <div class="module">
-        {% if status %}
-            <table class="table-details" style="width: 100%;">
-                <tr>
-                    <th>{% trans "Transaction ID" %}</th>
-                    <td>{{ status.transactionId }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Référence" %}</th>
-                    <td>{{ status.merchantPaymentReference }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Montant" %}</th>
-                    <td>{{ status.amount }} {{ status.currency }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Statut" %}</th>
-                    <td>
-                        <span class="badge {% if status.status == 'SUCCESS' %}badge-success{% else %}badge-info{% endif %}">
-                            {{ status.status }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{% trans "Méthode de Paiement" %}</th>
-                    <td>{{ status.paymentMethod }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Numéro Payeur" %}</th>
-                    <td>{{ status.payerNumber }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Date Création" %}</th>
-                    <td>{{ status.createdAt }}</td>
-                </tr>
-                <tr>
-                    <th>{% trans "Date Mise à Jour" %}</th>
-                    <td>{{ status.updatedAt }}</td>
-                </tr>
-            </table>
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .djomy-detail { max-width: 800px; margin: 0 auto; }
 
-            <br>
-            <h3>{% trans "Réponse API Complète" %}</h3>
-            <pre style="background: #f4f4f4; padding: 10px; border: 1px solid #ddd;">
-                {{ status|json_script:"status-data" }}
-                {{ status }}
-            </pre>
-        {% else %}
+    .djomy-detail-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #303030;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e8590c;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* ── Key-value table ── */
+    .djomy-kv {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        margin-bottom: 1.5rem;
+    }
+    .djomy-kv th {
+        width: 35%;
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    .djomy-kv td {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .djomy-kv tr:last-child th,
+    .djomy-kv tr:last-child td { border-bottom: none; }
+
+    /* ── Badge ── */
+    .djomy-badge {
+        display: inline-block;
+        padding: 0.25rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .djomy-badge--success { background: #d4edda; color: #155724; }
+    .djomy-badge--pending { background: #fff3cd; color: #856404; }
+    .djomy-badge--failed  { background: #f8d7da; color: #721c24; }
+    .djomy-badge--info    { background: #d1ecf1; color: #0c5460; }
+
+    /* ── Raw JSON ── */
+    .djomy-json-block {
+        background: #1e1e2e;
+        color: #a6e3a1;
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 400px;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ── Buttons ── */
+    .djomy-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .djomy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        border: none;
+        cursor: pointer;
+    }
+    .djomy-btn--primary { background: #e8590c; color: #fff; }
+    .djomy-btn--primary:hover { background: #d04e0a; color: #fff; }
+    .djomy-btn--outline {
+        background: transparent;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+    .djomy-btn--outline:hover { background: #f8f9fa; }
+
+    /* ── Empty / error state ── */
+    .djomy-empty {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #868e96;
+    }
+    .djomy-empty .icon { font-size: 3rem; display: block; margin-bottom: 0.75rem; }
+    .djomy-empty p { margin: 0; font-size: 1rem; }
+    .djomy-empty .sub { font-size: 0.85rem; margin-top: 0.5rem; color: #adb5bd; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="djomy-detail">
+
+    <h2 class="djomy-detail-title">
+        <span>🔍</span>
+        {% trans "Détails de la Transaction Djomy" %}
+    </h2>
+
+    {% if error %}
+        <div class="djomy-empty">
+            <span class="icon">🚫</span>
+            <p>{{ error }}</p>
+        </div>
+    {% elif status %}
+        <table class="djomy-kv">
+            <tr>
+                <th>{% trans "Transaction ID" %}</th>
+                <td><code>{{ status.transactionId|default:"—" }}</code></td>
+            </tr>
+            <tr>
+                <th>{% trans "Référence Marchand" %}</th>
+                <td><code>{{ status.merchantPaymentReference|default:"—" }}</code></td>
+            </tr>
+            <tr>
+                <th>{% trans "Montant" %}</th>
+                <td><strong>{{ status.amount|default:"—" }}</strong> {{ status.currency|default:"GNF" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Statut" %}</th>
+                <td>
+                    <span class="djomy-badge {% if status.status == 'SUCCESS' %}djomy-badge--success{% elif status.status == 'PENDING' %}djomy-badge--pending{% elif status.status == 'FAILED' %}djomy-badge--failed{% else %}djomy-badge--info{% endif %}">
+                        {{ status.status|default:"INCONNU" }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans "Méthode de Paiement" %}</th>
+                <td>{{ status.paymentMethod|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Numéro Payeur" %}</th>
+                <td>{{ status.payerNumber|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Date de Création" %}</th>
+                <td>{{ status.createdAt|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Dernière Mise à Jour" %}</th>
+                <td>{{ status.updatedAt|default:"—" }}</td>
+            </tr>
+        </table>
+
+        <h3 class="djomy-detail-title" style="font-size: 1rem; border-bottom-width: 1px;">
+            <span>📋</span> {% trans "Réponse API Complète" %}
+        </h3>
+        <div class="djomy-json-block">{{ status }}</div>
+
+    {% else %}
+        <div class="djomy-empty">
+            <span class="icon">🔎</span>
             <p>{% trans "Aucun détail trouvé pour cette transaction." %}</p>
-        {% endif %}
-        
-        <p>
-            <a href="{% url 'django_djomy:admin_liste_paiements' %}" class="button">Retour à la liste</a>
-        </p>
+            <p class="sub">{% trans "L'identifiant n'existe peut-être pas ou l'API Djomy n'est pas joignable." %}</p>
+        </div>
+    {% endif %}
+
+    <div class="djomy-actions">
+        <a href="{% url 'django_djomy:admin_liste_paiements' %}" class="djomy-btn djomy-btn--outline">← {% trans "Retour à la liste" %}</a>
     </div>
+
 </div>
 {% endblock %}
