@@ -1,12 +1,167 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* ── Layout ── */
+    .djomy-dashboard { max-width: 1200px; margin: 0 auto; }
+    .djomy-section { margin-bottom: 2.5rem; }
+
+    .djomy-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #303030;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e8590c;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .djomy-section-title .icon { font-size: 1.1rem; }
+
+    /* ── Tables ── */
+    .djomy-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .djomy-table th {
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .djomy-table td {
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+        color: #333;
+        vertical-align: middle;
+    }
+    .djomy-table tbody tr:hover { background: #fdf8f4; }
+    .djomy-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ── */
+    .djomy-badge {
+        display: inline-block;
+        padding: 0.25rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .djomy-badge--success { background: #d4edda; color: #155724; }
+    .djomy-badge--pending { background: #fff3cd; color: #856404; }
+    .djomy-badge--failed  { background: #f8d7da; color: #721c24; }
+    .djomy-badge--info    { background: #d1ecf1; color: #0c5460; }
+
+    /* ── Buttons ── */
+    .djomy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.15s ease;
+        border: none;
+        cursor: pointer;
+    }
+    .djomy-btn--primary {
+        background: #e8590c;
+        color: #fff;
+    }
+    .djomy-btn--primary:hover { background: #d04e0a; color: #fff; }
+    .djomy-btn--outline {
+        background: transparent;
+        color: #e8590c;
+        border: 1px solid #e8590c;
+    }
+    .djomy-btn--outline:hover { background: #e8590c; color: #fff; }
+
+    /* ── Pagination ── */
+    .djomy-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        font-size: 0.85rem;
+    }
+    .djomy-pagination a {
+        padding: 0.3rem 0.7rem;
+        border-radius: 6px;
+        background: #f8f9fa;
+        color: #495057;
+        text-decoration: none;
+        border: 1px solid #dee2e6;
+        transition: all 0.15s ease;
+    }
+    .djomy-pagination a:hover { background: #e8590c; color: #fff; border-color: #e8590c; }
+    .djomy-pagination .current {
+        font-weight: 700;
+        color: #e8590c;
+    }
+
+    /* ── Empty state ── */
+    .djomy-empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        color: #868e96;
+    }
+    .djomy-empty .icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+    .djomy-empty p { margin: 0; font-size: 0.95rem; }
+
+    /* ── Alert banner ── */
+    .djomy-alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .djomy-alert--warning { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .djomy-table th, .djomy-table td { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div id="content-main">
-    <h1>{% trans "Historique des Liens de Paiement Djomy" %}</h1>
-    
-    <div class="module">
-        <table style="width: 100%;">
+<div class="djomy-dashboard">
+
+    {% if api_error %}
+    <div class="djomy-alert djomy-alert--warning">
+        ⚠️ {% trans "Impossible de contacter l'API Djomy. Seuls les enregistrements locaux sont affichés." %}
+    </div>
+    {% endif %}
+
+    <!-- ─── Liens API Djomy ─── -->
+    <div class="djomy-section">
+        <h2 class="djomy-section-title">
+            <span class="icon">🌐</span>
+            {% trans "Liens de Paiement (API Djomy)" %}
+        </h2>
+
+        <table class="djomy-table">
             <thead>
                 <tr>
                     <th>{% trans "Date" %}</th>
@@ -20,73 +175,100 @@
             <tbody>
                 {% for lien in liens %}
                 <tr>
-                    <td>{{ lien.createdAt|date:"d/m/Y H:i" }}</td>
-                    <td>{{ lien.amount }} {{ lien.currency }}</td>
-                    <td>{{ lien.merchantPaymentReference }}</td>
+                    <td>{{ lien.createdAt }}</td>
+                    <td><strong>{{ lien.amount }}</strong> {{ lien.currency|default:"GNF" }}</td>
+                    <td><code>{{ lien.merchantPaymentReference }}</code></td>
                     <td>
-                        <span class="badge {% if lien.status == 'SUCCESS' %}badge-success{% else %}badge-info{% endif %}">
+                        <span class="djomy-badge {% if lien.status == 'SUCCESS' %}djomy-badge--success{% elif lien.status == 'PENDING' %}djomy-badge--pending{% elif lien.status == 'FAILED' %}djomy-badge--failed{% else %}djomy-badge--info{% endif %}">
                             {{ lien.status }}
                         </span>
                     </td>
-                    <td><a href="{{ lien.paymentUrl }}" target="_blank">Ouvrir</a></td>
                     <td>
-                        <a href="{% url 'django_djomy:detail_transaction_check' lien.transactionId %}" class="button">Vérifier</a>
+                        {% if lien.paymentUrl %}
+                        <a href="{{ lien.paymentUrl }}" target="_blank" rel="noopener noreferrer" class="djomy-btn djomy-btn--outline">↗ {% trans "Ouvrir" %}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if lien.transactionId %}
+                        <a href="{% url 'django_djomy:detail_transaction_check' lien.transactionId %}" class="djomy-btn djomy-btn--primary">🔍 {% trans "Vérifier" %}</a>
+                        {% else %}—{% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6">{% trans "Aucun lien trouvé." %}</td>
+                    <td colspan="6">
+                        <div class="djomy-empty">
+                            <span class="icon">📭</span>
+                            <p>{% trans "Aucun lien de paiement trouvé via l'API." %}</p>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
+
         {% if pagination %}
-        <div class="pagination">
-            <span class="step-links">
-                {% if pagination.page > 1 %}
-                    <a href="?page=1">&laquo; première</a>
-                    <a href="?page={{ pagination.page|add:"-1" }}">précédente</a>
-                {% endif %}
-
-                <span class="current">
-                    Page {{ pagination.page }} sur {{ pagination.totalPages }}.
-                </span>
-
-                {% if pagination.page < pagination.totalPages %}
-                    <a href="?page={{ pagination.page|add:"1" }}">suivante</a>
-                    <a href="?page={{ pagination.totalPages }}">dernière &raquo;</a>
-                {% endif %}
-            </span>
+        <div class="djomy-pagination">
+            {% if pagination.page > 1 %}
+                <a href="?page=1">&laquo;</a>
+                <a href="?page={{ pagination.page|add:"-1" }}">‹</a>
+            {% endif %}
+            <span class="current">{{ pagination.page }} / {{ pagination.totalPages }}</span>
+            {% if pagination.page < pagination.totalPages %}
+                <a href="?page={{ pagination.page|add:"1" }}">›</a>
+                <a href="?page={{ pagination.totalPages }}">&raquo;</a>
+            {% endif %}
         </div>
         {% endif %}
     </div>
 
-    <br><br>
-    <h1>{% trans "Enregistrements Locaux (Modèle Django)" %}</h1>
-    <div class="module">
-        <table style="width: 100%;">
+    <!-- ─── Enregistrements locaux ─── -->
+    <div class="djomy-section">
+        <h2 class="djomy-section-title">
+            <span class="icon">💾</span>
+            {% trans "Enregistrements Locaux" %}
+        </h2>
+
+        <table class="djomy-table">
             <thead>
                 <tr>
                     <th>{% trans "Date" %}</th>
-                    <th>{% trans "Réf" %}</th>
+                    <th>{% trans "Référence" %}</th>
                     <th>{% trans "Montant" %}</th>
                     <th>{% trans "Statut" %}</th>
-                    <th>{% trans "Transaction" %}</th>
+                    <th>{% trans "Transaction ID" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for p in local_payments %}
                 <tr>
-                    <td>{{ p.created_at }}</td>
-                    <td>{{ p.merchant_reference }}</td>
-                    <td>{{ p.amount }} {{ p.currency }}</td>
-                    <td>{{ p.get_status_display }}</td>
-                    <td>{{ p.transaction_id }}</td>
+                    <td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
+                    <td><code>{{ p.merchant_reference }}</code></td>
+                    <td><strong>{{ p.amount }}</strong> {{ p.currency }}</td>
+                    <td>
+                        <span class="djomy-badge {% if p.status == 'SUCCESS' %}djomy-badge--success{% elif p.status == 'PENDING' %}djomy-badge--pending{% elif p.status == 'FAILED' %}djomy-badge--failed{% else %}djomy-badge--info{% endif %}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if p.transaction_id %}
+                        <a href="{% url 'django_djomy:detail_transaction_check' p.transaction_id %}" class="djomy-btn djomy-btn--outline">{{ p.transaction_id|truncatechars:20 }}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">
+                        <div class="djomy-empty">
+                            <span class="icon">📦</span>
+                            <p>{% trans "Aucun paiement enregistré localement." %}</p>
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
 </div>
 {% endblock %}
