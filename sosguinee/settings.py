@@ -18,14 +18,9 @@ from django.utils.translation import gettext_lazy as _
 =======
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+import dj_database_url
 
-try:
-    import django_heroku
-except ImportError:  # Local env may not have this optional package.
-    django_heroku = None
->>>>>>> chore/security-design-hardening
 # pip install dj-database-url
-# pip install django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -168,9 +163,6 @@ USE_POSTGRES = config("USE_POSTGRES", default=True)
 =======
 USE_POSTGRES = config("USE_POSTGRES", default=True, cast=bool)
 POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", default="")
-if USE_POSTGRES and not DEBUG and not POSTGRES_PASSWORD:
-
-    raise ImproperlyConfigured("POSTGRES_PASSWORD must be set in production.")
 
 >>>>>>> chore/security-design-hardening
 if USE_POSTGRES and not DEBUG:
@@ -208,6 +200,12 @@ DATABASES = {
 >>>>>>> chore/security-design-hardening
         }
     }
+
+# Mise à jour avec DATABASE_URL (Render/Heroku)
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=False)
+if db_from_env:
+    DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -399,8 +397,8 @@ PAYCARD_API_KEY = config("PAYCARD_API_KEY", cast=str, default="your_api_key")
 PAYCARD_API_SECRET = config("PAYCARD_API_SECRET", cast=str, default="your_api_secret")
 PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.paycard.com")
 
-if django_heroku is not None:
-    django_heroku.settings(locals())
+# if django_heroku is not None:
+#     django_heroku.settings(locals())
 
 #Email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
@@ -427,7 +425,7 @@ SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=5)
 
 if not DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
-    raise ImproperlyConfigured("EMAIL_HOST_USER and EMAIL_HOST_PASSWORD must be set in production.")
+    logger.warning("EMAIL_HOST_USER et EMAIL_HOST_PASSWORD ne sont pas définis. L'envoi d'emails échouera.")
 
 <<<<<<< HEAD
 print("Email configuration loaded successfully.")

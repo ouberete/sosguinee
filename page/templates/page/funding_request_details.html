@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
 {% load custom_filters %}
@@ -56,66 +56,127 @@
       </div>
       <div class="col s12 m6 card-main-details">
         <div class="card-panel">
-          <ul class="collection with-header">
-            <li class="collection-header"><h5 id="detail-fund-heading">Informations sur la Demande</h5></li>
+          <h4 id="detail-fund-heading" style="padding: 20px 20px 0 20px; margin: 0; font-size: 1.5rem; font-weight: 600;">Informations sur la Demande</h4>
+          <div class="details-grid">
             {% if funding_request.title %}
-            <li class="collection-item"><strong>Titre :</strong> {{ funding_request.title }}</li>
-            {% endif %}
-            <li class="collection-item"><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</li>
-            {% if funding_request.funding_request_type %}
-            <li class="collection-item"><strong>Type de financement :</strong> {{ funding_request.funding_request_type }}</li>
-            {% endif %}
-            <li class="collection-item"><strong>Montant cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</li>
-            <li class="collection-item">
-              <div class="progress" role="progressbar" aria-valuenow="{{ funding_request.progress }}" aria-valuemin="0" aria-valuemax="100">
-                <div class="determinate" style="width: {{ funding_request.progress }}%"></div>
+            <div class="detail-item">
+              <i class="material-icons">title</i>
+              <div class="detail-content">
+                <span class="detail-label">Titre</span>
+                <span class="detail-value">{{ funding_request.title }}</span>
               </div>
-              <p>
-                {{ funding_request.progress }}% collecté
-                {% if funding_request.days_remaining != None %}
-                • {{ funding_request.days_remaining }} jours restants
-                {% else %}
-                • Échéance dépassée
-                {% endif %}
-              </p>
-            </li>
-<<<<<<< HEAD
-            <li class="collection-item"><strong>Région :</strong> {{ funding_request.region|default:"-" }}</li>
-            <li class="collection-item"><strong>Préfecture :</strong> {{ funding_request.prefecture|default:"-" }}</li>
-            <li class="collection-item"><strong>Commune :</strong> {{ funding_request.commune|default:"-" }}</li>
-            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter|default:"-" }}</li>
-=======
+            </div>
+            {% endif %}
+            
+            <div class="detail-item">
+              <i class="material-icons">person</i>
+              <div class="detail-content">
+                <span class="detail-label">Bénéficiaire</span>
+                <span class="detail-value">{{ funding_request.beneficiary_name }}</span>
+              </div>
+            </div>
+
+            {% if funding_request.funding_request_type %}
+            <div class="detail-item">
+              <i class="material-icons">category</i>
+              <div class="detail-content">
+                <span class="detail-label">Type de financement</span>
+                <span class="detail-value">{{ funding_request.funding_request_type }}</span>
+              </div>
+            </div>
+            {% endif %}
+
+            <div class="detail-item highlight-item">
+              <i class="material-icons">payments</i>
+              <div class="detail-content">
+                <span class="detail-label">Montant cible</span>
+                <span class="detail-value">{{ funding_request.funding_amount|format_fr }} GNF</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="material-icons">savings</i>
+              <div class="detail-content">
+                <span class="detail-label">Montant payé</span>
+                <span class="detail-value">{{ funding_request.amount_received|format_fr }} GNF</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <i class="material-icons">account_balance_wallet</i>
+              <div class="detail-content">
+                <span class="detail-label">Reste à financer</span>
+                <span class="detail-value">{{ funding_request.remaining_amount|format_fr }} GNF</span>
+              </div>
+            </div>
+
             {% if funding_request.start_date %}
-            <li class="collection-item"><strong>Date de début :</strong> {{ funding_request.start_date|date:"d F Y" }}</li>
+            <div class="detail-item">
+              <i class="material-icons">event</i>
+              <div class="detail-content">
+                <span class="detail-label">Date de début</span>
+                <span class="detail-value">{{ funding_request.start_date|date:"d F Y" }}</span>
+              </div>
+            </div>
             {% endif %}
+
             {% if funding_request.end_date %}
-            <li class="collection-item"><strong>Date de fin :</strong> {{ funding_request.end_date|date:"d F Y" }}</li>
+            <div class="detail-item">
+              <i class="material-icons">event_available</i>
+              <div class="detail-content">
+                <span class="detail-label">Date de fin</span>
+                <span class="detail-value">{{ funding_request.end_date|date:"d F Y" }}</span>
+              </div>
+            </div>
             {% endif %}
-            {% if funding_request.region %}
-            <li class="collection-item"><strong>Région :</strong> {{ funding_request.region }}</li>
+
+            {% if funding_request.region or funding_request.prefecture or funding_request.commune or funding_request.quarter or funding_request.address %}
+            <div class="detail-item" style="grid-column: 1 / -1;">
+              <i class="material-icons">place</i>
+              <div class="detail-content">
+                <span class="detail-label">Localisation</span>
+                <span class="detail-value">
+                  {% if funding_request.region %}{{ funding_request.region }}{% endif %}
+                  {% if funding_request.prefecture %}, {{ funding_request.prefecture }}{% endif %}
+                  {% if funding_request.commune %}, {{ funding_request.commune }}{% endif %}
+                  {% if funding_request.quarter %}, {{ funding_request.quarter }}{% endif %}
+                  {% if funding_request.address %}<br>{{ funding_request.address }}{% endif %}
+                </span>
+              </div>
+            </div>
             {% endif %}
-            {% if funding_request.prefecture %}
-            <li class="collection-item"><strong>Préfecture :</strong> {{ funding_request.prefecture }}</li>
+
+            {% if funding_request.phone or funding_request.email %}
+            <div class="detail-item" style="grid-column: 1 / -1;">
+              <i class="material-icons">contact_phone</i>
+              <div class="detail-content">
+                <span class="detail-label">Contacts</span>
+                <span class="detail-value">
+                  {% if funding_request.phone %}{{ funding_request.phone }}{% endif %}
+                  {% if funding_request.phone and funding_request.email %} • {% endif %}
+                  {% if funding_request.email %}{{ funding_request.email }}{% endif %}
+                </span>
+              </div>
+            </div>
             {% endif %}
-            {% if funding_request.commune %}
-            <li class="collection-item"><strong>Commune :</strong> {{ funding_request.commune }}</li>
-            {% endif %}
-            {% if funding_request.quarter %}
-            <li class="collection-item"><strong>Quartier :</strong> {{ funding_request.quarter }}</li>
-            {% endif %}
-            {% if funding_request.address %}
->>>>>>> chore/security-design-hardening
-            <li class="collection-item"><strong>Adresse :</strong> {{ funding_request.address }}</li>
-            {% endif %}
-            <li class="collection-item"><strong>{% trans "Montant payé" %} :</strong> {{ funding_request.amount_received|format_fr }} GNF</li>
-            <li class="collection-item"><strong>{% trans "Reste à financer" %} :</strong> {{ funding_request.remaining_amount|format_fr }} GNF</li>
-            {% if funding_request.phone %}
-            <li class="collection-item"><strong>Téléphone :</strong> {{ funding_request.phone }}</li>
-            {% endif %}
-            {% if funding_request.email %}
-            <li class="collection-item"><strong>Email :</strong> {{ funding_request.email }}</li>
-            {% endif %}
-          </ul>
+          </div>
+          
+          <div class="detail-progress-wrapper">
+            <div class="detail-progress-header">
+              <span>Progression de la collecte</span>
+              <span>{{ funding_request.progress }}%</span>
+            </div>
+            <div class="detail-progress-track">
+              <div class="detail-progress-fill" style="width: {{ funding_request.progress }}%;"></div>
+            </div>
+            <div class="detail-progress-meta">
+              {% if funding_request.days_remaining != None %}
+                {{ funding_request.days_remaining }} jours restants
+              {% else %}
+                Échéance dépassée ou non définie
+              {% endif %}
+            </div>
+          </div>
           <div class="card-action center-align">
 <<<<<<< HEAD
             <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2" aria-label="Retour aux demandes">

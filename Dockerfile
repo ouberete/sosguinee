@@ -19,16 +19,16 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir "celery[redis]==5.4.0" "sentry-sdk==2.29.1"
 >>>>>>> chore/security-design-hardening
 
-# Copier le script d'initialisation et lui donner les droits d'exécution
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
 # Copier tout le reste du projet
 COPY . .
+
+# Donner les droits d'exécution et retirer les retours à la ligne Windows (CRLF) qui font crasher Fly.io
+RUN chmod +x /app/entrypoint.sh && \
+    sed -i 's/\r$//' /app/entrypoint.sh
 
 # Exposer le port sur lequel Gunicorn écoutera
 EXPOSE 8000
 
-# Utiliser le script comme point d'entrée
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Utiliser le script comme commande de démarrage
+CMD ["/app/entrypoint.sh"]
 
