@@ -69,7 +69,12 @@
   <li><a href="{% url 'profile' %}">{% trans "Profil" %}</a></li>
   <li><a href="{% url 'change_password' %}">{% trans "Modifier le mot de passe" %}</a></li>
   <li class="divider" tabindex="-1"></li>
-  <li><a href="{% url 'logout' %}">{% trans "Déconnexion" %}</a></li>
+  <li>
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">{% trans "Déconnexion" %}</button>
+    </form>
+  </li>
 </ul>
 {% endif %}
 
@@ -85,7 +90,12 @@
   {% if user.is_authenticated %}
   <li><a href="{% url 'profile' %}">{% trans "Profil" %}</a></li>
   <li><a href="{% url 'change_password' %}">{% trans "Modifier le mot de passe" %}</a></li>
-  <li><a href="{% url 'logout' %}">{% trans "Déconnexion" %}</a></li>
+  <li>
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">{% trans "Déconnexion" %}</button>
+    </form>
+  </li>
   {% else %}
   <li><a href="{% url 'login' %}">{% trans "Connexion" %}</a></li>
   {% endif %}

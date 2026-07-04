@@ -13,7 +13,6 @@ urlpatterns = [
     path('edit-loss-alert/<uuid:public_id>/', views.edit_loss_alert, name='edit_loss_alert'),
     path('delete-loss-alert/<uuid:public_id>/', views.delete_loss_alert, name='delete_loss_alert'),
     path('contact/', views.contact, name='contact'),
-    path('contact-2/', views.messageContact, name='contact-2'),
     path('loss-alert-details/<int:pk>/', views.loss_alert_detail, name='loss_alert_detail'),
     path('loss-alert-details/<uuid:public_id>/', views.loss_alert_detail, name='loss_alert_detail_public'),
     path('funding-request-details/<int:pk>/', views.funding_request_detail, name='funding_request_details'),

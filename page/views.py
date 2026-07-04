@@ -4,6 +4,7 @@ import hmac
 import hashlib
 import logging
 import re
+import time
 import unicodedata
 from decimal import Decimal, InvalidOperation
 from smtplib import SMTPException
@@ -11,7 +12,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -44,7 +45,16 @@ ALLOWED_COMMENT_MODELS = {
     "fundingrequest": FundingRequest,
     "lossalert": LossAlert,
 }
-PUBLIC_RATE_LIMIT_MESSAGE = "Trop de tentatives. Veuillez reessayer dans quelques minutes."
+PUBLIC_RATE_LIMIT_MESSAGE = "Trop de tentatives. Veuillez réessayer dans quelques minutes."
+MAX_ITEMS_PER_PAGE = 50
+
+
+def _items_per_page(request, default):
+    try:
+        value = int(request.GET.get('items_per_page', default))
+    except (TypeError, ValueError):
+        return default
+    return max(1, min(value, MAX_ITEMS_PER_PAGE))
 
 
 def _is_valid_payment_callback_token(payment, token):
@@ -130,7 +140,9 @@ def _prefill_donor_initial_data(request):
 def _client_ip(request):
     forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
     if forwarded_for:
-        return forwarded_for.split(",")[0].strip()
+        # Seul le dernier élément est ajouté par notre proxy (nginx); les
+        # précédents sont fournis par le client et donc forgeables.
+        return forwarded_for.split(",")[-1].strip()
     return request.META.get("REMOTE_ADDR", "")
 
 
@@ -207,6 +219,76 @@ def _log_payment_event(event, **kwargs):
     logger.info("payment_event=%s", json.dumps(payload, ensure_ascii=False, default=str))
 
 
+def _apply_payment_success(payment):
+    """
+    Confirme un paiement de manière idempotente (verrouillage en base) :
+    passage au statut réussi, crédit du financement, email de confirmation.
+    Ne doit être appelé qu'après vérification du statut auprès de Djomy
+    (API de statut ou webhook signé).
+    """
+    model = type(payment)
+    with transaction.atomic():
+        locked = model.objects.select_for_update().get(pk=payment.pk)
+        success_status = _get_payment_success_status(locked)
+        if locked.status == success_status:
+            return False
+        locked.status = success_status
+        locked.save(update_fields=["status", "updated_at"])
+
+        if isinstance(locked, FundPayment) and locked.funding_request_id:
+            funding_request = FundingRequest.objects.select_for_update().get(
+                pk=locked.funding_request_id
+            )
+            funding_request.amount_received = (funding_request.amount_received or 0) + locked.amount
+            funding_request.save(update_fields=["amount_received", "updated_at"])
+            _finalize_funding_request_status(funding_request)
+
+    _send_payment_success_email(locked)
+    payment.refresh_from_db()
+    return True
+
+
+def _mark_payment_failed(payment):
+    if payment.status != "en_attente":
+        return False
+    payment.status = "échoué"
+    payment.save(update_fields=["status", "updated_at"])
+    return True
+
+
+def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
+    """
+    Interroge l'API Djomy pour connaître le statut réel d'un paiement.
+    Retourne le statut normalisé ('réussi', 'échoué', 'en_attente') ou None
+    si la vérification n'a pas abouti.
+    """
+    try:
+        from django_djomy.services import DjomyService
+        ds = DjomyService()
+    except Exception as exc:
+        logger.warning("Service Djomy indisponible pour la vérification de statut: %s", exc)
+        return None
+
+    candidates = []
+    for value in (provider_tx_id, payment.reference, payment.transaction_id):
+        value = (str(value) if value else "").strip()
+        if value and value not in candidates:
+            candidates.append(value)
+
+    for candidate in candidates:
+        data = ds.get_payment_status(candidate)
+        if not isinstance(data, dict):
+            continue
+        raw_status = _extract_first_non_empty(
+            data,
+            ("status", "payment_status", "transaction_status", "state"),
+        )
+        normalized = _normalize_payment_status(raw_status)
+        if normalized in {"réussi", "échoué", "en_attente"}:
+            return normalized
+    return None
+
+
 def _force_https(url):
     parsed = urlparse(url)
     if parsed.scheme == "https":
@@ -243,7 +325,7 @@ def _verify_djomy_webhook_signature(request):
     secret = (getattr(settings, "DJOMY_WEBHOOK_SECRET", "") or "").strip()
     if not secret:
         if settings.DEBUG:
-            logger.warning("DJOMY_WEBHOOK_SECRET absent: signature webhook non vÃ©rifiÃ©e (mode DEBUG).")
+            logger.warning("DJOMY_WEBHOOK_SECRET absent: signature webhook non vérifiée (mode DEBUG).")
             return True
         return False
 
@@ -261,6 +343,18 @@ def _verify_djomy_webhook_signature(request):
         or request.headers.get("Djomy-Timestamp")
         or request.headers.get("X-Webhook-Timestamp")
     )
+    # Anti-rejeu: si un timestamp est fourni, il doit être récent.
+    if timestamp:
+        try:
+            ts = float(timestamp)
+        except (TypeError, ValueError):
+            logger.warning("Webhook Djomy: timestamp illisible, requête rejetée.")
+            return False
+        if ts > 1e12:  # millisecondes
+            ts /= 1000.0
+        if abs(time.time() - ts) > 300:
+            logger.warning("Webhook Djomy: timestamp trop ancien (rejeu possible), requête rejetée.")
+            return False
     raw_body = request.body or b""
 
     expected_signatures = set()
@@ -304,10 +398,10 @@ def _normalize_payment_status(raw_status):
     if raw_status is None:
         return None
     status = str(raw_status).strip().lower()
-    if status in {"success", "succeeded", "paid", "completed", "complete", "rÃ©ussi", "reussi"}:
-        return "rÃ©ussi"
-    if status in {"failed", "failure", "error", "cancelled", "canceled", "declined", "Ã©chouÃ©", "echoue"}:
-        return "Ã©chouÃ©"
+    if status in {"success", "succeeded", "paid", "completed", "complete", "réussi", "reussi"}:
+        return "réussi"
+    if status in {"failed", "failure", "error", "cancelled", "canceled", "declined", "échoué", "echoue"}:
+        return "échoué"
     if status in {"pending", "en_attente", "processing"}:
         return "en_attente"
     return status
@@ -315,7 +409,7 @@ def _normalize_payment_status(raw_status):
 
 def _extract_djomy_redirect_url(response_data):
     """
-    Extrait l'URL de redirection de la rÃ©ponse Djomy en supportant
+    Extrait l'URL de redirection de la réponse Djomy en supportant
     plusieurs formats de payload.
     """
     if not isinstance(response_data, dict):
@@ -327,7 +421,7 @@ def _extract_djomy_redirect_url(response_data):
         if value:
             return value
 
-    # Format encapsulÃ© sous "data"
+    # Format encapsulé sous "data"
     data = response_data.get("data")
     if isinstance(data, dict):
         for key in ("paymentUrl", "redirectUrl", "url"):
@@ -398,13 +492,13 @@ def index(request):
 
 def funding_request_list(request):
     funding_request_types = FundingType.objects.all()
-    funding_request_statuses = FundingRequestStatus.objects.all().exclude(name="Clos").exclude(name="TrouvÃ©")
+    funding_request_statuses = FundingRequestStatus.objects.all().exclude(name="Clos").exclude(name="Trouvé")
                 
     return render(request, 'page/funding_requests.html', {'funding_request_types': funding_request_types, 'funding_request_statuses': funding_request_statuses})
 
 def loss_alert_list(request):
     loss_alert_types = LossAlertType.objects.all()
-    loss_alert_statuses = LossAlertStatus.objects.all().exclude(name="Clos").exclude(name="TrouvÃ©")
+    loss_alert_statuses = LossAlertStatus.objects.all().exclude(name="Clos").exclude(name="Trouvé")
     return render(request, 'page/loss_alerts.html', {'loss_alert_types': loss_alert_types, 'loss_alert_statuses': loss_alert_statuses})
 
 def add_funding_request(request):
@@ -442,7 +536,7 @@ def add_funding_request(request):
 def edit_funding_request(request, public_id):
     fr = FundingRequest.objects.filter(public_id=public_id).first()
     if not fr or fr.created_by != request.user:
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  modifier cette demande.")
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette demande.")
     if request.method == 'POST':
         form = FundingRequestForm(request.POST, request.FILES, instance=fr)
         if form.is_valid():
@@ -456,7 +550,7 @@ def edit_funding_request(request, public_id):
                 obj=fr,
                 metadata={'updated_fields': list(form.changed_data), 'documents_added': len(docs)},
             )
-            messages.success(request, "Demande mise Ã  jour.")
+            messages.success(request, "Demande mise à jour.")
             return redirect('funding_request_details_public', public_id=fr.public_id)
     else:
         form = FundingRequestForm(instance=fr)
@@ -467,7 +561,7 @@ def edit_funding_request(request, public_id):
 def delete_funding_request(request, public_id):
     fr = FundingRequest.objects.filter(public_id=public_id).first()
     if not fr or fr.created_by != request.user:
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  supprimer cette demande.")
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette demande.")
     if request.method == 'POST':
         fr.delete()
         UserActionLog.record(
@@ -476,7 +570,7 @@ def delete_funding_request(request, public_id):
             obj=fr,
             metadata={'type': 'funding_request'},
         )
-        messages.success(request, "Demande supprimÃ©e.")
+        messages.success(request, "Demande supprimée.")
         return redirect('profile')
     return render(request, 'page/confirm_delete.html', {'object': fr, 'type': 'funding_request'})
 
@@ -484,14 +578,14 @@ def delete_funding_request(request, public_id):
 @login_required
 @require_POST
 def close_funding_request(request, public_id):
-    """ClÃ´turer une demande de financement (marquer comme terminÃ©e)"""
+    """Clôturer une demande de financement (marquer comme terminée)"""
     fr = FundingRequest.objects.filter(public_id=public_id).first()
     if not fr or fr.created_by != request.user:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': "Vous n'Ãªtes pas autorisÃ© Ã  clÃ´turer cette demande."}, status=403)
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  clÃ´turer cette demande.")
+            return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette demande."}, status=403)
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette demande.")
 
-    # Trouver le statut "Clos" ou "TerminÃ©"
+    # Trouver le statut "Clos" ou "Terminé"
     closed_status = _resolve_or_create_status(
         FundingRequestStatus,
         fallback_name="Clos",
@@ -508,13 +602,13 @@ def close_funding_request(request, public_id):
             obj=fr,
             metadata={'previous_status': previous_status, 'new_status': closed_status.name},
         )
-        messages.success(request, "Demande de financement clÃ´turÃ©e avec succÃ¨s.")
+        messages.success(request, "Demande de financement clôturée avec succès.")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 'message': 'Demande clÃ´turÃ©e avec succÃ¨s.', 'new_status': closed_status.name})
+            return JsonResponse({'success': True, 'message': 'Demande clôturée avec succès.', 'new_status': closed_status.name})
     else:
-        messages.error(request, "Statut 'Clos' non trouvÃ©. Veuillez contacter un administrateur.")
+        messages.error(request, "Statut 'Clos' non trouvé. Veuillez contacter un administrateur.")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': "Statut 'Clos' non trouvÃ©."}, status=400)
+            return JsonResponse({'error': "Statut 'Clos' non trouvé."}, status=400)
 
     return redirect('funding_request_details_public', public_id=fr.public_id)
 
@@ -522,14 +616,14 @@ def close_funding_request(request, public_id):
 @login_required
 @require_POST
 def close_loss_alert(request, public_id):
-    """ClÃ´turer une alerte de perte (marquer comme trouvÃ©/rÃ©solu)"""
+    """Clôturer une alerte de perte (marquer comme trouvé/résolu)"""
     alert = LossAlert.objects.filter(public_id=public_id).first()
     if not alert or alert.created_by != request.user:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': "Vous n'Ãªtes pas autorisÃ© Ã  clÃ´turer cette alerte."}, status=403)
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  clÃ´turer cette alerte.")
+            return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette alerte."}, status=403)
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette alerte.")
 
-    # Trouver le statut "TrouvÃ©" ou "RÃ©solu" ou "RetrouvÃ©" ou "Clos"
+    # Trouver le statut "Trouvé" ou "Résolu" ou "Retrouvé" ou "Clos"
     found_status = _resolve_or_create_status(
         LossAlertStatus,
         fallback_name="Trouvé",
@@ -546,13 +640,13 @@ def close_loss_alert(request, public_id):
             obj=alert,
             metadata={'previous_status': previous_status, 'new_status': found_status.name},
         )
-        messages.success(request, "Alerte clÃ´turÃ©e avec succÃ¨s. Merci d'avoir tenu SOS GuinÃ©e informÃ© !")
+        messages.success(request, "Alerte clôturée avec succès. Merci d'avoir tenu SOS Guinée informé !")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 'message': 'Alerte clÃ´turÃ©e avec succÃ¨s.', 'new_status': found_status.name})
+            return JsonResponse({'success': True, 'message': 'Alerte clôturée avec succès.', 'new_status': found_status.name})
     else:
-        messages.error(request, "Statut 'TrouvÃ©' non trouvÃ©. Veuillez contacter un administrateur.")
+        messages.error(request, "Statut 'Trouvé' non trouvé. Veuillez contacter un administrateur.")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': "Statut 'TrouvÃ©' non trouvÃ©."}, status=400)
+            return JsonResponse({'error': "Statut 'Trouvé' non trouvé."}, status=400)
 
     return redirect('loss_alert_detail_public', public_id=alert.public_id)
 
@@ -592,7 +686,7 @@ def add_loss_alert(request):
 def edit_loss_alert(request, public_id):
     alert = LossAlert.objects.filter(public_id=public_id).first()
     if not alert or alert.created_by != request.user:
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  modifier cette alerte.")
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier cette alerte.")
     if request.method == 'POST':
         form = LossAlertForm(request.POST, request.FILES, instance=alert)
         if form.is_valid():
@@ -606,7 +700,7 @@ def edit_loss_alert(request, public_id):
                 obj=alert,
                 metadata={'updated_fields': list(form.changed_data), 'documents_added': len(docs)},
             )
-            messages.success(request, "Alerte mise Ã  jour.")
+            messages.success(request, "Alerte mise à jour.")
             return redirect('loss_alert_detail_public', public_id=alert.public_id)
     else:
         form = LossAlertForm(instance=alert)
@@ -617,7 +711,7 @@ def edit_loss_alert(request, public_id):
 def delete_loss_alert(request, public_id):
     alert = LossAlert.objects.filter(public_id=public_id).first()
     if not alert or alert.created_by != request.user:
-        return HttpResponseForbidden("Vous n'Ãªtes pas autorisÃ© Ã  supprimer cette alerte.")
+        return HttpResponseForbidden("Vous n'êtes pas autorisé à supprimer cette alerte.")
     if request.method == 'POST':
         alert.delete()
         UserActionLog.record(
@@ -626,7 +720,7 @@ def delete_loss_alert(request, public_id):
             obj=alert,
             metadata={'type': 'loss_alert'},
         )
-        messages.success(request, "Alerte supprimÃ©e.")
+        messages.success(request, "Alerte supprimée.")
         return redirect('profile')
     return render(request, 'page/confirm_delete.html', {'object': alert, 'type': 'alert'})
 
@@ -637,9 +731,9 @@ def funding_request_detail(request, pk=None, public_id=None):
     else:
         funding_request = get_object_or_404(FundingRequest, public_id=public_id)
 
-    # Obtenir tous les commentaires liÃ©s Ã  cet objet
+    # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(FundingRequest)
-    comments = Comment.objects.filter(content_type=content_type, object_id=funding_request.id).select_related('user')
+    comments = Comment.objects.filter(content_type=content_type, object_id=funding_request.id, isDeleted=False).select_related('user')
 
     comment_form = CommentForm()
 
@@ -659,7 +753,7 @@ def loss_alert_detail(request, pk=None, public_id=None):
     else:
         alert = get_object_or_404(LossAlert, public_id=public_id)
 
-    # Obtenir tous les commentaires liÃ©s Ã  cet objet
+    # Obtenir tous les commentaires liés à cet objet
     content_type = ContentType.objects.get_for_model(LossAlert)
     comments = Comment.objects.filter(content_type=content_type, object_id=alert.id, isDeleted=False).select_related('user')
 
@@ -672,6 +766,30 @@ def loss_alert_detail(request, pk=None, public_id=None):
         'model_name': 'lossalert',
         'object_id': alert.id
     })
+
+def _send_contact_notification(name, email, message):
+    """
+    Notifie l'équipe SOS Guinée d'un nouveau message de contact.
+    Le message est déjà conservé en base; l'email est un best-effort.
+    N'envoie jamais vers l'adresse fournie par le visiteur (anti-relais spam).
+    """
+    notify_email = (getattr(settings, "CONTACT_NOTIFY_EMAIL", "") or "").strip()
+    if not notify_email:
+        logger.warning("CONTACT_NOTIFY_EMAIL non défini: notification de contact non envoyée.")
+        return False
+    context = {'name': name, 'email': email, 'message': message}
+    try:
+        EmailService.send_template_email(
+            [notify_email],
+            "Nouveau message de contact - SOS Guinée",
+            'page/template_email/contact_form_email.html',
+            context,
+        )
+        return True
+    except Exception as e:
+        logger.warning("Email de contact non envoyé, message conservé en base: %s", e)
+        return False
+
 
 def contact(request):
     contact = MessageContactForm(request.POST if request.method == 'POST' else None)
@@ -687,21 +805,9 @@ def contact(request):
                 contact.add_error(None, captcha_error)
             elif contact.is_valid():
                 contact.save()
-                context = {
-                    'name': name,
-                    'email': email,
-                    'message': message,
-                }
-                template_email = 'page/template_email/contact_form_email.html'
-                to_email = [email,]
-                mail_subject = "Message de contact"
-                try:
-                    EmailService.send_template_email(to_email, mail_subject, template_email, context)
-                except Exception as e:
-                    logger.warning("Email de contact non envoye, message conserve en base: %s", e)
-                else:
-                    if email:
-                        cache.delete(_rate_limit_key("contact", request, email))
+                _send_contact_notification(name, email, message)
+                if email:
+                    cache.delete(_rate_limit_key("contact", request, email))
                 contact = MessageContactForm()
                 context = {'success': 'Votre message a été reçu avec succès.', 'form': contact}
                 context.update(_captcha_context())
@@ -739,7 +845,7 @@ def donation(request):
             context.update(_captcha_context())
             return render(request, 'page/donation.html', context)
 
-        # RÃ©cupÃ©rer les donnÃ©es du formulaire
+        # Récupérer les données du formulaire
 
         amount = form.cleaned_data['amount']
         user_email = form.cleaned_data['donor_email']
@@ -750,7 +856,7 @@ def donation(request):
         donor_phone = form.cleaned_data['donor_phone']
         donor_address = form.cleaned_data['donor_address']
         try:
-            # Enregistrer le paiement dans la base de donnÃ©es
+            # Enregistrer le paiement dans la base de données
             payment = Donation.objects.create(
                 amount=amount,
                 donor_email=user_email,
@@ -760,7 +866,7 @@ def donation(request):
                 donor_city=donor_city,
                 donor_country=donor_country,
                 donor_phone =donor_phone,
-                transaction_id=str(uuid.uuid4()),  # GÃ©nÃ©rer un ID de transaction unique
+                transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
                 #reference=data.get('reference')
             )
 
@@ -837,40 +943,6 @@ def donation(request):
     context.update(_captcha_context())
     return render(request, 'page/donation.html', context)
 
-def messageContact(request):
-    if request.method == 'POST':
-
-        name = request.POST.get('name') 
-        email = request.POST.get('email')
-        message = request.POST.get('message')
-        contact = MessageContactForm(request.POST)
-        if contact.is_valid():
-            contact.save()
-            #Send Message contact email
-            context = {
-                'name': name,
-                'email': email,
-                'message': message
-            }
-            
-            to_email = [email]
-            mail_subject = "Message de contact"
-            template_email = 'page/template_email/contact_form_email.html'
-            try:
-
-                EmailService.send_template_email(to_email, mail_subject, template_email, context)
-
-
-            except Exception as e:
-
-                return JsonResponse({'error': 'L\'envoi du mail a Ã©chouÃ©. Veuillez contacter l\'administrateur.'})
-            return JsonResponse( {'success': 'Le message a Ã©tÃ© envoyÃ©.'})
-        else :
-            errors = contact.errors
-
-            return JsonResponse({'error': "Veuillez remplir tous les champs.", 'errors': errors})
-    return JsonResponse({'error': 'Veuillez remplir tous les champs.'})
-
 def confirmation_loss_alert_added(request):
     return render(request, 'page/confirmation_page/confirmation_loss_alert_added.html')
 
@@ -894,7 +966,7 @@ def about(request):
 class FundingRequestListView(View):
     def get(self, request):
         
-        # RÃ©cupÃ¨re les filtres Ã  partir des paramÃ¨tres GET
+        # Récupère les filtres à partir des paramètres GET
         status = request.GET.get('status')
         funding_type = request.GET.get('funding_type')
         min_amount = request.GET.get('min_amount')
@@ -903,7 +975,7 @@ class FundingRequestListView(View):
         end_date = request.GET.get('end_date')
         beneficiary_name = request.GET.get('beneficiary_name')
         
-        funding_list = FundingRequest.objects.all()  # RÃ©cupÃ¨re tous les Ã©lÃ©ments
+        funding_list = FundingRequest.objects.all()  # Récupère tous les éléments
         
          # Applique les filtres dynamiques
         if status:
@@ -921,17 +993,17 @@ class FundingRequestListView(View):
         if beneficiary_name:
             funding_list = funding_list.filter(beneficiary_name__icontains=beneficiary_name)
             
-        page_number = request.GET.get('page', 1)  # NumÃ©ro de la page Ã  partir des paramÃ¨tres GET, par dÃ©faut 1
-        items_per_page = request.GET.get('items_per_page', 10)  # Nombre d'Ã©lÃ©ments par page, par dÃ©faut 10
+        page_number = request.GET.get('page', 1)  # Numéro de la page à partir des paramètres GET, par défaut 1
+        items_per_page = _items_per_page(request, 10)
 
-        # CrÃ©ation du paginator
+        # Création du paginator
         paginator = Paginator(funding_list, items_per_page)
         try:
             page_obj = paginator.page(page_number)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-        # PrÃ©pare les donnÃ©es pour le format JSON
+        # Prépare les données pour le format JSON
         data = {
             'funding_requests': [
                 {
@@ -939,12 +1011,12 @@ class FundingRequestListView(View):
                     'beneficiary_name': element.beneficiary_name,
                     'description_needs': element.description_needs,
                     'funding_request_type_name': element.funding_request_type_name,
-                    'funding_request_status': element.funding_request_status_name,  # Utilise la propriÃ©tÃ© funding_request_status_name
+                    'funding_request_status': element.funding_request_status_name,  # Utilise la propriété funding_request_status_name
                     'principal_image_url': element.principal_image.url if element.principal_image else '',
                     'id': element.id,
                     'public_id': str(element.public_id),
-                    'progress': element.progress,  # Utilise la propriÃ©tÃ© progress
-                    'days_remaining': element.days_remaining,  # Utilise la propriÃ©tÃ© days_remaining
+                    'progress': element.progress,  # Utilise la propriété progress
+                    'days_remaining': element.days_remaining,  # Utilise la propriété days_remaining
                     'amount': element.funding_amount,
                     'amount_received': element.amount_received,
                     'remaining_amount': element.remaining_amount,
@@ -994,7 +1066,7 @@ class LossAlertListView(View):
             alert_list = alert_list.filter(name__icontains=name)
 
         page_number = request.GET.get('page', 1)  # Numéro de la page à partir des paramètres GET, par défaut 1
-        items_per_page = request.GET.get('items_per_page', 9)  # Nombre d'éléments par page, par défaut 9
+        items_per_page = _items_per_page(request, 9)
 
         # Création du paginator
         paginator = Paginator(alert_list, items_per_page)
@@ -1021,7 +1093,7 @@ class LossAlertListView(View):
                     'address': element.address or '',
                     'id': element.id,
                     'public_id': str(element.public_id),
-                    'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des dÃ©tails de l'alerte
+                    'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des détails de l'alerte
                     'phone': element.phone or '',
                     'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
                     'close_url': "/loss-alert/"+str(element.public_id)+"/close/",
@@ -1107,7 +1179,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                 context.update(_captcha_context())
                 return render(request, 'page/funding_payment.html', context)
             try:
-                # Enregistrer le paiement dans la base de donnÃ©es
+                # Enregistrer le paiement dans la base de données
                 payment = FundPayment.objects.create(
                     funding_request=funding_request,
                     amount=amount,
@@ -1118,7 +1190,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                     donor_city=donor_city,
                     donor_country=donor_country,
                     donor_phone =donor_phone,
-                    transaction_id=str(uuid.uuid4()),  # GÃ©nÃ©rer un ID de transaction unique
+                    transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
                     #reference=data.get('reference')
                 )
 
@@ -1232,21 +1304,39 @@ def djomy_payment_callback(request, payment_id=None, type=None, payment_public_i
         provider="djomy",
     )
 
-    success_status = _get_payment_success_status(payment)
-
+    # Le retour navigateur ne fait pas foi: seul un statut confirmé auprès de
+    # l'API Djomy (ici) ou via le webhook signé valide réellement le paiement.
     if payment.status == "en_attente":
-        payment.status = success_status
-        payment.save(update_fields=["status", "updated_at"])
+        provider_tx_id = (
+            request.GET.get("transactionId")
+            or request.GET.get("transaction_id")
+            or ""
+        ).strip()
+        verified_status = _verify_payment_status_with_djomy(payment, provider_tx_id or None)
+        _log_payment_event(
+            "payment_callback_verified",
+            payment_type=payment_type,
+            payment_id=payment.id,
+            verified_status=verified_status,
+            provider="djomy",
+        )
+        if verified_status == "réussi":
+            _apply_payment_success(payment)
+        elif verified_status == "échoué":
+            _mark_payment_failed(payment)
 
-        if model is FundPayment and getattr(payment, "funding_request_id", None):
-            funding_request = payment.funding_request
-            funding_request.amount_received = (funding_request.amount_received or 0) + payment.amount
-            funding_request.save(update_fields=["amount_received", "updated_at"])
-            _finalize_funding_request_status(funding_request)
+    success_status = _get_payment_success_status(payment)
+    if payment.status == success_status:
+        state = "confirmed"
+    elif payment.status == "échoué":
+        state = "failed"
+    else:
+        state = "pending"
 
-        _send_payment_success_email(payment)
-
-    return render(request, 'page/confirmation_page/confirmation_payment.html', {'request': 'added', 'type': type})
+    return render(request, 'page/confirmation_page/confirmation_payment.html', {
+        'payment_state': state,
+        'type': type,
+    })
 
 
 @csrf_exempt
@@ -1269,7 +1359,7 @@ def djomy_webhook(request):
             transaction_id=tx_id,
             provider="djomy",
         )
-        logger.warning("Webhook Djomy reÃ§u sans paiement correspondant: %s", payload)
+        logger.warning("Webhook Djomy reçu sans paiement correspondant: %s", payload)
         return JsonResponse({"ok": True, "ignored": True, "reason": "payment_not_found"}, status=200)
 
     status_raw = _extract_first_non_empty(
@@ -1289,7 +1379,6 @@ def djomy_webhook(request):
         provider="djomy",
     )
 
-    previous_status = payment.status
     update_fields = []
 
     if reference and not payment.reference:
@@ -1299,26 +1388,18 @@ def djomy_webhook(request):
         payment.transaction_id = tx_id
         update_fields.append("transaction_id")
 
-    allowed_statuses = {choice[0] for choice in payment._meta.get_field("status").choices}
-    if normalized_status in allowed_statuses and payment.status != normalized_status:
-        payment.status = normalized_status
-        update_fields.append("status")
-
     if update_fields:
         update_fields.append("updated_at")
         payment.save(update_fields=update_fields)
 
     success_status = _get_payment_success_status(payment)
 
-    # Idempotence: incrementer une seule fois le montant reçu lors du passage à "réussi".
-    if model is FundPayment and previous_status != success_status and payment.status == success_status:
-        funding_request = payment.funding_request
-        funding_request.amount_received = (funding_request.amount_received or 0) + payment.amount
-        funding_request.save(update_fields=["amount_received", "updated_at"])
-        _finalize_funding_request_status(funding_request)
-        _send_payment_success_email(payment)
-    elif model is Donation and previous_status != success_status and payment.status == success_status:
-        _send_payment_success_email(payment)
+    # La confirmation (statut, crédit du financement, email) est idempotente
+    # et protégée par verrou en base — voir _apply_payment_success.
+    if normalized_status == success_status:
+        _apply_payment_success(payment)
+    elif normalized_status == "échoué":
+        _mark_payment_failed(payment)
 
     return JsonResponse(
         {
@@ -1372,24 +1453,30 @@ def add_comment(request, model_name, object_id):
 
 
 
+@login_required
+@require_POST
 def reply_comment(request):
-    if request.method == 'POST' and request.user.is_authenticated:
-        text = request.POST.get('text')
-        parent_id = request.POST.get('parent')
-        rate_identifier = f"{request.user.id}:{parent_id}"
-        if _is_rate_limited("reply-comment", request, identifier=rate_identifier, limit=8, window=300):
-            return JsonResponse({'success': False, 'message': PUBLIC_RATE_LIMIT_MESSAGE}, status=429)
-        parent = get_object_or_404(Comment, id=parent_id)
-        comment = Comment.objects.create(
-            user=request.user,
-            content_object=parent.content_object,
-            parent=parent,
-            text=text
-        )
-        cache.delete(_rate_limit_key("reply-comment", request, rate_identifier))
-        html = render_to_string('page/components/comments/comment_item.html', {'comment': comment, 'user': request.user})
-        return JsonResponse({'success': True, 'reply_html': html})
-    return JsonResponse({'success': False}, status=400)
+    parent_id = request.POST.get('parent')
+    rate_identifier = f"{request.user.id}:{parent_id}"
+    if _is_rate_limited("reply-comment", request, identifier=rate_identifier, limit=8, window=300):
+        return JsonResponse({'success': False, 'message': PUBLIC_RATE_LIMIT_MESSAGE}, status=429)
+
+    parent = Comment.objects.filter(id=parent_id, isDeleted=False).first()
+    if parent is None:
+        return JsonResponse({'success': False, 'error': 'Commentaire parent introuvable'}, status=404)
+
+    form = CommentForm(request.POST)
+    if not form.is_valid():
+        return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+    comment = form.save(commit=False)
+    comment.user = request.user
+    comment.content_object = parent.content_object
+    comment.parent = parent
+    comment.save()
+    cache.delete(_rate_limit_key("reply-comment", request, rate_identifier))
+    html = render_to_string('page/components/comments/comment_item.html', {'comment': comment, 'user': request.user})
+    return JsonResponse({'success': True, 'reply_html': html})
 
 @login_required
 @require_POST
@@ -1397,7 +1484,7 @@ def edit_comment(request, comment_id):
     try:
         comment = Comment.objects.get(id=comment_id, user=request.user)
     except Comment.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Commentaire non trouvÃ©'}, status=404)
+        return JsonResponse({'success': False, 'error': 'Commentaire non trouvé'}, status=404)
     # Support both form-encoded and JSON payloads
     new_text = ''
     if request.content_type and 'application/json' in request.content_type:

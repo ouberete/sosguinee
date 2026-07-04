@@ -231,3 +231,36 @@ body{
   .ml-10 {
     margin-left: 10em;
   }
+/* Bouton de déconnexion (formulaire POST) aligné sur les liens de menu */
+.logout-form {
+  margin: 0;
+}
+
+.logout-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dropdown-content .logout-btn {
+  color: #26a69a;
+}
+
+.dropdown-content .logout-btn:hover,
+.sidenav .logout-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.sidenav .logout-btn {
+  padding: 0 32px;
+  line-height: 48px;
+  height: 48px;
+  color: rgba(0, 0, 0, 0.87);
+}
