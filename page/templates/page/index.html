@@ -193,16 +193,12 @@
 
             <div class="ws-card-stats">
               <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.funding_amount | format_fr}} GNF</div>
+                <div class="ws-card-stat-value">{{ req.funding_amount|format_fr }} GNF</div>
                 <div class="ws-card-stat-label">{% trans "Objectif" %}</div>
               </div>
               <div class="ws-card-stat">
                 <div class="ws-card-stat-value">{{ req.amount_received|format_fr }} GNF</div>
                 <div class="ws-card-stat-label">{% trans "Collecté" %}</div>
-              </div>
-              <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.remaining_amount|format_fr }} GNF</div>
-                <div class="ws-card-stat-label">{% trans "Reste" %}</div>
               </div>
             </div>
 
@@ -263,7 +259,6 @@
 </div>
 
 {% block extrajs %}
-<script src="{% static 'js/index.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var elemsParallax = document.querySelectorAll('.parallax');

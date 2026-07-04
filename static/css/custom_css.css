@@ -711,7 +711,8 @@
 /* — Stats grid (bottom) — */
 .ws-card-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* S'adapte au nombre de stats affichées (2 colonnes actuellement) */
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid #e5e7eb;
     margin-top: auto;
@@ -721,6 +722,7 @@
 .ws-card-stat {
     text-align: center;
     padding: 0 8px;
+    min-width: 0; /* permet aux colonnes de la grille de rétrécir */
 }
 
 .ws-card-stat:not(:last-child) {
@@ -732,9 +734,18 @@
     font-weight: 700;
     color: #111827;
     margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Pas de troncature: les montants doivent rester lisibles en entier.
+       Le format compact (1,5 Md GNF) limite la longueur; en dernier
+       recours, on autorise le passage à la ligne. */
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+@media (max-width: 600px) {
+    .ws-card-stat-value {
+        font-size: 0.9rem;
+    }
 }
 
 .ws-card-stat-label {
