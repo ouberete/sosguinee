@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -10,10 +10,10 @@ RUN apt-get update && \
 
 
 # Copier les fichiers de dépendances et installer les paquets Python
+# (celery et sentry-sdk sont déjà dans requirements.txt)
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir "celery[redis]==5.4.0" "sentry-sdk==2.29.1"
+    pip install --no-cache-dir -r requirements.txt
 
 # Copier tout le reste du projet
 COPY . .
