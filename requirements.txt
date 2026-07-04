@@ -1,47 +1,21 @@
-asgiref==3.8.1
+# Dépendances directes du projet (les transitives sont résolues par pip).
+Django==6.0.6
 
-certifi==2026.5.20
-cffi==2.0.0
-charset-normalizer==3.4.7
-cryptography==48.0.0
-defusedxml==0.7.1
-dj-database-url==2.2.0
-
-Django==5.0.6
-
-django-allauth==65.18.0
-django-crispy-forms==2.3
+django-allauth[socialaccount]==65.18.0
+django-crispy-forms==2.6
 django-formtools==2.6.1
-django-heroku==0.3.1
-django-jazzmin==3.0.4
+django-jazzmin==3.0.5
+django-redis==7.0.0
 
-dnspython==2.8.0
-gunicorn==23.0.0
-idna==3.18
-oauthlib==3.3.1
-packaging==25.0
-pillow==11.2.1
-
-psycopg2-binary==2.9.10
-
-pycparser==2.22
-PyJWT==2.10.1
-
+dj-database-url==3.1.2
 python-decouple==3.8
-python3-openid==3.2.0
 
-requests==2.32.3
-requests-oauthlib==2.0.0
+whitenoise==6.12.0
+gunicorn==26.0.0
+psycopg2-binary==2.9.12
 
-social-auth-app-django==5.4.2
-social-auth-core==4.5.4
+pillow==12.3.0
+requests==2.34.2
 
-sqlparse==0.5.1
-typing_extensions==4.12.2
-tzdata==2025.2
-
-urllib3==2.3.0
-whitenoise==6.8.2
-
-celery[redis]==5.4.0
-sentry-sdk==2.29.1
+celery[redis]==5.6.3
+sentry-sdk==2.64.0
