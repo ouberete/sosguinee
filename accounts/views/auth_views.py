@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.decorators.http import require_POST
 
 from sosguinee.utils.captcha import get_turnstile_site_key, verify_turnstile_request
 from sosguinee.utils.utilities import Utilities
@@ -38,7 +39,9 @@ def _site_protocol_domain():
 def _client_ip(request):
     forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
     if forwarded_for:
-        return forwarded_for.split(",")[0].strip()
+        # Seul le dernier élément est ajouté par notre proxy (nginx); les
+        # précédents sont fournis par le client et donc forgeables.
+        return forwarded_for.split(",")[-1].strip()
     return request.META.get("REMOTE_ADDR", "")
 
 
@@ -189,7 +192,10 @@ def activate(request, uidb64, token):
     })
 
 
+@require_POST
 def user_logout(request):
+    # POST uniquement: une déconnexion via GET est déclenchable par un tiers
+    # (simple lien ou image pointant vers /logout).
     logout(request)
     return redirect("home")
 

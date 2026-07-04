@@ -29,20 +29,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 DEBUG = config("DEBUG", default=(ENVIRONMENT != "production"), cast=bool)
 
-#Generate secret key
-def generate_secret_key():
-    import string
-    import random
-    return ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=50))
-
-
-
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY", default="")
 
-if SECRET_KEY == "dev-only-insecure-key-change-me" or SECRET_KEY == "":
-    SECRET_KEY = generate_secret_key()
+if not SECRET_KEY or SECRET_KEY == "dev-only-insecure-key-change-me":
+    if DEBUG:
+        # Clé stable en dev uniquement: une clé aléatoire par processus casserait
+        # les sessions et les liens de réinitialisation avec plusieurs workers.
+        SECRET_KEY = "django-insecure-dev-only-do-not-use-in-production"
+    else:
+        raise ImproperlyConfigured(
+            "SECRET_KEY doit être définie via la variable d'environnement en production."
+        )
 
 
 
@@ -232,7 +230,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "SOS Guinée",
     "site_header": "SOS Guinée",
     "site_brand": "SOS Guinée",
-    "site_logo": "page/img/logo/new_logo.png",  # Mettez Ã  jour ce chemin selon l'emplacement de votre logo
+    "site_logo": "page/img/logo/new_logo.png",  # Mettez à jour ce chemin selon l'emplacement de votre logo
     "login_logo": None,
     "login_logo_dark": None,
     "site_logo_classes": "img-circle",
@@ -261,7 +259,7 @@ JAZZMIN_SETTINGS = {
         {
             "app": "page",  # Nom de l'application
             "label": "Gestion des Alertes",  # Libellé du groupe
-            "models": ["page.LossAlert", "page.LossAlertType", "page.LossAlertStatus"],  # Modèles Ã  inclure
+            "models": ["page.LossAlert", "page.LossAlertType", "page.LossAlertStatus"],  # Modèles à inclure
         },
         {
             "app": "page",
@@ -281,7 +279,7 @@ JAZZMIN_SETTINGS = {
         
        ],
 
-    # IcÃ´nes pour les modèles
+    # Icônes pour les modèles
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -303,7 +301,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "hide_apps": [],
     "hide_models": [],
-    "order_with_respect_to": ["auth", "page"],  # Mis Ã  jour pour refléter vos apps
+    "order_with_respect_to": ["auth", "page"],  # Mis à jour pour refléter vos apps
     "custom_links": {
         "page": [
             {
@@ -329,15 +327,6 @@ JAZZMIN_SETTINGS = {
     "language_chooser": True,
 }
 
-# Paycard configuration
-
-PAYCARD_API_KEY = config("PAYCARD_API_KEY", cast=str, default="your_api_key")
-PAYCARD_API_SECRET = config("PAYCARD_API_SECRET", cast=str, default="your_api_secret")
-PAYCARD_ENDPOINT = config("PAYCARD_ENDPOINT", cast=str, default="https://api.paycard.com")
-
-# if django_heroku is not None:
-#     django_heroku.settings(locals())
-
 #Email configuration
 EMAIL_BACKEND = "sosguinee.utils.custom_email_backend.CustomEmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", cast=str, default="smtp.gmail.com")
@@ -352,18 +341,21 @@ EMAIL_CLIENT_DOMAIN = config("EMAIL_CLIENT_DOMAIN", cast=str, default="localhost
 SITE_URL = config("SITE_URL", cast=str, default="http://localhost:8000")
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=5)
 
+# Destinataire interne des messages du formulaire de contact
+CONTACT_NOTIFY_EMAIL = config("CONTACT_NOTIFY_EMAIL", cast=str, default=EMAIL_HOST_USER)
+
 if not DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
     logger.warning("EMAIL_HOST_USER et EMAIL_HOST_PASSWORD ne sont pas définis. L'envoi d'emails échouera.")
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-    ]
+# DEFAULT_FILE_STORAGE / STATICFILES_STORAGE ont été supprimés en Django 5.1+.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
 }
-
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -380,13 +372,13 @@ LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home'
 
 # Use HTTPS outside development
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https' if DEBUG else 'https'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http' if DEBUG else 'https'
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in config(
         "CSRF_TRUSTED_ORIGINS",
-        default="http://localhost:7400,http://127.0.0.1:7400,https://hypergenetical-haustorial-madisyn.ngrok-free.dev",
+        default="http://localhost:8000,http://127.0.0.1:8000",
     ).split(",")
     if origin.strip()
 ]
@@ -402,7 +394,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000, cast=int)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    REFERRER_POLICY = "same-origin"
+    SECURE_REFERRER_POLICY = "same-origin"
 
 # Djomy configuration
 DJOMY_CLIENT_ID = config("DJOMY_CLIENT_ID", default="votre_client_id")
@@ -444,6 +436,25 @@ def _env_float(name, default):
 ASYNC_EMAIL_ENABLED = _env_bool("ASYNC_EMAIL_ENABLED", False)
 CELERY_BROKER_URL = (os.getenv("CELERY_BROKER_URL", "") or "").strip() or "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = (os.getenv("CELERY_RESULT_BACKEND", "") or "").strip() or CELERY_BROKER_URL
+
+# --- CACHE ---
+# Le rate limiting (login, dons, commentaires...) repose sur le cache: il doit
+# être partagé entre les workers/conteneurs. LocMemCache est réservé au dev.
+REDIS_CACHE_URL = (os.getenv("REDIS_CACHE_URL", "") or "").strip() or CELERY_BROKER_URL
+if DEBUG and not _env_bool("USE_REDIS_CACHE", False):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_CACHE_URL,
+            "KEY_PREFIX": "sosguinee",
+        }
+    }
 CELERY_TASK_DEFAULT_QUEUE = (os.getenv("CELERY_TASK_DEFAULT_QUEUE", "") or "").strip() or "default"
 CELERY_TASK_TIME_LIMIT = _env_int("CELERY_TASK_TIME_LIMIT", 120)
 CELERY_TASK_SOFT_TIME_LIMIT = _env_int("CELERY_TASK_SOFT_TIME_LIMIT", 90)

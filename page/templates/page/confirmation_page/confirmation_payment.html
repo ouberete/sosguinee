@@ -11,21 +11,29 @@
     <div class="row" style="margin-bottom: 0;">
       <div class="col s12 m10 offset-m1 l8 offset-l2">
         <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 50px 30px; margin-top: 40px;">
-          {% if request %}
+          {% if payment_state == "confirmed" %}
             <div style="background-color: #e8f5e9; width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
               <i class="material-icons green-text text-darken-2" style="font-size: 50px;">check_circle</i>
             </div>
-            <h4 style="font-weight: 600; color: #2e7d32;">{{ type }} {% trans "ajouté avec succès !" %}</h4>
+            <h4 style="font-weight: 600; color: #2e7d32;">{{ type }} {% trans "confirmé avec succès !" %}</h4>
             <p class="flow-text" style="font-size: 1.2rem; color: #555; margin-top: 20px; margin-bottom: 40px;">
               {% trans "Un message de confirmation vous a été envoyé par courriel." %}
+            </p>
+          {% elif payment_state == "pending" %}
+            <div style="background-color: #fff8e1; width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+              <i class="material-icons amber-text text-darken-2" style="font-size: 50px;">hourglass_top</i>
+            </div>
+            <h4 style="font-weight: 600; color: #f57f17;">{% trans "Paiement en cours de vérification" %}</h4>
+            <p class="flow-text" style="font-size: 1.2rem; color: #555; margin-top: 20px; margin-bottom: 40px;">
+              {% trans "Votre paiement est en cours de traitement par l'opérateur. Vous recevrez un email de confirmation dès qu'il sera validé." %}
             </p>
           {% else %}
             <div style="background-color: #ffebee; width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
               <i class="material-icons red-text text-darken-2" style="font-size: 50px;">error_outline</i>
             </div>
-            <h4 style="font-weight: 600; color: #c62828;">{% trans "Ajout de" %} {{ type }} {% trans "impossible." %}</h4>
+            <h4 style="font-weight: 600; color: #c62828;">{% trans "Le paiement n'a pas abouti." %}</h4>
             <p class="flow-text" style="font-size: 1.2rem; color: #555; margin-top: 20px; margin-bottom: 40px;">
-              {% trans "Une erreur est survenue lors de l'enregistrement de votre transaction. Veuillez réessayer." %}
+              {% trans "La transaction a été refusée ou annulée. Aucun montant n'a été débité. Vous pouvez réessayer." %}
             </p>
           {% endif %}
           
