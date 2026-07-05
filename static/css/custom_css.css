@@ -729,6 +729,17 @@
     border-right: 1px solid #e5e7eb;
 }
 
+/* Objectif ancré à gauche, montant payé (Collecté) ancré à droite */
+.ws-card-stats .ws-card-stat:first-child {
+    text-align: left;
+    padding-left: 0;
+}
+
+.ws-card-stats .ws-card-stat:last-child {
+    text-align: right;
+    padding-right: 0;
+}
+
 .ws-card-stat-value {
     font-size: 1rem;
     font-weight: 700;
