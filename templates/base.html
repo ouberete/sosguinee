@@ -51,6 +51,23 @@
         M.FormSelect.init(document.querySelectorAll('select'));
         M.Materialbox.init(document.querySelectorAll('.materialboxed'));
         M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+
+        // Bouton flottant "+" : on n'utilise PAS M.FloatingActionButton dont
+        // l'animation JS (anime.js) échouait ici en laissant les actions à
+        // opacity:0 (donc incliquables). Simple bascule de la classe .active,
+        // l'ouverture/fermeture étant entièrement gérée en CSS.
+        document.querySelectorAll('.fixed-action-btn').forEach(function (fab) {
+            var mainBtn = fab.querySelector(':scope > a');
+            if (!mainBtn) return;
+            mainBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fab.classList.toggle('active');
+            });
+            document.addEventListener('click', function (e) {
+                if (!fab.contains(e.target)) fab.classList.remove('active');
+            });
+        });
     });
 </script>
 {% block extrajs %}{% endblock %}
