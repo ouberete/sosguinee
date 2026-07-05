@@ -169,46 +169,48 @@
     /* Ombre pour le texte */
 }
 
-/*
- * 1. Transformer la ligne principale en conteneur Flexbox
- * Ceci force les colonnes enfants (gauche et droite) à avoir la même hauteur.
+/* --- Pages de détails (alerte / financement) : ligne image + infos ---
+ * La ligne est passée en flex pour égaliser la hauteur des deux cartes.
+ * Pièges Materialize traités ici :
+ *  - .col.s12 a margin-left/right:auto -> en flex, ces marges auto poussent
+ *    les colonnes à droite; on les neutralise.
+ *  - deux colonnes à width:50% peuvent dépasser la ligne d'une fraction de
+ *    pixel (arrondi) et se retrouver empilées; on utilise flex-basis:50%
+ *    avec shrink pour garantir le côte à côte dès 601px.
+ *  - pas de height/min-height:100% sur les cartes (parents en hauteur auto,
+ *    les pourcentages s'effondrent) : flex:1 dans la colonne suffit.
  */
 .details-content-section>.row:first-child {
     display: flex;
     flex-wrap: wrap;
-    /* Assure le passage à la ligne sur les petits écrans */
+    align-items: stretch;
 }
 
-/*
- * 2. Forcer la carte de l'image à occuper toute la hauteur de sa colonne
- * On la transforme aussi en conteneur flex pour contrôler son contenu.
- */
-/* Detail page: use natural sizing and flex to align content */
-.detail-main-image .card,
-.card-main-details .card-panel {
+.details-content-section>.row:first-child>.col {
+    margin-left: 0;
+    margin-right: 0;
     display: flex;
     flex-direction: column;
-    /* Aligne les enfants (image, actions) verticalement */
-    min-height: 100%;
+    min-width: 0;
 }
 
-/*
- * 3. Faire en sorte que le conteneur de l'image grandisse
- * pour occuper tout l'espace vertical disponible dans la carte.
- */
-.detail-main-image .card .card-image {
-    flex-grow: 1;
+@media (min-width: 601px) {
+    .details-content-section>.row:first-child>.col.m6 {
+        width: auto;
+        /* base volontairement < 50% : à 50% exactement, l'arrondi sous-pixel
+           fait replier la 2e colonne; flex-grow répartit ensuite en 50/50. */
+        flex: 1 1 40%;
+    }
 }
 
-/*
- * 4. Ajuster l'image elle-même pour qu'elle remplisse son conteneur
- * sans être déformée.
- */
-.detail-main-image .card .card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    /* Redimensionne l'image pour remplir le conteneur en conservant son ratio, en la rognant si nécessaire. */
+/* Les cartes remplissent leur colonne -> hauteurs égales */
+.detail-main-image .card,
+.details-content-section>.row:first-child>.col>.card-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    margin-bottom: 0;
 }
 
 .loader {
@@ -218,28 +220,12 @@
     height: 200px;
 }
 
-
-/* Conteneur principal en Flex pour égaliser les hauteurs */
-.details-content-section>.row:first-child {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-}
-
-/* Colonne image et infos même hauteur */
-.detail-main-image,
-.card-main-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-main-image .card,
-.card-main-details .card-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-    height: 100%;
+/* Le helper invisible de Materialize pour l'auto-dimensionnement des
+   textareas (.hiddendiv, ajouté au body) peut être plus large que l'écran
+   et créer un défilement horizontal sur mobile. */
+.hiddendiv {
+    max-width: 100%;
+    left: 0;
 }
 
 /* Detail image container adjustments */
@@ -249,6 +235,8 @@
     position: relative;
     background-color: #f5f5f5;
     overflow: hidden;
+    flex-grow: 1;
+    /* remplit la hauteur restante quand la colonne infos est plus haute */
 }
 
 .detail-main-image .card .card-image img {
@@ -300,7 +288,9 @@
     margin: auto;
 }
 
-@media (max-width: 992px) {
+/* En dessous du breakpoint "m" de Materialize, les colonnes s'empilent
+   (aligné sur les classes s12/m6 du template : côte à côte dès 601px). */
+@media (max-width: 600px) {
     .details-content-section>.row:first-child {
         flex-direction: column;
     }
@@ -3508,7 +3498,10 @@ body:has(.update-profile-page) .main-wrapper > main {
     padding: 16px 20px;
 }
 
-@media (min-width: 600px) {
+/* 2 colonnes seulement quand la colonne parente est assez large : entre
+   601 et 992px, la grille vit dans une demi-colonne (~300px) et 2 colonnes
+   coupent les mots en plein milieu. */
+@media (min-width: 993px) {
     .details-grid {
         grid-template-columns: repeat(2, 1fr);
     }
