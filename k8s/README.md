@@ -14,6 +14,7 @@ l'image, pas-à-pas complet, opérations courantes) est dans
 | `postgres.yaml` | PostgreSQL (StatefulSet + PVC) — ou base managée |
 | `redis.yaml` | Redis (broker Celery + cache/rate limiting) |
 | `media-pvc.yaml` | Volume partagé des fichiers uploadés (RWX) |
+| `media-server.yaml` | nginx servant `/media/` (docs d'identité bloqués en 403) |
 | `web.yaml` | Django/gunicorn (2 répliques, probes `/healthz/`) |
 | `celery-worker.yaml` | Worker emails asynchrones |
 | `celery-beat.yaml` | Tâches planifiées (1 réplique obligatoire) |
