@@ -13,7 +13,6 @@ urlpatterns = [
     path('edit-loss-alert/<uuid:public_id>/', views.edit_loss_alert, name='edit_loss_alert'),
     path('delete-loss-alert/<uuid:public_id>/', views.delete_loss_alert, name='delete_loss_alert'),
     path('contact/', views.contact, name='contact'),
-    path('contact-2/', views.messageContact, name='contact-2'),
     path('loss-alert-details/<int:pk>/', views.loss_alert_detail, name='loss_alert_detail'),
     path('loss-alert-details/<uuid:public_id>/', views.loss_alert_detail, name='loss_alert_detail_public'),
     path('funding-request-details/<int:pk>/', views.funding_request_detail, name='funding_request_details'),
@@ -27,35 +26,16 @@ urlpatterns = [
     path('policy-privacy/', views.policy_privacy, name='policy_privacy'),
     path('about-us', views.about, name='about_us'),
     path('api/', include('page.api_urls')),
-<<<<<<< HEAD
-    path('funding/<int:pk>/paycard/', views.paycard_funding, name='paycard_funding'),
-    path('funding/<uuid:public_id>/paycard/', views.paycard_funding, name='paycard_funding_public'),
-    path('paycard_funding_payment/<int:funding_id>/paycard/', views.start_paycard_funding_payment, name='funding_paycard_payment'),
-    path('paycard_funding_payment/<uuid:funding_public_id>/paycard/', views.start_paycard_funding_payment, name='funding_paycard_payment_public'),
-    path('paycard/callback/<int:payment_id>/<str:type>/', views.paycard_payment_callback, name='paycard_payment_callback'),
-    path('paycard/callback/<uuid:payment_public_id>/<str:type>/', views.paycard_payment_callback, name='paycard_payment_callback_public'),
-    #path('comment/<str:model_name>/<int:object_id>/add/', add_comment, name='add_comment'),
-=======
     path('funding/<int:pk>/djomy/', views.djomy_funding, name='djomy_funding'),
     path('funding/<uuid:public_id>/djomy/', views.djomy_funding, name='djomy_funding_public'),
     path('djomy_funding_payment/<int:funding_id>/djomy/', views.start_djomy_funding_payment, name='funding_djomy_payment'),
     path('djomy_funding_payment/<uuid:funding_public_id>/djomy/', views.start_djomy_funding_payment, name='funding_djomy_payment_public'),
     path('djomy/callback/<int:payment_id>/<str:type>/', views.djomy_payment_callback, name='djomy_payment_callback'),
     path('djomy/callback/<uuid:payment_public_id>/<str:type>/', views.djomy_payment_callback, name='djomy_payment_callback_public'),
->>>>>>> chore/security-design-hardening
     path('comment/add/<str:model_name>/<int:object_id>/', views.add_comment, name='add_comment'),
-    path('comment/add/<str:model_name>/<uuid:payment_public_id>/', views.add_comment, name='add_comment'),
     path('comment/edit/<int:comment_id>/', views.edit_comment, name='edit_comment'),
-    path('comment/edit/<uuid:payment_public_id>/', views.edit_comment, name='edit_comment'),
     path('comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
-    path('comment/delete/<uuid:payment_public_id>/', views.delete_comment, name='delete_comment'),
     path('comment/report/<int:comment_id>/', views.report_comment, name='report_comment'),
-    path('comment/report/<uuid:payment_public_id>/', views.report_comment, name='report_comment'),
-
-    # Aliases to match JS endpoints used by static/js/comments.js
-    path('comments/<int:comment_id>/edit/', views.edit_comment, name='js_edit_comment'),
-    path('comments/<int:comment_id>/delete/', views.delete_comment, name='js_delete_comment'),
-    path('comments/<int:comment_id>/report/', views.report_comment, name='js_report_comment'),
 
     # Aliases to match JS endpoints used by static/js/comments.js
     path('comments/<int:comment_id>/edit/', views.edit_comment, name='js_edit_comment'),

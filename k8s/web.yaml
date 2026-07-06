@@ -1,0 +1,92 @@
+# Serveur web Django (gunicorn). Whitenoise sert les fichiers statiques
+# directement depuis le conteneur: pas besoin de nginx sidecar.
+apiVersion: v1
+kind: Service
+metadata:
+  name: sosguinee-web
+  namespace: sosguinee
+spec:
+  selector:
+    app: sosguinee-web
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sosguinee-web
+  namespace: sosguinee
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sosguinee-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: sosguinee-web
+    spec:
+      containers:
+        - name: web
+          # ⚠️ Remplacez par votre image (registre + tag versionné, pas latest)
+          image: REGISTRY/sosguinee:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              python manage.py collectstatic --noinput &&
+              exec gunicorn sosguinee.wsgi:application
+              --bind 0.0.0.0:8000
+              --workers 3
+              --timeout 60
+              --access-logfile -
+              --error-logfile -
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: sosguinee-config
+            - secretRef:
+                name: sosguinee-secrets
+          volumeMounts:
+            - name: media
+              mountPath: /app/mediafiles
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+              httpHeaders:
+                # ⚠️ Doit figurer dans ALLOWED_HOSTS
+                - name: Host
+                  value: sosguinee.example.com
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+              httpHeaders:
+                - name: Host
+                  value: sosguinee.example.com
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: sosguinee-media

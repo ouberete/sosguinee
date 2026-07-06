@@ -1,32 +1,11 @@
-<<<<<<< HEAD
-
-/* Styles pour la section Hero */
-.hero-section {
-    min-height: 600px; /* Hauteur minimale pour le parallax */
-=======
 /* Styles pour la section Hero */
 .hero-section {
     min-height: 600px;
     /* Hauteur minimale pour le parallax */
->>>>>>> chore/security-design-hardening
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-<<<<<<< HEAD
-    overflow: hidden; /* Assure que le contenu ne déborde pas */
-}
-
-.hero-content {
-    z-index: 10; /* Assure que le texte est au-dessus de l'image parallax */
-    position: relative;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.4); /* Overlay sombre pour la lisibilité du texte */
-    border-radius: 8px;
-}
-
-.hero-content h1,.hero-content h5 {
-=======
     overflow: hidden;
     /* Assure que le contenu ne déborde pas */
 }
@@ -43,7 +22,6 @@
 
 .hero-content h1,
 .hero-content h5 {
->>>>>>> chore/security-design-hardening
     margin-top: 0;
     margin-bottom: 15px;
 }
@@ -63,12 +41,8 @@
 
 /* Hero Section for List Pages */
 .list-hero-section {
-<<<<<<< HEAD
-    min-height: 400px; /* Height for list page hero */
-=======
     min-height: 400px;
     /* Height for list page hero */
->>>>>>> chore/security-design-hardening
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,15 +53,6 @@
 .list-hero-content {
     z-index: 10;
     position: relative;
-<<<<<<< HEAD
-    padding: 25px 35px; /* Augmenter le padding pour un fond plus large */
-    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Ombre pour la profondeur */
-}
-
-.list-hero-content h1, .list-hero-content h5 {
-=======
     padding: 25px 35px;
     /* Augmenter le padding pour un fond plus large */
     background: rgba(0, 0, 0, 0.5);
@@ -99,7 +64,6 @@
 
 .list-hero-content h1,
 .list-hero-content h5 {
->>>>>>> chore/security-design-hardening
     margin-top: 0;
     margin-bottom: 15px;
 }
@@ -113,15 +77,10 @@
 /* Assurez-vous que le texte a une couleur claire pour contraster avec le fond sombre */
 .list-hero-content h1,
 .list-hero-content h5 {
-<<<<<<< HEAD
-    color: white; /* Texte blanc */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Ombre pour le texte */
-=======
     color: white;
     /* Texte blanc */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     /* Ombre pour le texte */
->>>>>>> chore/security-design-hardening
 }
 
 
@@ -136,11 +95,7 @@
 }
 
 .card:focus {
-<<<<<<< HEAD
-    outline: 3px solid rgba(33,150,243,0.35);
-=======
     outline: 3px solid rgba(33, 150, 243, 0.35);
->>>>>>> chore/security-design-hardening
     outline-offset: 2px;
 }
 
@@ -148,12 +103,8 @@
 .card .card-image {
     position: relative;
     height: 0;
-<<<<<<< HEAD
-    padding-bottom: 56.25%; /* 16:9 aspect by default */
-=======
     padding-bottom: 56.25%;
     /* 16:9 aspect by default */
->>>>>>> chore/security-design-hardening
     overflow: hidden;
     background-color: #f5f5f5;
 }
@@ -173,10 +124,6 @@
     transform: scale(1.03);
 }
 
-<<<<<<< HEAD
-.card .card-content { flex: 1; padding: 16px; }
-.card .card-action { margin-top: auto; padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); }
-=======
 .card .card-content {
     flex: 1;
     padding: 16px;
@@ -187,17 +134,12 @@
     padding: 12px 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
->>>>>>> chore/security-design-hardening
 
 
 /* Hero Section for Detail Page */
 .detail-hero-section {
-<<<<<<< HEAD
-    min-height: 300px; /* Smaller height for detail page hero */
-=======
     min-height: 300px;
     /* Smaller height for detail page hero */
->>>>>>> chore/security-design-hardening
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,19 +150,6 @@
 .detail-hero-content {
     z-index: 10;
     position: relative;
-<<<<<<< HEAD
-    padding: 25px 35px; /* Augmenter le padding */
-    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Ombre pour la profondeur */
-}
-
-.detail-hero-content h1, .detail-hero-content h5 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: white; /* Texte blanc */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Ombre pour le texte */
-=======
     padding: 25px 35px;
     /* Augmenter le padding */
     background: rgba(0, 0, 0, 0.5);
@@ -238,23 +167,16 @@
     /* Texte blanc */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     /* Ombre pour le texte */
->>>>>>> chore/security-design-hardening
 }
 
 /*
  * 1. Transformer la ligne principale en conteneur Flexbox
  * Ceci force les colonnes enfants (gauche et droite) à avoir la même hauteur.
  */
-<<<<<<< HEAD
-.section > .row:first-child {
-    display: flex;
-    flex-wrap: wrap; /* Assure le passage à la ligne sur les petits écrans */
-=======
 .details-content-section>.row:first-child {
     display: flex;
     flex-wrap: wrap;
     /* Assure le passage à la ligne sur les petits écrans */
->>>>>>> chore/security-design-hardening
 }
 
 /*
@@ -262,17 +184,11 @@
  * On la transforme aussi en conteneur flex pour contrôler son contenu.
  */
 /* Detail page: use natural sizing and flex to align content */
-<<<<<<< HEAD
-.detail-main-image .card, .card-main-details .card-panel {
-    display: flex;
-    flex-direction: column; /* Aligne les enfants (image, actions) verticalement */
-=======
 .detail-main-image .card,
 .card-main-details .card-panel {
     display: flex;
     flex-direction: column;
     /* Aligne les enfants (image, actions) verticalement */
->>>>>>> chore/security-design-hardening
     min-height: 100%;
 }
 
@@ -291,21 +207,6 @@
 .detail-main-image .card .card-image img {
     width: 100%;
     height: 100%;
-<<<<<<< HEAD
-    object-fit: contain; /* Redimensionne l'image pour remplir le conteneur en conservant son ratio, en la rognant si nécessaire. */
-}
-
- .loader {
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     height: 200px;
- }
-
-
-/* Conteneur principal en Flex pour égaliser les hauteurs */
-.section > .row:first-child {
-=======
     object-fit: contain;
     /* Redimensionne l'image pour remplir le conteneur en conservant son ratio, en la rognant si nécessaire. */
 }
@@ -320,7 +221,6 @@
 
 /* Conteneur principal en Flex pour égaliser les hauteurs */
 .details-content-section>.row:first-child {
->>>>>>> chore/security-design-hardening
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
@@ -344,12 +244,8 @@
 
 /* Detail image container adjustments */
 .detail-main-image .card .card-image {
-<<<<<<< HEAD
-    padding-bottom: 62%; /* taller aspect for detail images */
-=======
     padding-bottom: 62%;
     /* taller aspect for detail images */
->>>>>>> chore/security-design-hardening
     position: relative;
     background-color: #f5f5f5;
     overflow: hidden;
@@ -377,15 +273,12 @@
     border-radius: 4px;
     font-size: 0.85rem;
     font-weight: 600;
-<<<<<<< HEAD
-=======
     display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
     min-height: 28px;
     white-space: nowrap;
->>>>>>> chore/security-design-hardening
 }
 
 /* Boutons en bas du card */
@@ -408,11 +301,7 @@
 }
 
 @media (max-width: 992px) {
-<<<<<<< HEAD
-    .section > .row:first-child {
-=======
     .details-content-section>.row:first-child {
->>>>>>> chore/security-design-hardening
         flex-direction: column;
     }
 }
@@ -421,20 +310,11 @@
     float: right;
     position: relative;
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> chore/security-design-hardening
 .comment-actions .dropdown-content {
     min-width: 150px;
 }
 
-<<<<<<< HEAD
-
-
-
-
-=======
 /* ============================================
    DESIGN PROFESSIONNEL OPTIMISÉ
    ============================================ */
@@ -3414,4 +3294,3 @@ body:has(.update-profile-page) .main-wrapper > main {
         min-height: 82px;
     }
 }
->>>>>>> chore/security-design-hardening

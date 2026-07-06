@@ -5,6 +5,7 @@
 
 {% block title %}{% trans "Inscription" %} - SOS Guinée{% endblock %}
 {% block extracss %}
+<meta name="robots" content="noindex">
 <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
@@ -62,29 +63,9 @@
               {% endif %}
             {% endfor %}
 
-<<<<<<< HEAD
-              <p class="signup-password-toggle">
-                <label>
-                  <input type="checkbox" id="show-password" />
-                  <span>{% trans "Afficher le mot de passe" %}</span>
-                </label>
-              </p>
-<<<<<<< HEAD
-              <div class="center" style="margin-top:2rem;">
-                <button type="submit" class="btn waves-effect waves-light blue" id="signup-btn">S'inscrire</button>
-=======
-
-              <div class="center form-submit-row">
-                <button type="submit" class="btn waves-effect waves-light blue" id="signup-btn">{% trans "S'inscrire" %}</button>
->>>>>>> chore/security-design-hardening
-                <button class="btn waves-effect waves-light blue hide" id="loading-btn" type="button" disabled>
-                  <i class="material-icons left">hourglass_empty</i>{% trans "Inscription..." %}
-                </button>
-=======
             {% if turnstile_site_key %}
               <div class="input-field center-align" style="margin-top: 30px;">
                 <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
->>>>>>> dev
               </div>
             {% endif %}
 
@@ -128,18 +109,8 @@
             </div>
           </div>
 
-<<<<<<< HEAD
-            <div class="card-action center">
-<<<<<<< HEAD
-              <p>Déjà membre ? <a href="{% url 'login' %}">Se connecter</a></p>
-=======
-              <p>{% trans "Déjà membre ?" %} <a href="{% url 'login' %}">{% trans "Se connecter" %}</a></p>
->>>>>>> chore/security-design-hardening
-            </div>
-=======
           <div style="margin-top: 30px;">
             <p style="color: #555;">{% trans "Déjà membre ?" %} <a href="{% url 'login' %}" style="font-weight: bold; color: #f57c00;">{% trans "Se connecter" %}</a></p>
->>>>>>> dev
           </div>
         </div>
       </div>

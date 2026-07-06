@@ -185,28 +185,6 @@ class RegisterForm(UserCreationForm):
         return user
 
     def _send_activation_email(self, user):
-<<<<<<< HEAD
-        
-        if settings.DEBUG:
-            # En local : utilise ton adresse de dev
-            domain = "127.0.0.1:7400"
-            protocol = "http"
-        else:
-            # En production : récupère le domaine configuré
-            domain = "18.170.114.4"
-            protocol = "http"
-            
-        token = default_token_generator.make_token(user)
-        context = {
-            'user': user,
-            'domain': domain,
-            'uid': user.pk,
-            'protocol': protocol,
-            'token': token,
-        }
-        subject = "Activation de votre compte SOS Guinée"
-=======
->>>>>>> chore/security-design-hardening
         try:
             send_or_queue_activation_email(user, reuse_unsent=True)
         except Exception as e:

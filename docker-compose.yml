@@ -1,14 +1,11 @@
 version: '3.8'
 
 services:
-<<<<<<< HEAD
-=======
   redis:
     image: redis:7-alpine
     container_name: sosguinee_redis
     restart: always
 
->>>>>>> chore/security-design-hardening
   nginx:
     image: nginx:latest
     container_name: sosguinee_nginx
@@ -26,15 +23,9 @@ services:
     image: postgres:15
     container_name: sosguinee_db
     environment:
-<<<<<<< HEAD
-      - POSTGRES_DB=sosguinee
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=SEREma@2025
-=======
       - POSTGRES_DB=${POSTGRES_DB:-sosguinee}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
->>>>>>> chore/security-design-hardening
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
@@ -42,11 +33,8 @@ services:
   web:
     build: .
     container_name: sosguinee_web
-<<<<<<< HEAD
-=======
     env_file:
       - .env
->>>>>>> chore/security-design-hardening
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
@@ -54,18 +42,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-<<<<<<< HEAD
-      - DEBUG=0
-      - USE_POSTGRES=True
-      - POSTGRES_NAME=sosguinee
-      - POSTGRES_DB=sosguinee
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=SEREma@2025
-      - POSTGRES_PORT=5432
-      - ALLOWED_HOSTS=127.0.0.1,localhost,18.170.114.4
-    depends_on:
-      - db
-=======
       - DJANGO_SETTINGS_MODULE=sosguinee.settings_prod
       - ENVIRONMENT=production
       - DEBUG=0
@@ -138,7 +114,6 @@ services:
     depends_on:
       - db
       - redis
->>>>>>> chore/security-design-hardening
     restart: always
 
 volumes:

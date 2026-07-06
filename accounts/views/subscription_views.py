@@ -18,52 +18,15 @@ def subscription_plans(request):
 @login_required
 def subscribe(request):
     if request.method == 'POST':
-        plan_id = request.POST.get('plan_id')
-        plan_public_id = request.POST.get('plan_public_id')
-        
-        try:
-            plan = SubscriptionPlan.objects.get(public_id=plan_public_id) if plan_public_id else SubscriptionPlan.objects.get(id=plan_id)
-        except ObjectDoesNotExist:
-            return JsonResponse({'error': 'Plan non trouvÃ©'}, status=404)
-        
-        # CrÃ©er un paiement
-        payment = SubscriptionPayment.objects.create(
-            user=request.user,
-            plan=plan,
-            amount=plan.price,
-            transaction_id=str(uuid.uuid4())
+        # Désactivé tant qu'un paiement réel (Djomy) n'est pas branché sur ce
+        # flux: l'ancienne version marquait le paiement 'completed' sans
+        # aucune transaction, ce qui revenait à offrir les abonnements.
+        return JsonResponse(
+            {'error': "La souscription en ligne n'est pas encore disponible. Veuillez nous contacter."},
+            status=503,
         )
-        
-        # Ici, intÃ©grer la logique de paiement avec PayCard
-        # Pour l'exemple, on considÃ¨re le paiement comme rÃ©ussi
-        payment.status = 'completed'
-        payment.save()
-        
-        with transaction.atomic():
-            # Mettre Ã  jour ou crÃ©er l'abonnement
-            subscription, created = UserSubscription.objects.update_or_create(
-                user=request.user,
-                defaults={
-                    'plan': plan,
-                    'start_date': timezone.now(),
-                    'is_active': True,
-                    'reminder_sent': False
-                }
-            )
-            
-            try:
-                # Envoyer un email de confirmation
-                context = {
-                    'plan_name': plan.name,
-                    'end_date': subscription.end_date,
-                }
-                EmailService.send_subscription_notification(request.user, context)
-            except Exception as e:
-                print(f"Erreur lors de l'envoi de l'email: {e}")
-        
-        return JsonResponse({'success': True})
-    
-    return JsonResponse({'error': 'MÃ©thode non autorisÃ©e'}, status=405)
+
+    return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
 @login_required
 def cancel_subscription(request):
@@ -73,12 +36,12 @@ def cancel_subscription(request):
             subscription.is_active = False
             subscription.save()
             
-            messages.success(request, "Votre abonnement a Ã©tÃ© annulÃ© avec succÃ¨s.")
+            messages.success(request, "Votre abonnement a été annulé avec succès.")
             return JsonResponse({'success': True})
         except ObjectDoesNotExist:
             return JsonResponse({'error': 'Aucun abonnement actif'}, status=404)
     
-    return JsonResponse({'error': 'MÃ©thode non autorisÃ©e'}, status=405)
+    return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
 
 @login_required
 def subscription_status(request):

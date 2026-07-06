@@ -95,11 +95,7 @@
 }
 
 .card:focus {
-<<<<<<< HEAD
-    outline: 3px solid rgba(33,150,243,0.35);
-=======
     outline: 3px solid rgba(33, 150, 243, 0.35);
->>>>>>> chore/security-design-hardening
     outline-offset: 2px;
 }
 
@@ -107,12 +103,8 @@
 .card .card-image {
     position: relative;
     height: 0;
-<<<<<<< HEAD
-    padding-bottom: 56.25%; /* 16:9 aspect by default */
-=======
     padding-bottom: 56.25%;
     /* 16:9 aspect by default */
->>>>>>> chore/security-design-hardening
     overflow: hidden;
     background-color: #f5f5f5;
 }
@@ -126,8 +118,6 @@
     object-fit: cover;
     display: block;
     transition: transform .35s ease;
-<<<<<<< HEAD
-=======
 }
 
 .card:hover .card-image img {
@@ -143,15 +133,7 @@
     margin-top: auto;
     padding: 12px 16px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
->>>>>>> chore/security-design-hardening
 }
-
-.card:hover .card-image img {
-    transform: scale(1.03);
-}
-
-.card .card-content { flex: 1; padding: 16px; }
-.card .card-action { margin-top: auto; padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); }
 
 
 /* Hero Section for Detail Page */
@@ -187,52 +169,48 @@
     /* Ombre pour le texte */
 }
 
-/*
- * 1. Transformer la ligne principale en conteneur Flexbox
- * Ceci force les colonnes enfants (gauche et droite) à avoir la même hauteur.
+/* --- Pages de détails (alerte / financement) : ligne image + infos ---
+ * La ligne est passée en flex pour égaliser la hauteur des deux cartes.
+ * Pièges Materialize traités ici :
+ *  - .col.s12 a margin-left/right:auto -> en flex, ces marges auto poussent
+ *    les colonnes à droite; on les neutralise.
+ *  - deux colonnes à width:50% peuvent dépasser la ligne d'une fraction de
+ *    pixel (arrondi) et se retrouver empilées; on utilise flex-basis:50%
+ *    avec shrink pour garantir le côte à côte dès 601px.
+ *  - pas de height/min-height:100% sur les cartes (parents en hauteur auto,
+ *    les pourcentages s'effondrent) : flex:1 dans la colonne suffit.
  */
 .details-content-section>.row:first-child {
     display: flex;
     flex-wrap: wrap;
-    /* Assure le passage à la ligne sur les petits écrans */
+    align-items: stretch;
 }
 
-/*
- * 2. Forcer la carte de l'image à occuper toute la hauteur de sa colonne
- * On la transforme aussi en conteneur flex pour contrôler son contenu.
- */
-/* Detail page: use natural sizing and flex to align content */
-<<<<<<< HEAD
-.detail-main-image .card, .card-main-details .card-panel {
-    display: flex;
-    flex-direction: column; /* Aligne les enfants (image, actions) verticalement */
-=======
-.detail-main-image .card,
-.card-main-details .card-panel {
+.details-content-section>.row:first-child>.col {
+    margin-left: 0;
+    margin-right: 0;
     display: flex;
     flex-direction: column;
-    /* Aligne les enfants (image, actions) verticalement */
->>>>>>> chore/security-design-hardening
-    min-height: 100%;
+    min-width: 0;
 }
 
-/*
- * 3. Faire en sorte que le conteneur de l'image grandisse
- * pour occuper tout l'espace vertical disponible dans la carte.
- */
-.detail-main-image .card .card-image {
-    flex-grow: 1;
+@media (min-width: 601px) {
+    .details-content-section>.row:first-child>.col.m6 {
+        width: auto;
+        /* base volontairement < 50% : à 50% exactement, l'arrondi sous-pixel
+           fait replier la 2e colonne; flex-grow répartit ensuite en 50/50. */
+        flex: 1 1 40%;
+    }
 }
 
-/*
- * 4. Ajuster l'image elle-même pour qu'elle remplisse son conteneur
- * sans être déformée.
- */
-.detail-main-image .card .card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    /* Redimensionne l'image pour remplir le conteneur en conservant son ratio, en la rognant si nécessaire. */
+/* Les cartes remplissent leur colonne -> hauteurs égales */
+.detail-main-image .card,
+.details-content-section>.row:first-child>.col>.card-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    margin-bottom: 0;
 }
 
 .loader {
@@ -242,41 +220,23 @@
     height: 200px;
 }
 
-
-/* Conteneur principal en Flex pour égaliser les hauteurs */
-.details-content-section>.row:first-child {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-}
-
-/* Colonne image et infos même hauteur */
-.detail-main-image,
-.card-main-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-main-image .card,
-.card-main-details .card-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-    height: 100%;
+/* Le helper invisible de Materialize pour l'auto-dimensionnement des
+   textareas (.hiddendiv, ajouté au body) peut être plus large que l'écran
+   et créer un défilement horizontal sur mobile. */
+.hiddendiv {
+    max-width: 100%;
+    left: 0;
 }
 
 /* Detail image container adjustments */
 .detail-main-image .card .card-image {
-<<<<<<< HEAD
-    padding-bottom: 62%; /* taller aspect for detail images */
-=======
     padding-bottom: 62%;
     /* taller aspect for detail images */
->>>>>>> chore/security-design-hardening
     position: relative;
     background-color: #f5f5f5;
     overflow: hidden;
+    flex-grow: 1;
+    /* remplit la hauteur restante quand la colonne infos est plus haute */
 }
 
 .detail-main-image .card .card-image img {
@@ -301,15 +261,12 @@
     border-radius: 4px;
     font-size: 0.85rem;
     font-weight: 600;
-<<<<<<< HEAD
-=======
     display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
     min-height: 28px;
     white-space: nowrap;
->>>>>>> chore/security-design-hardening
 }
 
 /* Boutons en bas du card */
@@ -331,7 +288,9 @@
     margin: auto;
 }
 
-@media (max-width: 992px) {
+/* En dessous du breakpoint "m" de Materialize, les colonnes s'empilent
+   (aligné sur les classes s12/m6 du template : côte à côte dès 601px). */
+@media (max-width: 600px) {
     .details-content-section>.row:first-child {
         flex-direction: column;
     }
@@ -742,7 +701,8 @@
 /* — Stats grid (bottom) — */
 .ws-card-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* S'adapte au nombre de stats affichées (2 colonnes actuellement) */
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 0;
     border-top: 1px solid #e5e7eb;
     margin-top: auto;
@@ -752,10 +712,22 @@
 .ws-card-stat {
     text-align: center;
     padding: 0 8px;
+    min-width: 0; /* permet aux colonnes de la grille de rétrécir */
 }
 
 .ws-card-stat:not(:last-child) {
     border-right: 1px solid #e5e7eb;
+}
+
+/* Objectif ancré à gauche, montant payé (Collecté) ancré à droite */
+.ws-card-stats .ws-card-stat:first-child {
+    text-align: left;
+    padding-left: 0;
+}
+
+.ws-card-stats .ws-card-stat:last-child {
+    text-align: right;
+    padding-right: 0;
 }
 
 .ws-card-stat-value {
@@ -763,9 +735,18 @@
     font-weight: 700;
     color: #111827;
     margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Pas de troncature: les montants doivent rester lisibles en entier.
+       Le format compact (1,5 Md GNF) limite la longueur; en dernier
+       recours, on autorise le passage à la ligne. */
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+@media (max-width: 600px) {
+    .ws-card-stat-value {
+        font-size: 0.9rem;
+    }
 }
 
 .ws-card-stat-label {
@@ -3517,7 +3498,10 @@ body:has(.update-profile-page) .main-wrapper > main {
     padding: 16px 20px;
 }
 
-@media (min-width: 600px) {
+/* 2 colonnes seulement quand la colonne parente est assez large : entre
+   601 et 992px, la grille vit dans une demi-colonne (~300px) et 2 colonnes
+   coupent les mots en plein milieu. */
+@media (min-width: 993px) {
     .details-grid {
         grid-template-columns: repeat(2, 1fr);
     }

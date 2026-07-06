@@ -26,16 +26,12 @@ th {
 }
 
 .object-tools {
-<<<<<<< HEAD
-    float: left;
-=======
     text-align: left;
 }
 
 .object-tools li + li {
     margin-right: 15px;
     margin-left: 0;
->>>>>>> chore/security-design-hardening
 }
 
 thead th:first-child,
@@ -116,11 +112,7 @@ thead th.sorted .text {
     border-left: none;
 }
 
-<<<<<<< HEAD
-.paginator .end {
-=======
 .paginator ul {
->>>>>>> chore/security-design-hardening
     margin-left: 6px;
     margin-right: 0;
 }
@@ -250,24 +242,10 @@ fieldset .fieldBox {
     background-position: 0 -168px;
 }
 
-<<<<<<< HEAD
-.selector-chooseall {
-    background: url(../img/selector-icons.svg) right -128px no-repeat;
-}
-
-=======
->>>>>>> chore/security-design-hardening
 :enabled.selector-chooseall:focus, :enabled.selector-chooseall:hover {
     background-position: 100% -144px;
 }
 
-<<<<<<< HEAD
-.selector-clearall {
-    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
-}
-
-=======
->>>>>>> chore/security-design-hardening
 :enabled.selector-clearall:focus, :enabled.selector-clearall:hover {
     background-position: 0 -176px;
 }
@@ -310,11 +288,8 @@ form .form-row p.datetime {
 .selector .selector-chooser {
     margin: 0;
 }
-<<<<<<< HEAD
-=======
 
 ul.messagelist li {
     padding: 10px 65px 10px 10px;
     background-position-x: calc(100% - 40px);
 }
->>>>>>> chore/security-design-hardening

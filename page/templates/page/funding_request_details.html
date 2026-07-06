@@ -22,13 +22,8 @@
     <div class="container center-align white-text hero-content">
       <div class="row">
         <div class="col s12">
-<<<<<<< HEAD
-          <h3 class="header light text-shadow">Détails de la demande</h3>
-          <h5 class="light text-shadow truncate-3">{{ funding_request.title }}</h5>
-=======
           <h1 class="header light text-shadow">Détails de la demande</h1>
           <h5 class="light text-shadow truncate-3">{{ funding_request.title|default:funding_request.beneficiary_name }}</h5>
->>>>>>> chore/security-design-hardening
         </div>
       </div>
     </div>
@@ -39,11 +34,7 @@
       <div class="col s12 m6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-<<<<<<< HEAD
-            <span class="yellow category">{{ funding_request.funding_request_status }}</span>
-=======
             <span class="yellow category">{{ funding_request.funding_request_status_name }}</span>
->>>>>>> chore/security-design-hardening
             <img src="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
           </div>
@@ -178,21 +169,6 @@
             </div>
           </div>
           <div class="card-action center-align">
-<<<<<<< HEAD
-            <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2" aria-label="Retour aux demandes">
-              <i class="material-icons left">arrow_back</i>
-            </a>
-            {% if funding_request.phone %}
-            <a href="tel:{{ funding_request.phone }}" class="btn waves-effect waves-light red darken-2" aria-label="Contacter par téléphone">
-              <i class="material-icons left">call</i>
-            </a>
-            {% endif %}
-            {% if funding_request.funding_request_status.name == "En cours" %}
-            <a href="{% url 'paycard_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
-              <i class="material-icons left">payments</i> Financer
-            </a>
-            {% endif %}
-=======
             <div class="action-buttons-wrapper">
               <a href="{% url 'funding_request_list' %}" class="btn-flat waves-effect waves-light orange-text text-darken-2" aria-label="Retour aux demandes">
                 <i class="material-icons left">arrow_back</i> Retour
@@ -216,7 +192,6 @@
               </form>
               {% endif %}
             </div>
->>>>>>> chore/security-design-hardening
           </div>
         </div>
       </div>

@@ -149,7 +149,7 @@
               </div>
             </div>
 
-            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" onclick="this.innerHTML='<i class=\'material-icons left\'>autorenew</i> Redirection...'; this.classList.add('disabled'); this.form.submit();">
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment">
               <i class="material-icons left">favorite</i>
               {% trans "Faire un don sécurisé" %}
             </button>
@@ -169,6 +169,19 @@
   document.addEventListener('DOMContentLoaded', function () {
     M.FormSelect.init(document.querySelectorAll('select'));
     M.updateTextFields();
+
+    // Anti double-soumission: on laisse le submit natif se faire (validation
+    // du navigateur incluse) et on se contente de verrouiller le bouton.
+    var paymentForm = document.querySelector('form.payment-form');
+    var submitBtn = document.getElementById('submit-payment');
+    if (paymentForm && submitBtn) {
+      paymentForm.addEventListener('submit', function () {
+        if (submitBtn.dataset.submitting === '1') return;
+        submitBtn.dataset.submitting = '1';
+        submitBtn.classList.add('disabled');
+        submitBtn.innerHTML = '<i class="material-icons left">autorenew</i> Redirection...';
+      });
+    }
   });
 </script>
 {% endblock %}

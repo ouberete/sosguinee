@@ -231,3 +231,51 @@ body{
   .ml-10 {
     margin-left: 10em;
   }
+/* Bouton de déconnexion (formulaire POST) aligné sur les liens de menu */
+.logout-form {
+  margin: 0;
+}
+
+.logout-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dropdown-content .logout-btn {
+  color: #26a69a;
+}
+
+.dropdown-content .logout-btn:hover,
+.sidenav .logout-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.sidenav .logout-btn {
+  padding: 0 32px;
+  line-height: 48px;
+  height: 48px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Bouton flottant "+" piloté entièrement en CSS (voir base.html) : l'animation
+   JS de Materialize 1.0 (anime.js) échouait ici en laissant les actions à
+   opacity:0 donc incliquables. Materialize révèle déjà la liste via
+   `.active ul { visibility: visible }`, mais garde chaque action à opacity:0
+   (normalement animée en JS). On révèle les actions au clic via .active, avec
+   une spécificité (0,3,2) supérieure à la règle de base de Materialize (0,2,2). */
+.fixed-action-btn ul a.btn-floating {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: none;
+}
+
+.fixed-action-btn.active ul a.btn-floating {
+    opacity: 1;
+}

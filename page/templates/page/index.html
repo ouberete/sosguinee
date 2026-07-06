@@ -105,26 +105,6 @@
   <div class="container page-width-wide">
     {% if loss_alerts and loss_alerts.count > 0 %}
     <h4 class="center-align light">{% trans "Dernières Alertes de Perte" %}</h4>
-<<<<<<< HEAD
-    <div class="row">
-      {% for alert in loss_alerts %}
-      <div class="col s12 m6 l4">
-        <article class="card hoverable alert-card" role="article" aria-labelledby="alert-title-{{ alert.id }}">
-          <div class="card-image">
-            <span class="yellow category">{{ alert.status_alert_name }}</span>
-            <img src="{% if alert.principal_image and alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ alert.name }}" class="materialboxed" loading="lazy" width="800" height="450">
-          </div>
-          <div class="card-content">
-            <h3 id="alert-title-{{ alert.id }}" class="card-title truncate">{{ alert.name }}</h3>
-            <p><strong>Type :</strong> {{ alert.type_alert_name }}</p>
-            <p><strong>Date :</strong> {{ alert.date_alert }}</p>
-            <p><strong>Heure :</strong> {{ alert.hour_alert }}</p>
-          </div>
-          <div class="card-action">
-            <a href="{% url 'loss_alert_detail_public' alert.public_id %}" class="btn-small red waves-effect waves-light" aria-label="Voir détails de {{ alert.name }}">{% trans "Voir Détails" %}</a>
-            <a href="#" class="btn-small blue right waves-effect waves-light" aria-label="Contacter pour {{ alert.name }}">{% trans "Contacter" %}</a>
-          </div>
-=======
     <div class="row funding-grid">
       {% for alert in loss_alerts %}
       <div class="col s12 m6 l4">
@@ -158,7 +138,6 @@
               <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
           </div>
->>>>>>> chore/security-design-hardening
         </article>
       </div>
       {% endfor %}
@@ -180,31 +159,6 @@
   <div class="container page-width-wide">
     {% if funding_requests and funding_requests.count > 0 %}
     <h4 class="center-align light">{% trans "Demandes de Financement Récentes" %}</h4>
-<<<<<<< HEAD
-    <div class="row">
-      {% for req in funding_requests %}
-      <div class="col s12 m6 l4">
-        <article class="card hoverable funding-card" role="article" aria-labelledby="fund-title-{{ req.id }}">
-          <div class="card-image">
-            <span class="yellow category">{{ req.funding_request_status }}</span>
-            <img src="{% if req.principal_image and req.principal_image %}{{ req.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ req.beneficiary_name }}" class="materialboxed" loading="lazy" width="800" height="450">
-          </div>
-          <div class="card-content">
-            <h3 id="fund-title-{{ req.id }}" class="card-title truncate">{{ req.title }}</h3>
-            <p><strong>{% trans "Bénéficiaire :" %}</strong> {{ req.beneficiary_name }}</p>
-            <p><strong>{% trans "Montant:" %}</strong> {{ req.funding_amount | format_fr}} GNF</p>
-            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ req.progress }}">
-              <div class="determinate" style="width: {{ req.progress }}%"></div>
-            </div>
-            <p class="sr-only">{{ req.progress }}% {% trans "collecté" %}</p>
-            <p>{{ req.progress }}% {% trans "collecté" %} - {{ req.days_remaining }} {% trans "jours restants" %}</p>
-          </div>
-          <div class="card-action">
-            <a href="{% url 'funding_request_details_public' req.public_id %}" class="blue-text text-darken-2" aria-label="Plus d'infos sur {{ req.title }}">{% trans "PLUS D'INFOS" %}</a>
-            <a href="#" class="right social-icon" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="right social-icon" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
-          </div>
-=======
     <div class="row funding-grid">
       {% for req in funding_requests %}
       <div class="col s12 m12 l4">
@@ -239,16 +193,12 @@
 
             <div class="ws-card-stats">
               <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.funding_amount | format_fr}} GNF</div>
+                <div class="ws-card-stat-value">{{ req.funding_amount|format_fr }} GNF</div>
                 <div class="ws-card-stat-label">{% trans "Objectif" %}</div>
               </div>
               <div class="ws-card-stat">
                 <div class="ws-card-stat-value">{{ req.amount_received|format_fr }} GNF</div>
                 <div class="ws-card-stat-label">{% trans "Collecté" %}</div>
-              </div>
-              <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.remaining_amount|format_fr }} GNF</div>
-                <div class="ws-card-stat-label">{% trans "Reste" %}</div>
               </div>
             </div>
 
@@ -265,7 +215,6 @@
               <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
           </div>
->>>>>>> chore/security-design-hardening
         </article>
       </div>
       {% endfor %}
@@ -290,11 +239,7 @@
     <div class="row valign-wrapper">
       <div class="col s12 m8">
         <h5 class="light">{% trans "Soutenez notre cause" %}</h5>
-<<<<<<< HEAD
-        <p class="flow-text">{% trans "Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée." %}</p>
-=======
         <p class="flow-text">{% trans "Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée." %}</p>
->>>>>>> chore/security-design-hardening
       </div>
       <div class="col s12 m4 right-align">
         <a href="{% url 'donation' %}" class="btn-large white blue-text text-darken-4 waves-effect waves-light">{% trans "Faire un don" %}</a>
@@ -303,7 +248,7 @@
   </div>
 </section>
 
-<div class="fixed-action-btn">
+<div class="fixed-action-btn no-autoinit">
   <a class="btn-floating btn-large red">
     <i class="large material-icons">add</i>
   </a>
@@ -314,7 +259,6 @@
 </div>
 
 {% block extrajs %}
-<script src="{% static 'js/index.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var elemsParallax = document.querySelectorAll('.parallax');

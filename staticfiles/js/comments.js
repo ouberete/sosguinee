@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fermer tous les dropdowns si on clique ailleurs
 document.addEventListener('DOMContentLoaded', function () {
-<<<<<<< HEAD
-=======
     function showToast(message, classes = '') {
         if (window.M && M.toast) {
             M.toast({ html: message, classes, displayLength: 3000 });
@@ -25,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
             alert(message);
         }
     }
->>>>>>> chore/security-design-hardening
     const commentForm = document.getElementById('comment-form');
     const commentsList = document.getElementById('comments-list');
 
@@ -43,14 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: data
             })
                 .then(res => res.json())
-<<<<<<< HEAD
-                .then(data => {
-                    if (data.success && data.comment_html) {
-                        commentsList.insertAdjacentHTML('afterbegin', data.comment_html);
-                        this.reset();
-                    } else {
-                        alert('Erreur: ' + (data.errors || 'Inconnue'));
-=======
                     .then(data => {
                         if (data.success && data.comment_html) {
                         if (commentsList) {
@@ -68,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         showToast('Commentaire ajouté', 'green');
                     } else {
                         showToast('Erreur: ' + (data.errors || 'Inconnue'), 'red');
->>>>>>> chore/security-design-hardening
                     }
                 });
         });
@@ -83,12 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Delegation pour actions des commentaires
-<<<<<<< HEAD
-    commentsList.addEventListener('click', function (e) {
-=======
     if (commentsList) {
         commentsList.addEventListener('click', function (e) {
->>>>>>> chore/security-design-hardening
         const target = e.target;
 
         // Signaler
@@ -105,15 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-<<<<<<< HEAD
-                        alert('Commentaire signalé avec succès.');
-                    } else {
-                        alert('Erreur de signalement.');
-=======
                         showToast('Commentaire signalé', 'orange');
                     } else {
                         showToast(data.error || 'Erreur de signalement', 'red');
->>>>>>> chore/security-design-hardening
                     }
                 });
         }
@@ -136,16 +114,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-<<<<<<< HEAD
-                            commentText.textContent = newText;
-                        } else {
-                            alert('Erreur lors de la modification.');
-=======
                             commentText.textContent = newText.trim();
                             showToast('Commentaire modifié', 'green');
                         } else {
                             showToast('Erreur lors de la modification', 'red');
->>>>>>> chore/security-design-hardening
                         }
                     });
             }
@@ -165,36 +137,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-<<<<<<< HEAD
-                            const commentCard = document.getElementById(`comment-card-${commentId}`);
-                            if (commentCard) commentCard.remove();
-                        } else {
-                            alert('Erreur lors de la suppression.');
-=======
                             const commentCard = document.getElementById(`comment-${commentId}`);
                             if (commentCard) commentCard.remove();
                             showToast('Commentaire supprimé', 'green');
                         } else {
                             showToast('Erreur lors de la suppression', 'red');
->>>>>>> chore/security-design-hardening
                         }
                     });
             }
         }
-<<<<<<< HEAD
-    });
-=======
         });
     }
->>>>>>> chore/security-design-hardening
 
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
-<<<<<<< HEAD
-});
-=======
 });
 
 
->>>>>>> chore/security-design-hardening

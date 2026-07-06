@@ -1,4 +1,5 @@
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -30,7 +31,9 @@ class PaymentCallbackTests(TestCase):
         donation.refresh_from_db()
         self.assertEqual(donation.status, "en_attente")
 
-    def test_donation_callback_accepts_valid_token(self):
+    def test_donation_callback_does_not_confirm_without_provider_verification(self):
+        # Le retour navigateur seul (token valide) ne doit jamais confirmer le
+        # paiement: sans vérification Djomy concluante, il reste en attente.
         donation = Donation.objects.create(
             amount=Decimal("10000"),
             donor_email="donor@example.com",
@@ -38,10 +41,39 @@ class PaymentCallbackTests(TestCase):
         )
         url = reverse("djomy_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
 
-        response = self.client.get(f"{url}?token={donation.transaction_id}")
+        with patch("page.views._verify_payment_status_with_djomy", return_value=None):
+            response = self.client.get(f"{url}?token={donation.transaction_id}")
+        self.assertEqual(response.status_code, 200)
+        donation.refresh_from_db()
+        self.assertEqual(donation.status, "en_attente")
+
+    def test_donation_callback_confirms_when_provider_reports_success(self):
+        donation = Donation.objects.create(
+            amount=Decimal("10000"),
+            donor_email="donor@example.com",
+            transaction_id="tok_valid",
+        )
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
+
+        with patch("page.views._verify_payment_status_with_djomy", return_value="réussi"):
+            response = self.client.get(f"{url}?token={donation.transaction_id}")
         self.assertEqual(response.status_code, 200)
         donation.refresh_from_db()
         self.assertNotEqual(donation.status, "en_attente")
+
+    def test_donation_callback_marks_failure_when_provider_reports_failure(self):
+        donation = Donation.objects.create(
+            amount=Decimal("10000"),
+            donor_email="donor@example.com",
+            transaction_id="tok_valid",
+        )
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": donation.id, "type": "Don"})
+
+        with patch("page.views._verify_payment_status_with_djomy", return_value="échoué"):
+            response = self.client.get(f"{url}?token={donation.transaction_id}")
+        self.assertEqual(response.status_code, 200)
+        donation.refresh_from_db()
+        self.assertEqual(donation.status, "échoué")
 
     def test_funding_callback_updates_received_amount_once(self):
         funding = self._funding()
@@ -53,8 +85,9 @@ class PaymentCallbackTests(TestCase):
         )
         url = reverse("djomy_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
 
-        first = self.client.get(f"{url}?token={payment.transaction_id}")
-        second = self.client.get(f"{url}?token={payment.transaction_id}")
+        with patch("page.views._verify_payment_status_with_djomy", return_value="réussi"):
+            first = self.client.get(f"{url}?token={payment.transaction_id}")
+            second = self.client.get(f"{url}?token={payment.transaction_id}")
 
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)

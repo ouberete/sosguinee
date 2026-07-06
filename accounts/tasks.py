@@ -17,11 +17,7 @@ def send_subscription_reminders():
     
     for profile in users_to_remind:
         try:
-<<<<<<< HEAD
-            EmailService.send_subscription_reminder(profile.user)
-=======
             EmailService.send_subscription_reminder(profile.user, queue=False)
->>>>>>> chore/security-design-hardening
             profile.subscription_reminder_sent = True
             profile.save()
         except Exception as e:
@@ -38,8 +34,4 @@ def cleanup_expired_subscriptions():
     for profile in expired_profiles:
         profile.is_premium = False
         profile.save()
-<<<<<<< HEAD
         # Optionnel : envoyer un email pour informer l'utilisateur
-=======
-        # Optionnel : envoyer un email pour informer l'utilisateur
->>>>>>> chore/security-design-hardening

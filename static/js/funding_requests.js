@@ -9,6 +9,7 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
+
 function escapeHtml(value) {
     if (value === null || value === undefined) {
         return '';
@@ -110,7 +111,6 @@ function renderFundingCard(fundingRequest, index) {
     const description = escapeHtml(truncateText(fundingRequest.description_needs || 'Aucune description disponible.', 160));
     const collectedAmount = formatCurrency(fundingRequest.amount_received || 0);
     const targetAmount = formatCurrency(fundingRequest.amount || 0);
-    const remainingAmount = formatCurrency(fundingRequest.remaining_amount || 0);
     const fullUrl = `${window.location.origin}${fundingRequest.details_url}`;
     const paymentUrl = fundingRequest.payment_url || `/funding/${fundingRequest.public_id}/djomy/`;
     const canFund = fundingRequest.can_fund === true || fundingRequest.funding_request_status === 'En cours';
@@ -170,10 +170,6 @@ function renderFundingCard(fundingRequest, index) {
                         <div class="ws-card-stat">
                             <div class="ws-card-stat-value">${collectedAmount}</div>
                             <div class="ws-card-stat-label">Collecte</div>
-                        </div>
-                        <div class="ws-card-stat">
-                            <div class="ws-card-stat-value">${remainingAmount}</div>
-                            <div class="ws-card-stat-label">Reste</div>
                         </div>
                     </div>
 

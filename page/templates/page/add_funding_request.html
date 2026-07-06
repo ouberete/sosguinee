@@ -115,72 +115,7 @@
 {% endblock %}
 
 {% block extrajs %}
-<<<<<<< HEAD
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    M.FormSelect.init(document.querySelectorAll('select'));
-    function populateSelect(select, items, placeholder) {
-      select.innerHTML = '';
-      const opt = document.createElement('option');
-      opt.value = '';
-      opt.textContent = placeholder;
-      select.appendChild(opt);
-      items.forEach(it => {
-        const o = document.createElement('option');
-        o.value = it.id;
-        o.textContent = it.name;
-        select.appendChild(o);
-      });
-      M.FormSelect.init(select);
-    }
-
-    async function fetchJSON(url) {
-      const r = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
-      if (!r.ok) return {results: []};
-      return r.json();
-    }
-
-    const regionSel = document.getElementById('id_region');
-    const prefSel = document.getElementById('id_prefecture');
-    const comSel = document.getElementById('id_commune');
-    const quaSel = document.getElementById('id_quarter');
-
-    if (regionSel && prefSel && comSel && quaSel) {
-      regionSel.addEventListener('change', async function() {
-        const region = this.value;
-        populateSelect(prefSel, [], 'Sélectionnez une préfecture');
-        populateSelect(comSel, [], 'Sélectionnez une commune');
-        populateSelect(quaSel, [], 'Sélectionnez un quartier');
-        if (region) {
-          const data = await fetchJSON(`/api/locations/prefectures/?region=${region}`);
-          populateSelect(prefSel, data.results || [], 'Sélectionnez une préfecture');
-        }
-      });
-
-      prefSel.addEventListener('change', async function() {
-        const pref = this.value;
-        populateSelect(comSel, [], 'Sélectionnez une commune');
-        populateSelect(quaSel, [], 'Sélectionnez un quartier');
-        if (pref) {
-          const data = await fetchJSON(`/api/locations/communes/?prefecture=${pref}`);
-          populateSelect(comSel, data.results || [], 'Sélectionnez une commune');
-        }
-      });
-
-      comSel.addEventListener('change', async function() {
-        const com = this.value;
-        populateSelect(quaSel, [], 'Sélectionnez un quartier');
-        if (com) {
-          const data = await fetchJSON(`/api/locations/quarters/?commune=${com}`);
-          populateSelect(quaSel, data.results || [], 'Sélectionnez un quartier');
-        }
-      });
-    }
-  });
-</script>
-=======
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="{% static 'js/location_cascade.js' %}"></script>
 <script src="{% static 'js/upload_dropzones.js' %}"></script>
->>>>>>> chore/security-design-hardening
 {% endblock %}

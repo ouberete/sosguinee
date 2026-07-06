@@ -3,9 +3,6 @@ from django import forms
 from .models import FundingRequest, Gender, LossAlert, MessageContact, Donation, UserDetails, FundPayment, Comment, Region, Prefecture, Commune, Quarter
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-<<<<<<< HEAD
-import os
-=======
 from django.core.files.base import ContentFile
 from io import BytesIO
 from PIL import Image, ImageOps
@@ -26,7 +23,6 @@ ALLOWED_PRINCIPAL_IMAGE_EXTENSIONS = {
     ".webp",
     ".avif",
 }
->>>>>>> chore/security-design-hardening
 
 
 class CustomClearableFileInput(forms.ClearableFileInput):
@@ -88,11 +84,8 @@ def _compress_uploaded_image(uploaded_file, quality=82):
 class MultipleFileField(forms.FileField):
     widget = CustomClearableFileInput
     max_upload_size = 1 * 1024 * 1024  # 1 MB
-<<<<<<< HEAD
-=======
     max_file_count = 5
 
->>>>>>> chore/security-design-hardening
     def to_python(self, data):
         if not data:
             return []
@@ -164,13 +157,8 @@ class FundingRequestForm(forms.ModelForm):
     class Meta:
         model = FundingRequest
         fields = [
-<<<<<<< HEAD
-            'beneficiary_name','funding_request_type', 'funding_amount','title','description_needs',
-            'region','prefecture','commune','quarter', 'address', 'email', 'phone', 'start_date','end_date',  'principal_image'
-=======
             'beneficiary_name', 'funding_request_type', 'funding_amount', 'title', 'description_needs',
             'region', 'prefecture', 'commune', 'quarter', 'address', 'email', 'phone', 'start_date', 'end_date', 'principal_image'
->>>>>>> chore/security-design-hardening
         ]
 
     def __init__(self, *args, **kwargs):
@@ -179,8 +167,6 @@ class FundingRequestForm(forms.ModelForm):
         self.fields['prefecture'].queryset = Prefecture.objects.none()
         self.fields['commune'].queryset = Commune.objects.none()
         self.fields['quarter'].queryset = Quarter.objects.none()
-<<<<<<< HEAD
-=======
         self.fields['principal_image'].widget.attrs.update({
             'accept': '.jpg,.jpeg,.png,.webp,.avif',
             'class': 'upload-input upload-input-image',
@@ -191,7 +177,6 @@ class FundingRequestForm(forms.ModelForm):
             'class': 'upload-input upload-input-docs',
             'data-upload-input': 'optional_docs',
         })
->>>>>>> chore/security-design-hardening
 
         if 'region' in self.data:
             try:
@@ -214,10 +199,6 @@ class FundingRequestForm(forms.ModelForm):
             except (ValueError, TypeError):
                 pass
 
-<<<<<<< HEAD
-        # For editing instances
-=======
->>>>>>> chore/security-design-hardening
         if self.instance and self.instance.pk:
             if self.instance.region_id:
                 self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
@@ -225,12 +206,7 @@ class FundingRequestForm(forms.ModelForm):
                 self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
             if self.instance.commune_id:
                 self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
-<<<<<<< HEAD
-    
-    #throw errors if start date is greater than end date
-=======
 
->>>>>>> chore/security-design-hardening
     def clean(self):
         cleaned_data = super().clean()
         start_date = cleaned_data.get('start_date')
@@ -301,11 +277,7 @@ class LossAlertForm(forms.ModelForm):
 
     class Meta:
         model = LossAlert
-<<<<<<< HEAD
-        fields = ['name', 'loss_alert_type', 'description',  'email', 'phone', 'region','prefecture','commune','quarter', 'address', 'date_alert', 'hour_alert','principal_image']
-=======
         fields = ['name', 'loss_alert_type', 'description', 'email', 'phone', 'region', 'prefecture', 'commune', 'quarter', 'address', 'date_alert', 'hour_alert', 'principal_image']
->>>>>>> chore/security-design-hardening
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -313,8 +285,6 @@ class LossAlertForm(forms.ModelForm):
         self.fields['prefecture'].queryset = Prefecture.objects.none()
         self.fields['commune'].queryset = Commune.objects.none()
         self.fields['quarter'].queryset = Quarter.objects.none()
-<<<<<<< HEAD
-=======
         self.fields['principal_image'].widget.attrs.update({
             'accept': '.jpg,.jpeg,.png,.webp,.avif',
             'class': 'upload-input upload-input-image',
@@ -325,7 +295,6 @@ class LossAlertForm(forms.ModelForm):
             'class': 'upload-input upload-input-docs',
             'data-upload-input': 'optional_docs',
         })
->>>>>>> chore/security-design-hardening
 
         if 'region' in self.data:
             try:
@@ -348,10 +317,6 @@ class LossAlertForm(forms.ModelForm):
             except (ValueError, TypeError):
                 pass
 
-<<<<<<< HEAD
-        # For editing instances
-=======
->>>>>>> chore/security-design-hardening
         if self.instance and self.instance.pk:
             if self.instance.region_id:
                 self.fields['prefecture'].queryset = Prefecture.objects.filter(region=self.instance.region).order_by('name')
@@ -359,8 +324,6 @@ class LossAlertForm(forms.ModelForm):
                 self.fields['commune'].queryset = Commune.objects.filter(prefecture=self.instance.prefecture).order_by('name')
             if self.instance.commune_id:
                 self.fields['quarter'].queryset = Quarter.objects.filter(commune=self.instance.commune).order_by('name')
-<<<<<<< HEAD
-=======
 
     def clean_principal_image(self):
         principal_image = self.cleaned_data.get('principal_image')
@@ -407,7 +370,6 @@ class LossAlertForm(forms.ModelForm):
 
         return principal_image
 
->>>>>>> chore/security-design-hardening
 
 class MessageContactForm(forms.ModelForm):
     
@@ -489,8 +451,5 @@ class CommentForm(forms.ModelForm):
         labels = {
             'text': ''
         }
-<<<<<<< HEAD
-=======
 
 
->>>>>>> chore/security-design-hardening

@@ -16,24 +16,32 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
-<<<<<<< HEAD
-=======
+from accounts.views.documents import protected_user_document
 from page import views as page_views
->>>>>>> chore/security-design-hardening
+
+
+def healthz(request):
+    """Sonde de vivacité pour Kubernetes/monitoring: pas d'accès base."""
+    return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     # Pour le changement de langue (set_language)
     path("i18n/", include("django.conf.urls.i18n")),
-<<<<<<< HEAD
-=======
     # Webhook externe: hors i18n pour garder une URL stable côté PSP.
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
->>>>>>> chore/security-design-hardening
+    # Sonde de santé (probes Kubernetes, load balancer)
+    path("healthz/", healthz, name="healthz"),
+    # Documents personnels (pièces d'identité...): accès contrôlé par Django.
+    # Déclaré AVANT les patterns statiques de DEBUG pour les intercepter;
+    # en production, nginx/l'ingress route ce préfixe vers Django.
+    path("media/user_images/<path:path>", protected_user_document, name="protected_user_document"),
 ]
 
 
@@ -45,13 +53,8 @@ urlpatterns  += i18n_patterns(
     path('password/reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('login')), name='password_reset_confirm'),
     path('password/reset/complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-<<<<<<< HEAD
-    # Retiré: python-social-auth; on utilise allauth uniquement
-    path('accounts/', include('allauth.urls')),
-=======
     path('accounts/', include('allauth.urls')),
     path('', include('django_djomy.urls')),
->>>>>>> chore/security-design-hardening
 )
 
 if settings.DEBUG:
