@@ -2,10 +2,10 @@
 # statiques et Django ne sert pas les media hors DEBUG. Un nginx minimal
 # monte le PVC en lecture seule; l'ingress route /media/ vers lui.
 #
-# ⚠️ Confidentialité: tout ce qui est dans media/ devient public par URL.
-# Les documents d'identité (user_images/id_cards, birth_piece) sont bloqués
-# ci-dessous (403). À terme, servir ces fichiers via une vue Django
-# authentifiée ou un stockage objet privé avec URLs signées.
+# ⚠️ Confidentialité: tout ce qui passe par ce serveur devient public par
+# URL. Les documents personnels (user_images/) sont servis par une vue
+# Django authentifiée (propriétaire ou staff) — l'ingress route ce préfixe
+# vers le service web; le 403 ci-dessous n'est qu'une défense en profondeur.
 apiVersion: v1
 kind: ConfigMap
 metadata:

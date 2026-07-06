@@ -22,6 +22,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from accounts.views.documents import protected_user_document
 from page import views as page_views
 
 
@@ -37,6 +38,10 @@ urlpatterns = [
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
     # Sonde de santé (probes Kubernetes, load balancer)
     path("healthz/", healthz, name="healthz"),
+    # Documents personnels (pièces d'identité...): accès contrôlé par Django.
+    # Déclaré AVANT les patterns statiques de DEBUG pour les intercepter;
+    # en production, nginx/l'ingress route ce préfixe vers Django.
+    path("media/user_images/<path:path>", protected_user_document, name="protected_user_document"),
 ]
 
 

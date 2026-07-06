@@ -22,7 +22,17 @@ spec:
     - host: sosguinee.example.com
       http:
         paths:
-          # Fichiers uploadés (servis par le nginx media, PVC en lecture seule)
+          # Documents personnels: accès contrôlé par Django (le préfixe le
+          # plus long prime; le nginx media renvoie 403 en défense en
+          # profondeur si jamais cette règle disparaissait).
+          - path: /media/user_images/
+            pathType: Prefix
+            backend:
+              service:
+                name: sosguinee-web
+                port:
+                  number: 80
+          # Autres fichiers uploadés (nginx media, PVC en lecture seule)
           - path: /media/
             pathType: Prefix
             backend:
