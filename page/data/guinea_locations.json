@@ -3,13 +3,6 @@
     "Préfectures": {
       "Conakry": {
         "Communes": {
-<<<<<<< HEAD
-          "Kaloum": ["Tombo", "Almamya", "Boulbinet"],
-          "Dixinn": ["Taouyah", "Bellevue", "Minière"],
-          "Ratoma": ["Kipé", "Nongo", "Kaporo", "Lambanyi"],
-          "Matam": ["Bonfi", "Madina", "Lansébougny"],
-          "Matoto": ["Yimbaya", "Gbessia", "Sangoyah"]
-=======
           "Kaloum": ["Tombo", "Almamya", "Boulbinet", "Centre administratif"],
           "Dixinn": ["Taouyah", "Bellevue", "Minière", "Dixinn-Centre", "Cameroun"],
           "Matam": ["Bonfi", "Madina", "Lansébougny", "Matam-Centre"],
@@ -23,75 +16,10 @@
           "Kagbélén": ["Kagbélén Centre", "Ansoumania", "Bailobaya", "Wonkifong"],
           "Sanoyah": ["Sanoyah Km36", "Sanoyah Textile", "Dixinn Gare"],
           "Manéah": ["Manéah Centre", "Fassia", "Wonkifong", "Kilometer 36"]
->>>>>>> chore/security-design-hardening
         }
       }
     }
   },
-<<<<<<< HEAD
-  "Boké": {
-    "Préfectures": {
-      "Boké": {"Communes": {"Boké Centre": ["Tanènè", "Kassogna"]}},
-      "Boffa": {"Communes": {"Boffa Centre": ["Koba", "Tamonï"]}},
-      "Fria": {"Communes": {"Fria Centre": ["Banguigny", "Tabossy"]}},
-      "Koundara": {"Communes": {"Koundara Centre": ["Sambailo", "Sarébödo"]}},
-      "Gaoual": {"Communes": {"Gaoual Centre": ["Koumbia", "Fafaya"]}}
-    }
-  },
-  "Kindia": {
-    "Préfectures": {
-      "Kindia": {"Communes": {"Kindia Centre": ["Sambaya", "Abattoir"]}},
-      "Coyah": {"Communes": {"Coyah Centre": ["Manéah", "Wonkifong"]}},
-      "Dubréka": {"Communes": {"Dubréka Centre": ["Khorira", "Tanéné"]}},
-      "Forécariah": {"Communes": {"Forécariah Centre": ["Farmoriah", "Kaback"]}},
-      "Télimélé": {"Communes": {"Télimélé Centre": ["Sangaréyah", "Koba"]}}
-    }
-  },
-  "Mamou": {
-    "Préfectures": {
-      "Mamou": {"Communes": {"Mamou Centre": ["Horè Fello", "Poudrière"]}},
-      "Dalaba": {"Communes": {"Dalaba Centre": ["Konko Sylla", "Kébaly"]}},
-      "Pita": {"Communes": {"Pita Centre": ["Timbi Madina", "Ley Miro"]}}
-    }
-  },
-  "Faranah": {
-    "Préfectures": {
-      "Faranah": {"Communes": {"Faranah Centre": ["Fodéhadji", "Hèrèmakono"]}},
-      "Dabola": {"Communes": {"Dabola Centre": ["Kabiné", "Bissikrima"]}},
-      "Dinguiraye": {"Communes": {"Dinguiraye Centre": ["Banora", "Gagnakaly"]}}
-    }
-  },
-  "Kankan": {
-    "Préfectures": {
-      "Kankan": {"Communes": {"Kankan Centre": ["Banankoro", "Missiran"]}},
-      "Kérouané": {"Communes": {"Kérouané Centre": ["Soromaya", "Komodou"]}},
-      "Kouroussa": {"Communes": {"Kouroussa Centre": ["Sanguiana", "Diariba Koro"]}},
-      "Mandiana": {"Communes": {"Mandiana Centre": ["Koundjan", "Kouremalé"]}},
-      "Siguiri": {"Communes": {"Siguiri Centre": ["Doko", "Niani"]}}
-    }
-  },
-  "Labé": {
-    "Préfectures": {
-      "Labé": {"Communes": {"Labé Centre": ["Daka", "Mosquée"]}},
-      "Koubia": {"Communes": {"Koubia Centre": ["Fafaya", "Lambayi"]}},
-      "Mali": {"Communes": {"Mali Centre": ["Touba", "Sigon"]}},
-      "Lélouma": {"Communes": {"Lélouma Centre": ["Djountou", "Labessé"]}},
-      "Tougué": {"Communes": {"Tougué Centre": ["Fello Koundoua", "Kollet"]}}
-    }
-  },
-  "Nzérékoré": {
-    "Préfectures": {
-      "Nzérékoré": {"Communes": {"Nzérékoré Centre": ["Gbanghana", "Simbaya"]}},
-      "Beyla": {"Communes": {"Beyla Centre": ["Gbéssoba", "Boola"]}},
-      "Lola": {"Communes": {"Lola Centre": ["Bossou", "Gueassou"]}},
-      "Yomou": {"Communes": {"Yomou Centre": ["Bowé", "Péla"]}},
-      "Guéckédou": {"Communes": {"Guéckédou Centre": ["Tékoulo", "Katkama"]}},
-      "Macenta": {"Communes": {"Macenta Centre": ["Balizia", "Koyamah"]}}
-    }
-  }
-}
-
-=======
 
   "Kindia": {
     "Préfectures": {
@@ -489,4 +417,3 @@
     }
   }
 }
->>>>>>> chore/security-design-hardening

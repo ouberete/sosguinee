@@ -32,11 +32,7 @@
       <div class="col s12 m6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-<<<<<<< HEAD
-            <span class="yellow category">{{ alert.status_alert_name }}</span>
-=======
             <span class="badge">{{ alert.status_alert_name }}</span>
->>>>>>> chore/security-design-hardening
             <img src="{% if alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
                  alt="Image alerte {{ alert.name }}" loading="lazy" class="materialboxed">
           </div>
@@ -168,57 +164,6 @@
       </div>
     </div>
     {% endif %}
-<<<<<<< HEAD
-
-  </section>
-  <hr>
-  {% include 'page/components/comments/comments_section.html' with comments=comments comment_form=comment_form model_name='lossalert' object_id=alert.id %}
-  <section class="section container" aria-labelledby="detail-fund-heading">
-    {% if user.is_authenticated %}
-    <div class="row">
-      <div class="col s12">
-        <h6>Soumettre un Commentaire</h6>
-        <div id="comment-form-section">
-          <form id="comment-form" method="post">
-            {% csrf_token %}
-            {{ comment_form.text }}
-            <button type="submit" class="btn waves-effect blue">Commenter</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    {% else %}
-    <div class="row">
-      <div class="col s12">
-        <h4>Connexion Requise</h4>
-        <p>Veuillez vous connecter pour soumettre un commentaire.</p>
-        <a href="{% url 'login' %}" class="btn waves-effect waves-light blue darken-2">
-          <i class="material-icons left">login</i> Se connecter
-        </a>
-      </div>
-    </div>
-    {% endif %}
-    <div class="row">
-      <div class="col s12">
-        <h4>Commentaires récents</h4>
-        <div id="comments-list">
-          {% if comments %}
-          {% for comment in comments %}
-          <div class="card-panel">
-            <strong>{{ comment.user.username }}</strong> — <small>{{ comment.created_at|date:"d/m/Y H:i" }}</small>
-            <p>{{ comment.text }}</p>
-          </div>
-          {% endfor %}
-          {% else %}
-          <div class="center grey-text">Aucun commentaire</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-
-=======
->>>>>>> chore/security-design-hardening
   </section>
   <div class="divider" style="margin: 0 auto; max-width: 1280px;"></div>
   {% include 'page/components/comments/comments_section.html' with comments=comments comment_form=comment_form model_name='lossalert' object_id=alert.id %}

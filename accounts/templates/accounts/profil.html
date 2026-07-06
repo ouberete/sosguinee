@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-<<<<<<< HEAD
-=======
 {% load i18n %}
->>>>>>> chore/security-design-hardening
 {% load custom_filters %}
 
 {% block title %}Profil Utilisateur - SOS Guinée{% endblock %}
@@ -124,27 +121,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">report_problem</i> Mes Alertes</span>
                         {% if alerts %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for a in alerts %}
-                            <li class="collection-item valign-wrapper">
-                                <i class="material-icons left grey-text text-darken-1">error_outline</i>
-                                <div class="item-primary">
-                                    <div class="item-title">{{ a.name }}</div>
-                                    <div class="item-meta grey-text">
-                                        <span class="chip {{ a.status_alert_name|chip_class }}">{{ a.status_alert_name }}</span>
-                                        <small class="grey-text">Maj: {{ a.updated_at|date:"d/m/Y H:i" }}</small>
-                                    </div>
-                                </div>
-                                <div class="secondary-content">
-                                    <a class="btn-flat" href="{% url 'loss_alert_detail_public' a.public_id %}">Voir</a>
-                                    <a class="btn-flat" href="{% url 'edit_loss_alert' a.public_id %}">Modifier</a>
-                                    <a class="btn-flat red-text" href="{% url 'delete_loss_alert' a.public_id %}">Supprimer</a>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-item-grid">
                             {% for a in alerts %}
                             <article class="profile-mini-card alert-mini-card">
@@ -168,9 +144,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if alerts.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -194,7 +167,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucune alerte créée.</p>
                         {% endif %}
@@ -206,28 +178,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">request_quote</i> Mes Demandes de financement</span>
                         {% if funding_requests %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for fr in funding_requests %}
-                            <li class="collection-item valign-wrapper">
-                                <i class="material-icons left grey-text text-darken-1">payments</i>
-                                <div class="item-primary">
-                                    <div class="item-title">{{ fr.title|default:fr.beneficiary_name }}</div>
-                                    <div class="item-meta grey-text">
-                                        Montant: {{ fr.funding_amount|format_fr }} GNF
-                                        <span class="chip {{ fr.funding_request_status_name|chip_class }}">{{ fr.funding_request_status_name }}</span>
-                                        <small class="grey-text">Maj: {{ fr.updated_at|date:"d/m/Y H:i" }}</small>
-                                    </div>
-                                </div>
-                                <div class="secondary-content">
-                                    <a class="btn-flat" href="{% url 'funding_request_details_public' fr.public_id %}">Voir</a>
-                                    <a class="btn-flat" href="{% url 'edit_funding_request' fr.public_id %}">Modifier</a>
-                                    <a class="btn-flat red-text" href="{% url 'delete_funding_request' fr.public_id %}">Supprimer</a>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-item-grid">
                             {% for fr in funding_requests %}
                             <article class="profile-mini-card funding-mini-card">
@@ -260,9 +210,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if funding_requests.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -286,7 +233,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucune demande de financement créée.</p>
                         {% endif %}
@@ -300,17 +246,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">volunteer_activism</i> Mes Dons</span>
                         {% if donations %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for d in donations %}
-                            <li class="collection-item">
-                                <span class="item-title">{{ d.amount|format_fr }} GNF</span>
-                                <span class="chip right {{ d.get_status_display|default:d.status|chip_class }}">{{ d.get_status_display|default:d.status }}</span>
-                                <div class="item-meta grey-text">Le {{ d.created_at|date:"d/m/Y H:i" }}</div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-compact-grid">
                             {% for d in donations %}
                             <article class="profile-compact-card">
@@ -327,9 +262,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if donations.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -353,7 +285,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucun don effectué.</p>
                         {% endif %}
@@ -365,20 +296,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">account_balance_wallet</i> Mes Financements</span>
                         {% if fundings %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for fp in fundings %}
-                            <li class="collection-item">
-                                <span class="item-title">{{ fp.amount|format_fr }} GNF</span>
-                                {% if fp.funding_request %}
-                                <div class="item-meta grey-text">{{ fp.funding_request.title|default:fp.funding_request.beneficiary_name }}</div>
-                                {% endif %}
-                                <span class="chip right {{ fp.get_status_display|default:fp.status|chip_class }}">{{ fp.get_status_display|default:fp.status }}</span>
-                                <div class="item-meta grey-text">Le {{ fp.created_at|date:"d/m/Y H:i" }}</div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-compact-grid">
                             {% for fp in fundings %}
                             <article class="profile-compact-card">
@@ -398,9 +315,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if fundings.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -424,7 +338,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucun financement effectué.</p>
                         {% endif %}
@@ -438,16 +351,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">mail</i> Mes Messages</span>
                         {% if messages_sent %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for m in messages_sent %}
-                            <li class="collection-item">
-                                <strong>{{ m.subject|default:"Message" }}</strong>
-                                <div class="item-meta grey-text truncate-3">{{ m.message }}</div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-compact-grid">
                             {% for m in messages_sent %}
                             <article class="profile-compact-card">
@@ -463,9 +366,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if messages_sent.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -489,7 +389,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucun message envoyé.</p>
                         {% endif %}
@@ -501,16 +400,6 @@
                     <div class="card-content">
                         <span class="card-title"><i class="material-icons left">chat_bubble_outline</i> Mes Commentaires</span>
                         {% if comments %}
-<<<<<<< HEAD
-                        <ul class="collection">
-                            {% for c in comments %}
-                            <li class="collection-item">
-                                <div class="item-meta grey-text">{{ c.created_at|date:"d/m/Y H:i" }}</div>
-                                <div class="truncate-3">{{ c.text }}</div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-=======
                         <div class="profile-compact-grid">
                             {% for c in comments %}
                             <article class="profile-compact-card">
@@ -527,9 +416,6 @@
                             </article>
                             {% endfor %}
                         </div>
-<<<<<<< HEAD
->>>>>>> chore/security-design-hardening
-=======
                         {% if comments.has_other_pages %}
                         <div class="center-align" style="margin-top: 20px;">
                             <ul class="pagination">
@@ -553,7 +439,6 @@
                             </ul>
                         </div>
                         {% endif %}
->>>>>>> dev
                         {% else %}
                         <p class="grey-text">Aucun commentaire.</p>
                         {% endif %}
@@ -567,22 +452,8 @@
 
 {% block extrajs %}
 <script src="{% static 'profil/profil.js' %}"></script>
-<style>
-    .profile-sections .card .card-title { display:flex; align-items:center; gap:.5rem; }
-    .profile-sections .collection .collection-item { display:block; }
-    .profile-sections .collection .item-title { font-weight:600; }
-    .profile-sections .collection .item-meta { font-size:.9rem; }
-    .profile-sections .chip { background:#eee; color:#333; }
-    @media (max-width: 600px) {
-        .profile-sections .card .card-title { font-size:1.1rem; }
-    }
-    .valign-wrapper .item-primary { flex:1; }
-    .valign-wrapper .secondary-content { margin-left: .5rem; }
-</style>
 {% endblock %}
 
-<<<<<<< HEAD
-=======
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 <style>
@@ -934,4 +805,3 @@
     }
 </style>
 {% endblock %}
->>>>>>> chore/security-design-hardening

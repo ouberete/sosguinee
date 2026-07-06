@@ -34,11 +34,7 @@
       <!-- Avatar et Dropdown utilisateur -->
       <li>
         <a class="dropdown-trigger" href="#!" data-target="user-dropdown" aria-label="Menu utilisateur">
-<<<<<<< HEAD
-          <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle responsive-img" style="height:32px; vertical-align: middle; margin-right:8px;">
-=======
           <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar">
->>>>>>> chore/security-design-hardening
           <i class="material-icons right">arrow_drop_down</i>
         </a>
       </li>
@@ -50,21 +46,12 @@
 
       <!-- Sélecteur de langue (desktop) -->
       <li>
-<<<<<<< HEAD
-        <form action="{% url 'set_language' %}" method="post" class="language-switcher" style="display:inline-flex; align-items:center; gap:4px;">
-          {% csrf_token %}
-          <input name="next" type="hidden" value="{{ request.get_full_path }}">
-          <button type="submit" name="language" value="fr" class="btn-flat white-text" style="min-width:auto; padding:0 4px; {% if request.LANGUAGE_CODE == 'fr' %}font-weight:bold; text-decoration:underline;{% endif %}">FR</button>
-          <span style="color:white;">|</span>
-          <button type="submit" name="language" value="en" class="btn-flat white-text" style="min-width:auto; padding:0 4px; {% if request.LANGUAGE_CODE == 'en' %}font-weight:bold; text-decoration:underline;{% endif %}">EN</button>
-=======
         <form action="{% url 'set_language' %}" method="post" class="lang-switcher">
           {% csrf_token %}
           <input name="next" type="hidden" value="{{ request.get_full_path }}">
           <button type="submit" name="language" value="fr" class="btn-flat white-text lang-btn {% if request.LANGUAGE_CODE == 'fr' %}is-active{% endif %}">FR</button>
           <span style="color:white;">|</span>
           <button type="submit" name="language" value="en" class="btn-flat white-text lang-btn {% if request.LANGUAGE_CODE == 'en' %}is-active{% endif %}">EN</button>
->>>>>>> chore/security-design-hardening
         </form>
       </li>
     </ul>
@@ -82,7 +69,12 @@
   <li><a href="{% url 'profile' %}">{% trans "Profil" %}</a></li>
   <li><a href="{% url 'change_password' %}">{% trans "Modifier le mot de passe" %}</a></li>
   <li class="divider" tabindex="-1"></li>
-  <li><a href="{% url 'logout' %}">{% trans "Déconnexion" %}</a></li>
+  <li>
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">{% trans "Déconnexion" %}</button>
+    </form>
+  </li>
 </ul>
 {% endif %}
 
@@ -98,7 +90,12 @@
   {% if user.is_authenticated %}
   <li><a href="{% url 'profile' %}">{% trans "Profil" %}</a></li>
   <li><a href="{% url 'change_password' %}">{% trans "Modifier le mot de passe" %}</a></li>
-  <li><a href="{% url 'logout' %}">{% trans "Déconnexion" %}</a></li>
+  <li>
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">{% trans "Déconnexion" %}</button>
+    </form>
+  </li>
   {% else %}
   <li><a href="{% url 'login' %}">{% trans "Connexion" %}</a></li>
   {% endif %}
@@ -114,17 +111,3 @@
   </li>
 </ul>
 
-<<<<<<< HEAD
-<!-- JS init -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var elemsDropdown = document.querySelectorAll('.dropdown-trigger');
-    M.Dropdown.init(elemsDropdown, { constrainWidth: false, coverTrigger: false });
-
-    var elemsSidenav = document.querySelectorAll('.sidenav');
-    M.Sidenav.init(elemsSidenav);
-  });
-</script>
-
-=======
->>>>>>> chore/security-design-hardening

@@ -1,0 +1,43 @@
+# Configuration NON sensible de l'application.
+# Les secrets (SECRET_KEY, mots de passe, clés API) vont dans le Secret
+# "sosguinee-secrets" — voir secret.example.yaml.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sosguinee-config
+  namespace: sosguinee
+data:
+  ENVIRONMENT: "production"
+  DEBUG: "False"
+  DJANGO_SETTINGS_MODULE: "sosguinee.settings_prod"
+
+  # ⚠️ À adapter à votre domaine réel
+  ALLOWED_HOSTS: "sosguinee.example.com"
+  CSRF_TRUSTED_ORIGINS: "https://sosguinee.example.com"
+  SITE_URL: "https://sosguinee.example.com"
+
+  # Base de données (le mot de passe est dans le Secret)
+  USE_POSTGRES: "True"
+  POSTGRES_NAME: "sosguinee"
+  POSTGRES_USER: "sosguinee"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+
+  # Redis: cache partagé (rate limiting) + broker Celery
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+  REDIS_CACHE_URL: "redis://redis:6379/1"
+
+  # Emails asynchrones via Celery
+  ASYNC_EMAIL_ENABLED: "True"
+  EMAIL_HOST: "smtp.gmail.com"
+  EMAIL_PORT: "587"
+  EMAIL_USE_TLS: "True"
+  EMAIL_USE_SSL: "False"
+  EMAIL_TIMEOUT: "15"
+
+  # Djomy (les identifiants sont dans le Secret)
+  DJOMY_BASE_URL: "https://api.djomy.africa/v1"
+
+  # Divers
+  SECURE_SSL_REDIRECT: "True"

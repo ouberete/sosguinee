@@ -21,11 +21,7 @@
     margin-bottom: 15px;
 }
 
-<<<<<<< HEAD
-.hero-content.btn-large {
-=======
 .hero-content .btn-large {
->>>>>>> chore/security-design-hardening
     margin: 10px;
     font-weight: bold;
     text-transform: uppercase;
@@ -35,8 +31,6 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-<<<<<<< HEAD
-=======
 #impact-stats h4.light,
 #how-it-works h4.light,
 #home-alerts h4.light,
@@ -68,7 +62,6 @@
     background: linear-gradient(90deg, #f57c00 0%, #ffb74d 100%);
 }
 
->>>>>>> chore/security-design-hardening
 /* Styles pour les sections d'alertes et de financement */
 .section {
     padding: 40px 0; /* Espacement vertical pour toutes les sections */
@@ -141,8 +134,6 @@
     border-top: 1px solid rgba(160, 160, 160, 0.2);
 }
 
-<<<<<<< HEAD
-=======
 .card-highlight-title {
     min-height: 120px;
 }
@@ -164,7 +155,6 @@
     margin: 0 0 0 0.4rem;
 }
 
->>>>>>> chore/security-design-hardening
 .alert-card.card-action.btn-small,.funding-card.card-action.btn-small {
     margin-right: 5px;
 }
@@ -219,8 +209,6 @@
     margin-top: 0;
 }
 
-<<<<<<< HEAD
-=======
 #impact-stats .card-panel {
     position: relative;
     overflow: hidden;
@@ -246,7 +234,6 @@
     font-weight: 600;
 }
 
->>>>>>> chore/security-design-hardening
 /* Section Comment ça Marche */
 #how-it-works.icon-block {
     padding: 20px;
@@ -330,8 +317,6 @@
     text-transform: uppercase;
 }
 
-<<<<<<< HEAD
-=======
 #how-it-works .icon-block {
     min-height: 100%;
     padding: 28px 22px;
@@ -374,7 +359,6 @@
     box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
 }
 
->>>>>>> chore/security-design-hardening
 /* Responsive adjustments */
 @media (max-width: 992px) {
     .hero-section {
@@ -413,11 +397,7 @@
     .hero-content h5 {
         font-size: 1.2rem;
     }
-<<<<<<< HEAD
-    .hero-content.btn-large {
-=======
     .hero-content .btn-large {
->>>>>>> chore/security-design-hardening
         width: 100%;
         margin: 5px 0;
     }
@@ -434,9 +414,6 @@
         width: 80px;
         height: 80px;
     }
-<<<<<<< HEAD
-}
-=======
 }
 
 #home-alerts .funding-grid,
@@ -486,4 +463,3 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: none;
 }
->>>>>>> chore/security-design-hardening

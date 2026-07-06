@@ -77,13 +77,8 @@
             {% get_providers as providers %}
             <div style="display: flex; flex-direction: column; gap: 10px;">
               {% for provider in providers %}
-<<<<<<< HEAD
-                <a href="{% provider_login_url "google" %}"
-                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="margin-bottom:.5rem; display:block;">
-=======
                 <a href="{% provider_login_url provider.id %}"
                    class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="border-radius: 25px; display:block;">
->>>>>>> chore/security-design-hardening
                   <i class="material-icons left">
                     {% if provider.id == 'google' %}account_circle
                     {% elif provider.id == 'facebook' %}facebook

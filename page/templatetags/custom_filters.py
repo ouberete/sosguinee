@@ -42,13 +42,10 @@ def chip_class(value):
         return any(k in s for k in keys)
     if contains('réussi', 'reussi', 'success'):
         return 'green white-text'
-<<<<<<< HEAD
-=======
     if contains('blocked', 'bloqu'):
         return 'red white-text'
     if contains('inactive', 'inactif'):
         return 'grey white-text'
->>>>>>> chore/security-design-hardening
     if contains('attente', 'pending'):
         return 'orange white-text'
     if contains('échou', 'echou', 'failed', 'echec'):
@@ -60,8 +57,6 @@ def chip_class(value):
     if contains('trouv'):
         return 'teal white-text'
     return 'blue white-text'
-<<<<<<< HEAD
-=======
 
 
 @register.filter
@@ -75,4 +70,3 @@ def is_image_file(value):
     filename = getattr(value, "name", str(value))
     extension = os.path.splitext(filename)[1].lower()
     return extension in {".jpg", ".jpeg", ".png", ".webp", ".avif"}
->>>>>>> chore/security-design-hardening

@@ -1,10 +1,7 @@
 from datetime import datetime
 from email.policy import default
 from random import choices
-<<<<<<< HEAD
-=======
 import mimetypes
->>>>>>> chore/security-design-hardening
 import uuid
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -121,7 +118,9 @@ class UserActionLog(models.Model):
     def client_ip(request):
         forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '') if request else ''
         if forwarded_for:
-            return forwarded_for.split(',')[0].strip()
+            # Seul le dernier élément est ajouté par notre proxy (nginx); les
+            # précédents sont fournis par le client et donc forgeables.
+            return forwarded_for.split(',')[-1].strip()
         return request.META.get('REMOTE_ADDR') if request else None
 
     @classmethod

@@ -170,10 +170,7 @@ input[type="submit"], button {
 
     /* Forms */
 
-<<<<<<< HEAD
-=======
     legend,
->>>>>>> chore/security-design-hardening
     label {
         font-size: 1rem;
     }
@@ -341,21 +338,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-<<<<<<< HEAD
-        padding-left: 55px;
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 30px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 30px 14px;
-=======
         padding: 10px 10px 10px 55px;
         background-position-x: 30px;
->>>>>>> chore/security-design-hardening
     }
 
     /* Login */
@@ -426,13 +410,6 @@ input[type="submit"], button {
 
     /* Changelist */
 
-<<<<<<< HEAD
-    #changelist {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-=======
     #changelist .changelist-form-container {
         flex-direction: column;
     }
@@ -442,7 +419,6 @@ input[type="submit"], button {
         width: 100%;
     }
 
->>>>>>> chore/security-design-hardening
     #toolbar {
         padding: 10px;
     }
@@ -465,33 +441,12 @@ input[type="submit"], button {
     }
 
     #changelist-filter {
-<<<<<<< HEAD
-        position: static;
-        width: auto;
-=======
         width: 100%;
->>>>>>> chore/security-design-hardening
         margin-top: 30px;
     }
 
     .object-tools {
-<<<<<<< HEAD
-        float: none;
-        margin: 0 0 15px;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .object-tools li {
-        height: auto;
-        margin-left: 0;
-    }
-
-    .object-tools li + li {
-        margin-left: 15px;
-=======
         text-align: left;
->>>>>>> chore/security-design-hardening
     }
 
     /* Forms */
@@ -530,10 +485,7 @@ input[type="submit"], button {
         padding-top: 15px;
     }
 
-<<<<<<< HEAD
-=======
     .aligned legend,
->>>>>>> chore/security-design-hardening
     .aligned label {
         width: 100%;
         min-width: auto;
@@ -772,21 +724,8 @@ input[type="submit"], button {
     /* Messages */
 
     ul.messagelist li {
-<<<<<<< HEAD
-        padding-left: 40px;
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.error {
-        background-position: 15px 12px;
-    }
-
-    ul.messagelist li.warning {
-        background-position: 15px 14px;
-=======
         padding: 10px 10px 10px 40px;
         background-position-x: 15px;
->>>>>>> chore/security-design-hardening
     }
 
     /* Paginator */

@@ -29,12 +29,8 @@
     <div class="card-action">
       {% if is_funding %}
       <a href="{% url 'funding_request_details_public' item.public_id %}" class="blue-text text-darken-2">PLUS D'INFOS</a>
-<<<<<<< HEAD
-      <a href="{% url 'paycard_funding_public' item.public_id %}" class="btn-small green waves-effect waves-light">
-=======
       {% if item.funding_request_status_name == 'En cours' %}
       <a href="{% url 'djomy_funding_public' item.public_id %}" class="btn-small green waves-effect waves-light">
->>>>>>> chore/security-design-hardening
         <i class="material-icons left">payments</i> Financer
       </a>
       {% endif %}

@@ -34,8 +34,9 @@ h6 {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    position: relative;
-    z-index: 1;
+    /* Pas de z-index ici : cela créerait un contexte d'empilement qui
+       piégerait le menu mobile (.sidenav, z-index 999) sous le voile
+       .sidenav-overlay (z-index 997, ajouté par Materialize dans body). */
 }
 
 main {
@@ -44,7 +45,8 @@ main {
 
 .site-bg-shape {
     position: fixed;
-    z-index: 0;
+    z-index: -1;
+    /* derrière le contenu sans imposer de z-index au wrapper */
     pointer-events: none;
     filter: blur(2px);
     opacity: 0.45;

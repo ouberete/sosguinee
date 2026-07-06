@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-from django.contrib import admin
-from django.utils.html import format_html
-from django.urls import reverse
-from django.db.models import Sum
-from django.template.loader import render_to_string
-=======
 import csv
 import json
 from types import MethodType
@@ -17,7 +10,6 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.db.models import Sum
 from django.utils import timezone
->>>>>>> chore/security-design-hardening
 from .models import (
     LossAlertType,
     LossAlert,
@@ -33,16 +25,12 @@ from .models import (
     Prefecture,
     Commune,
     Quarter,
-<<<<<<< HEAD
-)
-=======
     UserActionLog,
     Report,
     EmailContent,
     UserDetails,
 )
 from sosguinee.utils.email_retry import resend_email_content
->>>>>>> chore/security-design-hardening
 
 # Register your models here.
 admin.site.site_header = "SOS Guinee Admin"
@@ -50,8 +38,6 @@ admin.site.site_title = "SOS Guinee Admin Portal"
 admin.site.index_title = "Welcome to SOS Guinee Admin Portal"
 admin.site.site_url = "https://sosguinee.com"
 
-<<<<<<< HEAD
-=======
 
 def export_as_csv(modeladmin, request, queryset):
     model = queryset.model
@@ -107,7 +93,6 @@ def resend_selected_emails(modeladmin, request, queryset):
 
 resend_selected_emails.short_description = "Renvoyer les emails selectionnes"
 
->>>>>>> chore/security-design-hardening
 @admin.register(LossAlert)
 class LossAlertAdmin(admin.ModelAdmin):
     list_display = ('name', 'public_id', 'type_alert_name', 'status_alert_name', 'region', 'prefecture', 'commune', 'quarter', 'date_alert', 'priority_badge')
@@ -115,10 +100,7 @@ class LossAlertAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description', 'public_id')
     ordering = ('-date_alert',)
     readonly_fields = ('created_at', 'public_id')
-<<<<<<< HEAD
-=======
     actions = [export_as_csv]
->>>>>>> chore/security-design-hardening
     
     def type_alert_name(self, obj):
         return obj.loss_alert_type.name if obj.loss_alert_type else '-'
@@ -152,12 +134,8 @@ class FundingRequestAdmin(admin.ModelAdmin):
     list_filter = ('funding_request_type', 'funding_request_status', 'region', 'prefecture', 'commune', 'quarter', 'created_at')
     search_fields = ('title', 'beneficiary_name', 'description_needs', 'public_id')
     ordering = ('-created_at',)
-<<<<<<< HEAD
-    readonly_fields = ('created_at', 'amount_received', 'public_id')
-=======
     readonly_fields = ('created_at', 'public_id')
     actions = [export_as_csv]
->>>>>>> chore/security-design-hardening
     
     def funding_request_status_name(self, obj):
         return obj.funding_request_status.name if obj.funding_request_status else '-'
@@ -185,10 +163,7 @@ class DonationAdmin(admin.ModelAdmin):
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'donor_email')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id')
-<<<<<<< HEAD
-=======
     actions = [export_as_csv]
->>>>>>> chore/security-design-hardening
     
     def donor_name(self, obj):
         return f"{obj.donor_first_name} {obj.donor_last_name}"
@@ -201,10 +176,7 @@ class FundPaymentAdmin(admin.ModelAdmin):
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'funding_request__title')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id')
-<<<<<<< HEAD
-=======
     actions = [export_as_csv]
->>>>>>> chore/security-design-hardening
     
     def funding_request_link(self, obj):
         url = reverse('admin:page_fundingrequest_change', args=[obj.funding_request.id])
@@ -302,8 +274,6 @@ class CommentAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     readonly_fields = ('public_id', 'created_at', 'updated_at')
 
-<<<<<<< HEAD
-=======
 
 @admin.register(UserActionLog)
 class UserActionLogAdmin(admin.ModelAdmin):
@@ -418,7 +388,6 @@ class UserAdmin(DjangoUserAdmin):
         self.message_user(request, f"{count} utilisateur(s) debloque(s).", messages.SUCCESS)
     unblock_users.short_description = "Debloquer les utilisateurs selectionnes"
 
->>>>>>> chore/security-design-hardening
 # Personnalisation du tableau de bord admin
 class CustomAdminSite(admin.AdminSite):
     def get_app_list(self, request):
@@ -444,8 +413,6 @@ class CustomAdminSite(admin.AdminSite):
         
         return super().index(request, extra_context)
 
-<<<<<<< HEAD
-=======
 
 def _admin_dashboard_context():
     current_year = timezone.now().year
@@ -480,4 +447,3 @@ def _dashboard_index(self, request, extra_context=None):
 
 admin.site.index = MethodType(_dashboard_index, admin.site)
 
->>>>>>> chore/security-design-hardening

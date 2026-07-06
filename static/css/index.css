@@ -415,8 +415,6 @@
         height: 80px;
     }
 }
-<<<<<<< HEAD
-=======
 
 #home-alerts .funding-grid,
 #home-funding .funding-grid {
@@ -465,4 +463,3 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: none;
 }
->>>>>>> chore/security-design-hardening

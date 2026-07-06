@@ -28,23 +28,6 @@
       <span>{{ message }}</span>
     </div>
     {% endfor %}
-<<<<<<< HEAD
-    <div class="card-panel">
-        <p><strong>Bénéficiaire :</strong> {{ funding_request.beneficiary_name }}</p>
-        <p><strong>Description :</strong> {{ funding_request.title }}</p>
-        <p><strong>Montant Cible :</strong> {{ funding_request.funding_amount|format_fr }} GNF</p>
-        <br>
-        <form action="{% url 'funding_paycard_payment_public' funding_request.public_id %}" method="post" class="paycard-form">
-            {% csrf_token %}
-            <!-- Informations du donateur -->
-            {% if request.user.is_authenticated %}
-            <div class="input-field col">
-                <input id="amount" name="amount" type="text" class="validate" required>
-                <label for="amount">Montant à financer</label>
-            </div>
-            {% endif %}
-=======
->>>>>>> chore/security-design-hardening
 
     {% if form.non_field_errors %}
     <div class="payment-alert error">
@@ -174,7 +157,7 @@
             {% endif %}
             {% endfor %}
 
-            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" onclick="this.innerHTML='<i class=\'material-icons left\'>autorenew</i> Redirection...'; this.classList.add('disabled'); this.form.submit();">
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment">
               <i class="material-icons left">payments</i>
               {% trans "Financer maintenant" %}
             </button>
@@ -193,6 +176,19 @@
   document.addEventListener('DOMContentLoaded', function () {
     M.FormSelect.init(document.querySelectorAll('select'));
     M.updateTextFields();
+
+    // Anti double-soumission: on laisse le submit natif se faire (validation
+    // du navigateur incluse) et on se contente de verrouiller le bouton.
+    var paymentForm = document.querySelector('form.payment-form');
+    var submitBtn = document.getElementById('submit-payment');
+    if (paymentForm && submitBtn) {
+      paymentForm.addEventListener('submit', function () {
+        if (submitBtn.dataset.submitting === '1') return;
+        submitBtn.dataset.submitting = '1';
+        submitBtn.classList.add('disabled');
+        submitBtn.innerHTML = '<i class="material-icons left">autorenew</i> Redirection...';
+      });
+    }
   });
 </script>
 {% endblock %}

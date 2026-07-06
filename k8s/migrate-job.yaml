@@ -1,0 +1,37 @@
+# Job de migration: à lancer à chaque déploiement AVANT la mise à jour
+# des Deployments (ou via un pipeline CI/CD).
+#
+#   kubectl -n sosguinee delete job sosguinee-migrate --ignore-not-found
+#   kubectl -n sosguinee apply -f k8s/migrate-job.yaml
+#   kubectl -n sosguinee wait --for=condition=complete job/sosguinee-migrate --timeout=300s
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sosguinee-migrate
+  namespace: sosguinee
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: sosguinee-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          # ⚠️ Remplacez par votre image (même tag que web/worker/beat)
+          image: REGISTRY/sosguinee:latest
+          command: ["python", "manage.py", "migrate", "--noinput"]
+          envFrom:
+            - configMapRef:
+                name: sosguinee-config
+            - secretRef:
+                name: sosguinee-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

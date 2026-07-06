@@ -6,101 +6,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-    <title>{% block title %}SOS Guinée{% endblock %}</title>
-    <!-- Styles critiques chargés immédiatement -->
-    <style>
-        /* Styles critiques de base */
-        .main-wrapper {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-        }
-
-        .hero {
-            position: relative;
-            min-height: 60vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem 1rem;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 0;
-        }
-
-        .hero > * {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-        }
-
-        /* Détails: bannière plus compacte et lisible */
-        .hero-details-page {
-            position: relative;
-            min-height: 32vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 1.5rem 1rem;
-            overflow: hidden;
-        }
-        .hero-details-page::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.35);
-            z-index: 0;
-        }
-        .hero-details-page .hero-content { position: relative; z-index: 1; }
-        .hero-details-page .header { font-size: 2rem; }
-        .hero-details-page h5 { font-size: 1.25rem; max-width: 900px; margin: 0 auto; }
-
-        /* Classes utilitaires de base */
-        .truncate-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
-
-    <!-- Préchargement des ressources importantes -->
-    <link rel="preload" href="{% static 'materialize/css/materialize.min.css' %}" as="style" />
-    <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style" />
-
-    <!-- Chargement asynchrone des styles non critiques -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="{% static 'materialize/css/materialize.min.css' %}" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}" media="print" onload="this.media='all'" />
-
-    <!-- Fallback pour les navigateurs qui ne supportent pas le chargement asynchrone -->
-    <noscript>
-        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-        <link rel="stylesheet" href="{% static 'materialize/css/materialize.min.css' %}" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-        <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
-    </noscript>
-=======
     <title>{% block title %}SOS Guinee{% endblock %}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,7 +18,6 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
->>>>>>> chore/security-design-hardening
 
     {% block extracss %}{% endblock %}
     {% block extra_head %}{% endblock %}
@@ -147,41 +51,25 @@
         M.FormSelect.init(document.querySelectorAll('select'));
         M.Materialbox.init(document.querySelectorAll('.materialboxed'));
         M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+
+        // Bouton flottant "+" : on n'utilise PAS M.FloatingActionButton dont
+        // l'animation JS (anime.js) échouait ici en laissant les actions à
+        // opacity:0 (donc incliquables). Simple bascule de la classe .active,
+        // l'ouverture/fermeture étant entièrement gérée en CSS.
+        document.querySelectorAll('.fixed-action-btn').forEach(function (fab) {
+            var mainBtn = fab.querySelector(':scope > a');
+            if (!mainBtn) return;
+            mainBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fab.classList.toggle('active');
+            });
+            document.addEventListener('click', function (e) {
+                if (!fab.contains(e.target)) fab.classList.remove('active');
+            });
+        });
     });
 </script>
-<<<<<<< HEAD
-<!-- Chargement différé des scripts -->
-<script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script>
-        // Fonction d'initialisation des composants Materialize
-        function initMaterialize() {
-                // Initialisation générale
-                M.AutoInit();
-
-                // Initialisation spécifique des composants avec options
-                const dropdowns = document.querySelectorAll('.dropdown-trigger');
-                M.Dropdown.init(dropdowns, {
-                        coverTrigger: false,
-                        constrainWidth: false
-                });
-
-                // Initialisation de la navigation mobile
-                const sidenavs = document.querySelectorAll('.sidenav');
-                M.Sidenav.init(sidenavs);
-
-                // Initialisation des modales
-                const modals = document.querySelectorAll('.modal');
-                M.Modal.init(modals);
-        }
-
-        // Attendre que le DOM et les scripts soient chargés
-        window.addEventListener('load', initMaterialize);
-</script>
 {% block extrajs %}{% endblock %}
-    
-=======
-{% block extrajs %}{% endblock %}
->>>>>>> chore/security-design-hardening
 </body>
 </html>
