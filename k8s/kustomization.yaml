@@ -12,6 +12,7 @@ resources:
   - postgres.yaml
   - redis.yaml
   - media-pvc.yaml
+  - media-server.yaml
   - web.yaml
   - celery-worker.yaml
   - celery-beat.yaml

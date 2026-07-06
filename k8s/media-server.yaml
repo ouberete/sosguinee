@@ -1,0 +1,94 @@
+# Sert les fichiers uploadés (/media/) — whitenoise ne sert que les
+# statiques et Django ne sert pas les media hors DEBUG. Un nginx minimal
+# monte le PVC en lecture seule; l'ingress route /media/ vers lui.
+#
+# ⚠️ Confidentialité: tout ce qui est dans media/ devient public par URL.
+# Les documents d'identité (user_images/id_cards, birth_piece) sont bloqués
+# ci-dessous (403). À terme, servir ces fichiers via une vue Django
+# authentifiée ou un stockage objet privé avec URLs signées.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sosguinee-media-nginx
+  namespace: sosguinee
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+
+        # Documents personnels: jamais servis publiquement.
+        location ^~ /media/user_images/ {
+            return 403;
+        }
+
+        location /media/ {
+            alias /data/media/;
+            expires 7d;
+            add_header Cache-Control "public";
+            add_header X-Content-Type-Options "nosniff";
+        }
+
+        location = /healthz {
+            return 200 "ok";
+        }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sosguinee-media
+  namespace: sosguinee
+spec:
+  selector:
+    app: sosguinee-media
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sosguinee-media
+  namespace: sosguinee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sosguinee-media
+  template:
+    metadata:
+      labels:
+        app: sosguinee-media
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.29-alpine
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: media
+              mountPath: /data/media
+              readOnly: true
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: sosguinee-media
+        - name: nginx-conf
+          configMap:
+            name: sosguinee-media-nginx
