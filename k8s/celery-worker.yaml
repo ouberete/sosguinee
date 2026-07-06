@@ -1,0 +1,58 @@
+# Worker Celery: emails asynchrones (files default + email).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sosguinee-celery-worker
+  namespace: sosguinee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sosguinee-celery-worker
+  template:
+    metadata:
+      labels:
+        app: sosguinee-celery-worker
+    spec:
+      containers:
+        - name: worker
+          # ⚠️ Même image et même tag que web
+          image: REGISTRY/sosguinee:latest
+          command:
+            - celery
+            - -A
+            - sosguinee
+            - worker
+            - -l
+            - info
+            - -Q
+            - default,email
+            - --concurrency=2
+          envFrom:
+            - configMapRef:
+                name: sosguinee-config
+            - secretRef:
+                name: sosguinee-secrets
+          volumeMounts:
+            - name: media
+              mountPath: /app/mediafiles
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - celery -A sosguinee inspect ping -d celery@$HOSTNAME --timeout 10
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            timeoutSeconds: 15
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: sosguinee-media
