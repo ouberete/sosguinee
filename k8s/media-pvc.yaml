@@ -1,0 +1,22 @@
+# Volume partagé pour les fichiers uploadés (images d'alertes/financements,
+# documents d'identité des utilisateurs).
+#
+# ⚠️ ReadWriteMany (RWX) est requis dès que web tourne avec plusieurs
+# répliques. Toutes les offres cloud ne le proposent pas par défaut :
+#   - OVH/Scaleway: NFS / système de fichiers managé
+#   - AWS: EFS ; GCP: Filestore
+#   - Cluster simple: rook-ceph, longhorn, ou nfs-subdir-external-provisioner
+# Si votre StorageClass ne fait que RWO, passez web à replicas: 1.
+# À terme, le plus robuste est un stockage objet S3 (django-storages).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sosguinee-media
+  namespace: sosguinee
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  # storageClassName: <classe RWX de votre fournisseur>

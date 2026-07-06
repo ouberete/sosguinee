@@ -1,0 +1,26 @@
+# Déploiement d'un coup: kubectl apply -k k8s/
+# (le Secret n'est PAS inclus: créez-le d'abord — voir secret.example.yaml.
+#  Le Job de migration se lance séparément à chaque déploiement.)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sosguinee
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - postgres.yaml
+  - redis.yaml
+  - media-pvc.yaml
+  - web.yaml
+  - celery-worker.yaml
+  - celery-beat.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+# Pour changer l'image et le tag en une seule commande:
+#   kustomize edit set image REGISTRY/sosguinee=ghcr.io/mon-org/sosguinee:v1.2.3
+images:
+  - name: REGISTRY/sosguinee
+    newName: REGISTRY/sosguinee
+    newTag: latest

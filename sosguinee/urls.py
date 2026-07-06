@@ -16,6 +16,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
@@ -23,11 +24,19 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from page import views as page_views
 
+
+def healthz(request):
+    """Sonde de vivacité pour Kubernetes/monitoring: pas d'accès base."""
+    return JsonResponse({"status": "ok"})
+
+
 urlpatterns = [
     # Pour le changement de langue (set_language)
     path("i18n/", include("django.conf.urls.i18n")),
     # Webhook externe: hors i18n pour garder une URL stable côté PSP.
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
+    # Sonde de santé (probes Kubernetes, load balancer)
+    path("healthz/", healthz, name="healthz"),
 ]
 
 

@@ -1,0 +1,42 @@
+# Planificateur Celery Beat: rappels d'abonnements, nettoyages périodiques.
+# ⚠️ TOUJOURS 1 seule réplique (sinon les tâches planifiées partent en double).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sosguinee-celery-beat
+  namespace: sosguinee
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sosguinee-celery-beat
+  template:
+    metadata:
+      labels:
+        app: sosguinee-celery-beat
+    spec:
+      containers:
+        - name: beat
+          # ⚠️ Même image et même tag que web
+          image: REGISTRY/sosguinee:latest
+          command:
+            - celery
+            - -A
+            - sosguinee
+            - beat
+            - -l
+            - info
+          envFrom:
+            - configMapRef:
+                name: sosguinee-config
+            - secretRef:
+                name: sosguinee-secrets
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

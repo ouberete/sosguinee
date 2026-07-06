@@ -385,6 +385,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
+    # Les sondes Kubernetes / load balancer interrogent /healthz/ en HTTP
+    # interne: on ne les redirige pas vers HTTPS.
+    SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
