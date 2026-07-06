@@ -1,5 +1,9 @@
+import tempfile
+from pathlib import Path
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
@@ -7,6 +11,12 @@ from django.core.paginator import Paginator
 from django.core.files.storage import FileSystemStorage
 from page.models import UserDetails, LossAlert, FundingRequest, Donation, FundPayment, MessageContact, Comment
 from ..forms import ProfileForm, UserInfosForm, UserDocumentForm, UserLinkForm
+
+# Stockage temporaire des fichiers du wizard (pièces d'identité). L'ancien
+# chemin '/tmp' codé en dur n'existe pas sous Windows et faisait planter le
+# wizard; on utilise le répertoire temporaire du système, multiplateforme.
+_WIZARD_TMP_DIR = Path(tempfile.gettempdir()) / "sosguinee_wizard_uploads"
+_WIZARD_TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 @login_required
 def user_profile(request):
@@ -81,7 +91,7 @@ def user_profile(request):
     else:
         return redirect('home')
 
-class UserInfosView(FormView):
+class UserInfosView(LoginRequiredMixin, FormView):
     template_name = 'accounts/user_infos.html'
     form_class = UserInfosForm
     success_url = 'user-document'
@@ -89,7 +99,7 @@ class UserInfosView(FormView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-class UserDocumentView(FormView):
+class UserDocumentView(LoginRequiredMixin, FormView):
     template_name = 'accounts/user_document.html'
     form_class = UserDocumentForm
     success_url = 'user-link'
@@ -97,7 +107,7 @@ class UserDocumentView(FormView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-class UserLinkView(FormView):
+class UserLinkView(LoginRequiredMixin, FormView):
     template_name = 'accounts/user_link.html'
     form_class = UserLinkForm
     success_url = 'update_profile'
@@ -117,10 +127,10 @@ TEMPLATES = {
     "user_link": "accounts/user_link.html",
 }
 
-class UpdateUserProfileWizard(SessionWizardView):
+class UpdateUserProfileWizard(LoginRequiredMixin, SessionWizardView):
     form_list = FORMS
-    file_storage = FileSystemStorage(location='/tmp')
-    
+    file_storage = FileSystemStorage(location=str(_WIZARD_TMP_DIR))
+
     def post(self, *args, **kwargs):
         return super().post(*args, **kwargs)
 
