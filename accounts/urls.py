@@ -24,8 +24,7 @@ urlpatterns = [
     path(r'user-infos', views.UserInfosView.as_view(), name="user-infos"),
     path(r'user-documents', views.UserDocumentView.as_view(), name="user-documents"),
     path(r'user-link', views.UserLinkView.as_view(), name="user-link"),
-    path(r'otp-login/', views.otp_login_view, name='otp_login'),
-    
+
     # URLs d'abonnement
     path('subscriptions/plans/', subscription_plans, name='subscription_plans'),
     path('subscriptions/subscribe/', subscribe, name='subscribe'),
