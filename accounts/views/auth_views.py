@@ -139,20 +139,20 @@ def resend_activation(request):
                 if profile and profile.user_status == "Blocked":
                     messages.success(
                         request,
-                        "Si un compte inactif existe, un lien d'activation a ete envoye.",
+                        "Si un compte inactif existe, un lien d'activation a été envoyé.",
                     )
-                    cache.delete(_rate_limit_key("resend-activation", request, identifier))
                     return redirect("login")
                 try:
                     send_or_queue_activation_email(user, reuse_unsent=True)
                 except Exception as e:
-                    logger.exception("Renvoi du lien d'activation non envoye: %s", e)
+                    logger.exception("Renvoi du lien d'activation non envoyé: %s", e)
 
+            # Ne pas remettre le compteur à zéro en cas de succès : la limite
+            # doit couvrir les envois répétés (anti-spam de la boîte cible).
             messages.success(
                 request,
-                "Si un compte inactif existe, un lien d'activation a ete envoye.",
+                "Si un compte inactif existe, un lien d'activation a été envoyé.",
             )
-            cache.delete(_rate_limit_key("resend-activation", request, identifier))
             return redirect("login")
     else:
         form = ResendActivationForm()
@@ -232,11 +232,12 @@ def reset_password(request):
                 except Exception:
                     if settings.DEBUG:
                         raise
+            # Ne pas remettre le compteur à zéro en cas de succès : la limite
+            # doit couvrir les envois répétés (anti-spam de la boîte cible).
             messages.success(
                 request,
                 "Si un compte existe pour cet email, un lien de réinitialisation a été envoyé.",
             )
-            cache.delete(_rate_limit_key("password-reset", request, email))
             return redirect("password_reset_done")
     else:
         form = PasswordResetForm()
@@ -257,7 +258,3 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
 
     return render(request, "accounts/change_password.html", {"form": form})
-
-
-def otp_login_view(request):
-    return render(request, "accounts/otp_login.html")
