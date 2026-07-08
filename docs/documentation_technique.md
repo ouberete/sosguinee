@@ -266,6 +266,10 @@ le stockage disque local.
 
 ## 9. Gestion des Services Externes (Runbook & Handover)
 
+> 🔧 Pour le détail **configuration + points d'appel dans le code + débogage** de
+> chaque brique (Djomy, Celery, Redis, Docker, Kubernetes, emails, captcha, OAuth,
+> Sentry, S3, rate limiting), voir [`SERVICES_ET_INTEGRATIONS.md`](SERVICES_ET_INTEGRATIONS.md).
+
 ### 9.1 PostgreSQL (Production)
 C'est la base de données principale.
 - **Opérations :** `python manage.py migrate`
