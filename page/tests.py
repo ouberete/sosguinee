@@ -1,11 +1,14 @@
+from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from page.models import Comment, Donation, FundPayment, FundingRequest, LossAlert
+from page.tasks import reconcile_pending_payments
 
 
 class PaymentCallbackTests(TestCase):
@@ -93,6 +96,58 @@ class PaymentCallbackTests(TestCase):
         self.assertEqual(second.status_code, 200)
         funding.refresh_from_db()
         self.assertEqual(funding.amount_received, Decimal("150.00"))
+
+
+class ReconcilePendingPaymentsTests(TestCase):
+    """Point a : réconciliation/expiration des paiements restés en attente."""
+
+    def _stale_donation(self, hours=48):
+        donation = Donation.objects.create(
+            amount=Decimal("10000"),
+            donor_email="donor@example.com",
+            transaction_id="tok_reconcile",
+            status="en_attente",
+        )
+        # created_at est auto_now_add : on le force via update() pour simuler l'âge.
+        Donation.objects.filter(pk=donation.pk).update(
+            created_at=timezone.now() - timedelta(hours=hours)
+        )
+        donation.refresh_from_db()
+        return donation
+
+    def test_noop_when_disabled(self):
+        donation = self._stale_donation()
+        result = reconcile_pending_payments()
+        self.assertEqual(result, {"enabled": False})
+        donation.refresh_from_db()
+        self.assertEqual(donation.status, "en_attente")
+
+    @override_settings(PAYMENT_RECONCILIATION_ENABLED=True, PENDING_PAYMENT_EXPIRY_HOURS=24)
+    def test_expires_stale_pending_when_unverifiable(self):
+        donation = self._stale_donation(hours=48)
+        with patch("page.views._verify_payment_status_with_djomy", return_value=None):
+            result = reconcile_pending_payments()
+        donation.refresh_from_db()
+        self.assertEqual(donation.status, "échoué")
+        self.assertEqual(result["expired"], 1)
+
+    @override_settings(PAYMENT_RECONCILIATION_ENABLED=True, PENDING_PAYMENT_EXPIRY_HOURS=24)
+    def test_confirms_when_provider_reports_success(self):
+        donation = self._stale_donation(hours=48)
+        with patch("page.views._verify_payment_status_with_djomy", return_value="réussi"):
+            result = reconcile_pending_payments()
+        donation.refresh_from_db()
+        self.assertNotIn(donation.status, ("en_attente", "échoué"))
+        self.assertEqual(result["succeeded"], 1)
+
+    @override_settings(PAYMENT_RECONCILIATION_ENABLED=True, PENDING_PAYMENT_EXPIRY_HOURS=24)
+    def test_recent_pending_is_left_untouched(self):
+        donation = self._stale_donation(hours=1)  # plus récent que le délai
+        with patch("page.views._verify_payment_status_with_djomy", return_value=None):
+            result = reconcile_pending_payments()
+        donation.refresh_from_db()
+        self.assertEqual(donation.status, "en_attente")
+        self.assertEqual(result["checked"], 0)
 
 
 class CommentEndpointTests(TestCase):

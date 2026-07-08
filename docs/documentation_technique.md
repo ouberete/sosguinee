@@ -224,7 +224,10 @@ Le fichier `.env` contrôle le comportement du système.
 |---|---|
 | `DJOMY_CLIENT_ID`, `DJOMY_CLIENT_SECRET` | Identifiants API Djomy. |
 | `DJOMY_BASE_URL` | URL de l'API (sandbox ou prod). |
-| `DJOMY_WEBHOOK_SECRET` | Secret pour valider la signature des requêtes entrantes. |
+| `DJOMY_WEBHOOK_SECRET` | Secret de signature webhook (si vide, retombe sur `DJOMY_CLIENT_SECRET`). |
+| `PAYMENT_RECONCILIATION_ENABLED` | Active le job d'expiration des paiements en attente (défaut `False`). |
+| `PENDING_PAYMENT_EXPIRY_HOURS` | Délai avant expiration d'un paiement en attente (défaut 24 h). |
+| `DJOMY_ENFORCE_FUNDING_CAP` | Plafonne le montant reçu au montant cible à la confirmation (défaut `False`). |
 
 ### Stockage des médias (S3 / Object Storage)
 Portable AWS S3 ↔ OVH Object Storage (protocole S3). Deux buckets : un **public**

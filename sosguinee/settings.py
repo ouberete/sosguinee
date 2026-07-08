@@ -433,6 +433,15 @@ DJOMY_CANCEL_URL = config("DJOMY_CANCEL_URL", default=f"{SITE_URL}/payment/cance
 DJOMY_WEBHOOK_SECRET = config("DJOMY_WEBHOOK_SECRET", default="")
 DJOMY_REQUEST_TIMEOUT = config("DJOMY_REQUEST_TIMEOUT", default=12, cast=int)
 
+# Réconciliation des paiements restés "en_attente" (job Celery, point a).
+# Désactivée par défaut ; PENDING_PAYMENT_EXPIRY_HOURS = délai avant expiration.
+PAYMENT_RECONCILIATION_ENABLED = config("PAYMENT_RECONCILIATION_ENABLED", default=False, cast=bool)
+PENDING_PAYMENT_EXPIRY_HOURS = config("PENDING_PAYMENT_EXPIRY_HOURS", default=24, cast=int)
+
+# Plafonnement anti sur-financement à la confirmation (point b). Désactivé par
+# défaut : mettre True pour activer la limite de paiement sur les collectes.
+DJOMY_ENFORCE_FUNDING_CAP = config("DJOMY_ENFORCE_FUNDING_CAP", default=False, cast=bool)
+
 # Async jobs (Celery/Redis)
 def _env_bool(name, default=False):
     raw = os.getenv(name)
@@ -506,6 +515,11 @@ CELERY_BEAT_SCHEDULE = {
     "cleanup-expired-subscriptions-daily": {
         "task": "accounts.tasks.cleanup_expired_subscriptions",
         "schedule": _env_int("SUBSCRIPTION_CLEANUP_EVERY_SECONDS", 86400),
+    },
+    # Réconciliation des paiements en attente (no-op tant que le flag est off).
+    "reconcile-pending-payments": {
+        "task": "page.tasks.reconcile_pending_payments",
+        "schedule": _env_int("PAYMENT_RECONCILIATION_EVERY_SECONDS", 3600),
     },
 }
 

@@ -72,6 +72,23 @@
 - **Traçabilité** : tous les événements sont journalisés via `_log_payment_event`
   (`grep payment_event= <logs>`).
 
+### Robustesse (paiements non aboutis, refresh, double-soumission)
+- **Confirmation** uniquement via `_apply_payment_success` (verrou en base,
+  idempotent) après API/webhook — jamais sur simple retour navigateur.
+- **Refresh de la page de retour** : sans effet (le callback ne retraite que si
+  `status == en_attente`, et la confirmation est idempotente).
+- **Double-soumission du formulaire** : limitée par le rate limiting
+  (5 initiations/h par email ou téléphone).
+- **Réconciliation des paiements en attente** (`page/tasks.py:reconcile_pending_payments`,
+  job Celery beat) — **désactivée par défaut**. Variables :
+  - `PAYMENT_RECONCILIATION_ENABLED` (activer), `PENDING_PAYMENT_EXPIRY_HOURS`
+    (délai avant expiration, défaut 24 h), `PAYMENT_RECONCILIATION_EVERY_SECONDS`
+    (fréquence, défaut 3600 s). Revérifie via Djomy puis confirme / marque échoué /
+    expire les `en_attente` périmés.
+- **Plafond anti sur-financement** : `DJOMY_ENFORCE_FUNDING_CAP` (off par défaut) —
+  une fois activé, plafonne `amount_received` au montant cible lors de la
+  confirmation (dans `_apply_payment_success`).
+
 ### Améliorer
 - Mettre en cache le JWT (`get_access_token` est rappelé à chaque requête).
 - Consolider à terme sur **un seul** webhook (voir le doublon `django_djomy` vs

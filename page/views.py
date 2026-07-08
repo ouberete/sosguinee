@@ -239,7 +239,18 @@ def _apply_payment_success(payment):
             funding_request = FundingRequest.objects.select_for_update().get(
                 pk=locked.funding_request_id
             )
-            funding_request.amount_received = (funding_request.amount_received or 0) + locked.amount
+            new_total = (funding_request.amount_received or 0) + locked.amount
+            # Anti sur-financement (point b) — désactivé par défaut. Une fois
+            # DJOMY_ENFORCE_FUNDING_CAP=True, le montant reçu est plafonné au
+            # montant cible de la collecte lors de la confirmation (sous verrou).
+            if getattr(settings, "DJOMY_ENFORCE_FUNDING_CAP", False) and funding_request.funding_amount:
+                if new_total > funding_request.funding_amount:
+                    logger.warning(
+                        "funding_overfunded: paiement %s dépasse le plafond (%s > %s), montant reçu plafonné.",
+                        locked.pk, new_total, funding_request.funding_amount,
+                    )
+                    new_total = funding_request.funding_amount
+            funding_request.amount_received = new_total
             funding_request.save(update_fields=["amount_received", "updated_at"])
             _finalize_funding_request_status(funding_request)
 

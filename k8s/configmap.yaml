@@ -38,6 +38,11 @@ data:
 
   # Djomy (les identifiants sont dans le Secret)
   DJOMY_BASE_URL: "https://api.djomy.africa/v1"
+  # Réconciliation des paiements en attente (job Celery) — activer si besoin
+  PAYMENT_RECONCILIATION_ENABLED: "False"
+  PENDING_PAYMENT_EXPIRY_HOURS: "24"
+  # Plafonnement anti sur-financement à la confirmation — activer si besoin
+  DJOMY_ENFORCE_FUNDING_CAP: "False"
 
   # Stockage des médias sur S3 / Object Storage (les clés sont dans le Secret).
   # AWS_S3_ENDPOINT_URL vide = AWS S3 ; pour OVH: https://s3.<region>.io.cloud.ovh.net
