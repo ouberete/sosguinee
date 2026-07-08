@@ -45,6 +45,11 @@ services:
         value: sosguinee-web.onrender.com # You will add your custom domain here later
       - key: CSRF_TRUSTED_ORIGINS
         value: https://sosguinee-web.onrender.com
+      # API Djomy de PRODUCTION (le default du code est la sandbox).
+      # Les identifiants DJOMY_CLIENT_ID/SECRET/WEBHOOK_SECRET restent à définir
+      # comme variables secrètes dans le dashboard Render.
+      - key: DJOMY_BASE_URL
+        value: https://api.djomy.africa/v1
 
   - type: worker
     name: sosguinee-celery-worker

@@ -39,5 +39,13 @@ data:
   # Djomy (les identifiants sont dans le Secret)
   DJOMY_BASE_URL: "https://api.djomy.africa/v1"
 
+  # Stockage des médias sur S3 / Object Storage (les clés sont dans le Secret).
+  # AWS_S3_ENDPOINT_URL vide = AWS S3 ; pour OVH: https://s3.<region>.io.cloud.ovh.net
+  USE_S3: "True"
+  AWS_STORAGE_BUCKET_NAME: "sosguinee-media"          # ⚠️ bucket PUBLIC
+  AWS_PRIVATE_STORAGE_BUCKET_NAME: "sosguinee-private"  # ⚠️ bucket PRIVÉ (pièces d'identité)
+  AWS_S3_REGION_NAME: "gra"                            # ⚠️ à adapter (AWS: eu-west-3, OVH: gra...)
+  AWS_S3_ENDPOINT_URL: ""                              # ⚠️ vide=AWS ; OVH: https://s3.gra.io.cloud.ovh.net
+
   # Divers
   SECURE_SSL_REDIRECT: "True"

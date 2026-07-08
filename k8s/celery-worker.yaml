@@ -33,9 +33,6 @@ spec:
                 name: sosguinee-config
             - secretRef:
                 name: sosguinee-secrets
-          volumeMounts:
-            - name: media
-              mountPath: /app/mediafiles
           resources:
             requests:
               cpu: 100m
@@ -52,7 +49,3 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 120
             timeoutSeconds: 15
-      volumes:
-        - name: media
-          persistentVolumeClaim:
-            claimName: sosguinee-media

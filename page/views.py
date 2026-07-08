@@ -318,11 +318,22 @@ def _extract_signature_candidates(signature_header):
             _, value = token.split('=', 1)
             if value:
                 candidates.add(value.strip())
+        # Format Djomy: "v1:<hex>" (séparateur deux-points). On extrait le hex
+        # après le préfixe de version pour pouvoir le comparer au digest calculé.
+        if ':' in token:
+            _, value = token.split(':', 1)
+            if value:
+                candidates.add(value.strip())
     return [c for c in candidates if c]
 
 
 def _verify_djomy_webhook_signature(request):
     secret = (getattr(settings, "DJOMY_WEBHOOK_SECRET", "") or "").strip()
+    if not secret:
+        # Djomy signe le webhook avec le clientSecret (il n'existe pas de secret
+        # webhook dédié côté Djomy). On retombe donc sur DJOMY_CLIENT_SECRET, ce
+        # qui rend l'endpoint fonctionnel sans dupliquer le secret.
+        secret = (getattr(settings, "DJOMY_CLIENT_SECRET", "") or "").strip()
     if not secret:
         if settings.DEBUG:
             logger.warning("DJOMY_WEBHOOK_SECRET absent: signature webhook non vérifiée (mode DEBUG).")

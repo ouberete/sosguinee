@@ -57,6 +57,8 @@ services:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
       - ASYNC_EMAIL_ENABLED=${ASYNC_EMAIL_ENABLED:-True}
+      # API Djomy de PRODUCTION par defaut (le default du code est la sandbox).
+      - DJOMY_BASE_URL=${DJOMY_BASE_URL:-https://api.djomy.africa/v1}
     depends_on:
       - db
       - redis

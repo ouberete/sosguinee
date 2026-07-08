@@ -14,6 +14,10 @@ whitenoise==6.12.0
 gunicorn==26.0.0
 psycopg2-binary==2.9.12
 
+# Stockage des médias sur S3 / Object Storage (AWS S3, OVH Object Storage)
+django-storages==1.14.6
+boto3==1.40.44
+
 pillow==12.3.0
 requests==2.34.2
 

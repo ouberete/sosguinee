@@ -53,9 +53,6 @@ spec:
                 name: sosguinee-config
             - secretRef:
                 name: sosguinee-secrets
-          volumeMounts:
-            - name: media
-              mountPath: /app/mediafiles
           resources:
             requests:
               cpu: 250m
@@ -86,7 +83,3 @@ spec:
             failureThreshold: 3
           securityContext:
             allowPrivilegeEscalation: false
-      volumes:
-        - name: media
-          persistentVolumeClaim:
-            claimName: sosguinee-media

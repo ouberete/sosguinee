@@ -13,8 +13,6 @@ l'image, pas-à-pas complet, opérations courantes) est dans
 | `secret.example.yaml` | **Modèle** de secrets — ne jamais committer le vrai |
 | `postgres.yaml` | PostgreSQL (StatefulSet + PVC) — ou base managée |
 | `redis.yaml` | Redis (broker Celery + cache/rate limiting) |
-| `media-pvc.yaml` | Volume partagé des fichiers uploadés (RWX) |
-| `media-server.yaml` | nginx servant `/media/` (docs d'identité bloqués en 403) |
 | `web.yaml` | Django/gunicorn (2 répliques, probes `/healthz/`) |
 | `celery-worker.yaml` | Worker emails asynchrones |
 | `celery-beat.yaml` | Tâches planifiées (1 réplique obligatoire) |
@@ -63,8 +61,10 @@ kubectl apply -k k8s/            # rolling update sans coupure
 
 - **Secrets** : le fichier `secret.example.yaml` est un modèle. En GitOps,
   utilisez SealedSecrets ou External Secrets Operator.
-- **Media (RWX)** : plusieurs répliques web exigent un StorageClass
-  ReadWriteMany. À défaut, `replicas: 1` sur le web, ou stockage objet S3.
+- **Médias (S3/Object Storage)** : les fichiers uploadés sont stockés sur un
+  service objet S3-compatible (bucket public + bucket privé), plus de PVC.
+  Guides dédiés : [`docs/DEPLOIEMENT_AWS.md`](../docs/DEPLOIEMENT_AWS.md) et
+  [`docs/DEPLOIEMENT_OVH.md`](../docs/DEPLOIEMENT_OVH.md).
 - **PostgreSQL** : une base managée est recommandée en production réelle
   (sauvegardes/HA). Le StatefulSet fourni convient pour démarrer.
 - **celery-beat** : ne jamais dépasser 1 réplique (tâches en double sinon).

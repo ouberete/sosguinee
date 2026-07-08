@@ -179,24 +179,9 @@ class EmailService:
         sent = EmailService._send_mail_recorded(
             subject, plain_message, html_message, [donation.donor_email], settings.EMAIL_HOST_USER
         )
-
-        if donation.funding_request:
-            subject = "Vous avez recu un nouveau don!"
-            html_message = render_to_string(
-                "emails/donation_received_notification.html",
-                {
-                    "donation": donation,
-                    "site_url": settings.SITE_URL,
-                },
-            )
-            plain_message = strip_tags(html_message)
-            sent += EmailService._send_mail_recorded(
-                subject,
-                plain_message,
-                html_message,
-                [donation.funding_request.email],
-                settings.EMAIL_HOST_USER,
-            )
+        # NB: un Donation n'est pas rattaché à une FundingRequest (contrairement à
+        # FundPayment). L'ancien bloc « donation.funding_request » plantait donc
+        # systématiquement (AttributeError avalée) et a été retiré.
         return sent
 
     @staticmethod

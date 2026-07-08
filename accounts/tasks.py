@@ -1,9 +1,12 @@
+import logging
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from celery import shared_task
 from accounts.models import UserProfile
 from sosguinee.utils.email_service import EmailService
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def send_subscription_reminders():
@@ -20,8 +23,11 @@ def send_subscription_reminders():
             EmailService.send_subscription_reminder(profile.user, queue=False)
             profile.subscription_reminder_sent = True
             profile.save()
-        except Exception as e:
-            print(f"Erreur lors de l'envoi du rappel d'abonnement à {profile.user.email}: {str(e)}")
+        except Exception:
+            logger.exception(
+                "Erreur lors de l'envoi du rappel d'abonnement à %s",
+                profile.user.email,
+            )
 
 @shared_task
 def cleanup_expired_subscriptions():

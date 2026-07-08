@@ -31,6 +31,10 @@ Nginx (Reverse Proxy & Fichiers Statiques)
 Django Web App (Gunicorn)
    |-------------------------------> PostgreSQL (Base de données)
    |
+   |-------------------------------> S3 / Object Storage (médias)
+   |         bucket PUBLIC  : images d'alertes & financements (URLs directes)
+   |         bucket PRIVÉ   : pièces d'identité (servies par vue Django gardée)
+   |
    |-------------------------------> DJOMY API (Init paiement)
    |<------------------------------- DJOMY callback/webhook
    |
@@ -73,6 +77,7 @@ Sentry <----------------------------- Django + Celery (Capture d'exceptions)
 - `python-decouple` (Gestion des variables d'environnement)
 - `sentry-sdk` (Monitoring d'erreurs)
 - `pillow` (Traitement d'images)
+- `django-storages` + `boto3` (Stockage des médias sur S3 / Object Storage)
 
 ---
 
@@ -218,6 +223,22 @@ Le fichier `.env` contrôle le comportement du système.
 | `DJOMY_BASE_URL` | URL de l'API (sandbox ou prod). |
 | `DJOMY_WEBHOOK_SECRET` | Secret pour valider la signature des requêtes entrantes. |
 
+### Stockage des médias (S3 / Object Storage)
+Portable AWS S3 ↔ OVH Object Storage (protocole S3). Deux buckets : un **public**
+(images d'alertes/financements, URLs directes) et un **privé** (pièces d'identité,
+servies uniquement par la vue Django authentifiée). En dev, `USE_S3=False` conserve
+le stockage disque local.
+
+| Variable | Description |
+|---|---|
+| `USE_S3` | `True` en prod (S3), `False` en dev (disque local). |
+| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | Clés d'accès (secret). |
+| `AWS_STORAGE_BUCKET_NAME` | Bucket **public** (médias non sensibles). |
+| `AWS_PRIVATE_STORAGE_BUCKET_NAME` | Bucket **privé** (pièces d'identité). |
+| `AWS_S3_REGION_NAME` | Région (AWS ex: `eu-west-3` ; OVH ex: `gra`). |
+| `AWS_S3_ENDPOINT_URL` | **Vide** pour AWS ; pour OVH : `https://s3.<region>.io.cloud.ovh.net`. |
+| `AWS_QUERYSTRING_EXPIRE` | Durée (s) de validité des URLs signées du bucket privé (défaut 120). |
+
 ### SMTP (Emails)
 | Variable | Description |
 |---|---|
@@ -256,11 +277,27 @@ Utilisé pour soulager le processus web des tâches lourdes (envoi d'emails).
 - **Webhook en production :** Vous devez renseigner `https://<votre-domaine>/djomy/webhook/` dans le dashboard Djomy.
 - **Troubleshooting :** Si un paiement reste "en attente" côté Django mais est validé côté banque, c'est que le Webhook n'a pas atteint votre serveur (vérifier DNS, pare-feu, ou configuration du webhook Djomy).
 
-### 9.4 Sentry (Monitoring)
+### 9.4 Stockage des médias (S3 / Object Storage)
+Les fichiers uploadés ne sont plus stockés sur disque/PVC mais sur un service
+objet S3-compatible (AWS S3 ou OVH Object Storage).
+- **Deux buckets :** public (images d'alertes/financements) et privé (pièces
+  d'identité). Le bucket privé ne doit **jamais** être exposé publiquement.
+- **Sécurité :** les pièces d'identité transitent uniquement par la vue Django
+  `protected_user_document` (`/media/user_images/...`), qui vérifie le
+  propriétaire/staff puis streame le fichier depuis le bucket privé. Aucune URL
+  S3 directe ou présignée n'est exposée pour ces documents.
+- **Troubleshooting :** si une image publique ne s'affiche pas, vérifier la
+  *bucket policy* (lecture publique) du bucket public et `AWS_S3_ENDPOINT_URL`.
+  Si un document personnel renvoie 404, vérifier les clés `AWS_*` et l'existence
+  de l'objet dans le bucket privé.
+- **Guides de déploiement :** voir `docs/DEPLOIEMENT_AWS.md` et
+  `docs/DEPLOIEMENT_OVH.md`.
+
+### 9.5 Sentry (Monitoring)
 Capture automatiquement toutes les exceptions Python (Django & Celery).
 - **Mise en service :** Obtenir le DSN depuis le dashboard Sentry et définir `SENTRY_DSN` et `SENTRY_ENVIRONMENT=production`.
 
-### 9.5 Google OAuth & Cloudflare Turnstile
+### 9.6 Google OAuth & Cloudflare Turnstile
 - **Google OAuth :** Renseigner les "Redirect URIs" dans Google Cloud Console (ex: `https://<domaine>/accounts/google/login/callback/`).
 - **Turnstile :** Sans les clés en production, les formulaires protégés (inscription, don) bloqueront les requêtes.
 
@@ -307,11 +344,12 @@ Avant l'ouverture au public, vérifiez impérativement :
 2. [ ] `SECRET_KEY` est générée aléatoirement et gardée secrète.
 3. [ ] `ALLOWED_HOSTS` et `CSRF_TRUSTED_ORIGINS` contiennent le bon domaine (https).
 4. [ ] Paramètres SMTP (`EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`) configurés.
-5. [ ] Credentials de production DJOMY en place et **Webhook configuré** sur le dashboard DJOMY.
+5. [ ] Credentials de production DJOMY en place et **Webhook `POST /djomy/webhook/` configuré** sur le dashboard DJOMY.
 6. [ ] Redis et Celery Workers lancés et surveillés.
 7. [ ] Clés Turnstile configurées (sinon les inscriptions échoueront).
 8. [ ] Plan de sauvegarde PostgreSQL actif.
-9. [ ] Test "End-to-End" manuel : Inscription → Création Alerte → Demande Financement → Don Djomy réussi → Réception des emails.
+9. [ ] **Stockage objet configuré** : bucket public (lecture publique) + bucket privé (accès refusé au public), clés `AWS_*` en place, `USE_S3=True`.
+10. [ ] Test "End-to-End" manuel : Inscription → Upload pièce d'identité (accès réservé au propriétaire) → Création Alerte → Demande Financement → Don Djomy réussi → Réception des emails.
 
 ---
 

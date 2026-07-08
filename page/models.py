@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from page.middleware import get_current_user
+from sosguinee.utils.storages import select_private_storage
 
 
 class BaseEntity(models.Model):
@@ -516,16 +517,16 @@ class UserDetails(BaseEntity):
     bio = models.TextField(blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
-    id_card = models.FileField(upload_to='user_images/id_cards', blank=True, null=True)
+    id_card = models.FileField(upload_to='user_images/id_cards', storage=select_private_storage, blank=True, null=True)
     id_card_type = models.CharField(max_length=100, blank=True, null=True)
     id_card_country = models.CharField(max_length=100, blank=True, null=True, choices=COUNTRY_CHOICES)
-    birth_piece = models.FileField(upload_to='user_images/birth_piece', blank=True, null=True)
+    birth_piece = models.FileField(upload_to='user_images/birth_piece', storage=select_private_storage, blank=True, null=True)
     birth_piece_country = models.CharField(max_length=100, blank=True, null=True, choices=COUNTRY_CHOICES)
     person_contact = models.CharField(max_length=100, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     website = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    photo = models.ImageField(upload_to='user_images/photos', blank=True, null=True)
+    photo = models.ImageField(upload_to='user_images/photos', storage=select_private_storage, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     birth_place = models.CharField(max_length=100, blank=True, null=True)
     profession = models.CharField(max_length=100, choices=PROFESSION_CHOICES, blank=True, null=True, verbose_name='Profession', editable=True)

@@ -63,7 +63,7 @@ else:
 
 import logging
 logger = logging.getLogger(__name__)
-logger.warning(f"MEDIA_ROOT actif : {MEDIA_ROOT}")
+logger.debug("MEDIA_ROOT actif : %s", MEDIA_ROOT)
 
 # Application definition
 
@@ -347,15 +347,40 @@ CONTACT_NOTIFY_EMAIL = config("CONTACT_NOTIFY_EMAIL", cast=str, default=EMAIL_HO
 if not DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
     logger.warning("EMAIL_HOST_USER et EMAIL_HOST_PASSWORD ne sont pas définis. L'envoi d'emails échouera.")
 
+# --- Stockage des médias : S3 / Object Storage (AWS S3, OVH Object Storage) ---
+# USE_S3=True en prod. Endpoint vide = AWS S3 ; défini = OVH Object Storage
+# (ex: https://s3.gra.io.cloud.ovh.net). Deux buckets: public + privé.
+USE_S3 = config("USE_S3", default=False, cast=bool)
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")  # bucket PUBLIC
+AWS_PRIVATE_STORAGE_BUCKET_NAME = config("AWS_PRIVATE_STORAGE_BUCKET_NAME", default="")  # bucket PRIVÉ
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default="") or None
+AWS_S3_SIGNATURE_VERSION = config("AWS_S3_SIGNATURE_VERSION", default="s3v4")
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None  # l'ACL est fixée par chaque classe de storage
+AWS_QUERYSTRING_EXPIRE = config("AWS_QUERYSTRING_EXPIRE", default=120, cast=int)
+
 # DEFAULT_FILE_STORAGE / STATICFILES_STORAGE ont été supprimés en Django 5.1+.
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
+if USE_S3:
+    if not AWS_STORAGE_BUCKET_NAME or not AWS_PRIVATE_STORAGE_BUCKET_NAME:
+        raise ImproperlyConfigured(
+            "USE_S3=True: AWS_STORAGE_BUCKET_NAME et AWS_PRIVATE_STORAGE_BUCKET_NAME sont obligatoires."
+        )
+    STORAGES = {
+        "default": {"BACKEND": "sosguinee.utils.storages.PublicMediaStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

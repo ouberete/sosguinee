@@ -29,6 +29,7 @@ Bilingue français/anglais (i18n Django), interface Materialize CSS.
 | Cache & broker | Redis | 7+ |
 | Tâches asynchrones | Celery (worker + beat) | 5.6 |
 | Serveur applicatif | Gunicorn + Whitenoise (statiques) | — |
+| Stockage médias | S3 / Object Storage via django-storages + boto3 | — |
 | Auth | django-allauth (email + Google) | 65.x |
 | Paiements | Djomy (app locale `django_djomy`) | API v1 |
 | Anti-bot | Cloudflare Turnstile | — |
@@ -104,6 +105,7 @@ Le fichier **`.env.example`** liste tout. Les essentielles :
 | `EMAIL_HOST_USER/PASSWORD` | SMTP (mot de passe d'application) | ✅ |
 | `CONTACT_NOTIFY_EMAIL` | Boîte qui reçoit les messages de contact | ✅ |
 | `DJOMY_CLIENT_ID/SECRET`, `DJOMY_WEBHOOK_SECRET` | Paiements | ✅ |
+| `USE_S3` + `AWS_*` (2 buckets, clés, région, endpoint) | Stockage médias S3/Object Storage | ✅ (prod) |
 | `TURNSTILE_SITE_KEY/SECRET_KEY` | Captcha (désactivé si vide) | recommandé |
 | `SENTRY_DSN` | Monitoring erreurs | optionnel |
 
@@ -138,20 +140,23 @@ python manage.py compilemessages       # compiler les .po -> .mo
                     ┌───────▼────────┐
                     │ Ingress (TLS)  │  ingress-nginx + cert-manager
                     └───────┬────────┘
-                            │
-                 ┌──────────▼───────────┐
-                 │  web (Deployment ×2) │  gunicorn + whitenoise
-                 │  /healthz/ probes    │──────────┐
-                 └───┬────────────┬─────┘          │ PVC RWX
-                     │            │            ┌───▼────┐
-              ┌──────▼───┐   ┌────▼────┐       │ media  │
-              │ Postgres │   │  Redis  │       └───▲────┘
-              │(StatefulSet)│ │(cache + │           │
-              └──────▲───┘   │ broker) │       ┌───┴──────────────┐
-                     │       └────▲────┘       │ celery-worker ×1 │ emails
-                     │            │            │ celery-beat   ×1 │ tâches cron
-                     └────────────┴────────────┴──────────────────┘
+                            │                      ┌─────────────────────────────┐
+                 ┌──────────▼───────────┐          │ S3 / Object Storage (externe)│
+                 │  web (Deployment ×2) │─────────▶│  • bucket PUBLIC : médias    │
+                 │  gunicorn+whitenoise │          │  • bucket PRIVÉ  : pièces ID │
+                 │  /healthz/ probes    │          └─────────────────────────────┘
+                 └───┬────────────┬─────┘
+                     │            │
+              ┌──────▼───┐   ┌────▼────┐       ┌──────────────────┐
+              │ Postgres │   │  Redis  │◀──────│ celery-worker ×1 │ emails
+              │(StatefulSet)│ │(cache + │       │ celery-beat   ×1 │ tâches cron
+              └──────────┘   │ broker) │       └──────────────────┘
+                             └─────────┘
 ```
+
+> Les médias ne sont plus sur un PVC : ils vivent dans un service objet
+> S3-compatible (AWS S3 ou OVH Object Storage). `web` peut donc scaler sans
+> stockage partagé RWX. Voir `docs/DEPLOIEMENT_AWS.md` et `docs/DEPLOIEMENT_OVH.md`.
 
 Rôles séparés (contrairement à `entrypoint.sh` qui groupe tout pour le
 mono-conteneur) :
@@ -176,8 +181,9 @@ Tous les manifestes sont dans [`k8s/`](../k8s/README.md).
 3. [cert-manager](https://cert-manager.io) + un `ClusterIssuer`
    `letsencrypt-prod` (TLS automatique) ;
 4. Un registre d'images (GHCR, Docker Hub, registre du cloud) ;
-5. Un StorageClass **ReadWriteMany** pour le volume media si `web` a
-   plusieurs répliques (sinon `replicas: 1`, ou stockage objet S3 à terme).
+5. Un **stockage objet S3-compatible** avec **deux buckets** (public + privé)
+   pour les médias — plus de PVC RWX requis. Voir les guides dédiés
+   [`DEPLOIEMENT_AWS.md`](DEPLOIEMENT_AWS.md) et [`DEPLOIEMENT_OVH.md`](DEPLOIEMENT_OVH.md).
 
 ### 6.2 Construire et pousser l'image
 
@@ -211,6 +217,8 @@ kubectl -n sosguinee create secret generic sosguinee-secrets \
   --from-literal=DJOMY_CLIENT_ID='...' \
   --from-literal=DJOMY_CLIENT_SECRET='...' \
   --from-literal=DJOMY_WEBHOOK_SECRET='...' \
+  --from-literal=AWS_ACCESS_KEY_ID='...' \
+  --from-literal=AWS_SECRET_ACCESS_KEY='...' \
   --from-literal=TURNSTILE_SITE_KEY='...' \
   --from-literal=TURNSTILE_SECRET_KEY='...' \
   --from-literal=SENTRY_DSN=''
@@ -273,9 +281,11 @@ cp .env.example .env   # remplir
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Lance nginx (reverse proxy + statiques/media), web, celery worker, beat,
+Lance nginx (reverse proxy + statiques), web, celery worker, beat,
 PostgreSQL et Redis sur une machine. Convient à un petit trafic ;
 `nginx.conf` doit être complété par du TLS (Certbot ou Cloudflare).
+Les médias passent par S3/Object Storage dès que `USE_S3=True` (sinon disque
+local du conteneur).
 
 ### Fly.io
 
@@ -293,7 +303,10 @@ embarqué et gunicorn dans un seul conteneur).
 2. **Secrets** : uniquement en variables d'environnement / Secrets K8s.
    `SECRET_KEY` absente = démarrage refusé hors DEBUG (voulu).
 3. **Uploads** : whitelist d'extensions + vérification PIL + taille max.
-   Les documents d'identité ne doivent **jamais** entrer dans git.
+   Les documents d'identité ne doivent **jamais** entrer dans git. En prod ils
+   sont stockés dans le **bucket privé** S3 et servis uniquement par la vue
+   Django `protected_user_document` (propriétaire/staff) — jamais d'URL S3
+   directe/présignée.
 4. **Rate limiting** : basé sur le cache Redis (partagé entre pods). Ne pas
    remettre les compteurs à zéro après succès pour reset-password /
    resend-activation (anti-spam).
