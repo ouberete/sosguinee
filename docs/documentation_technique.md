@@ -79,6 +79,9 @@ Sentry <----------------------------- Django + Celery (Capture d'exceptions)
 - `pillow` (Traitement d'images)
 - `django-storages` + `boto3` (Stockage des médias sur S3 / Object Storage)
 
+> 📚 **Inventaire complet** de toutes les bibliothèques (directes +
+> transitives, versions et rôles) : voir [`BIBLIOTHEQUES.md`](BIBLIOTHEQUES.md).
+
 ---
 
 ## 4. Architecture & Arborescence du projet
