@@ -158,33 +158,33 @@ class FundingRequestAdmin(admin.ModelAdmin):
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
-    list_display = ('public_id', 'donor_name', 'amount', 'created_at', 'status')
-    list_filter = ('status', 'created_at')
+    list_display = ('public_id', 'donor_name', 'amount', 'created_at', 'status', 'is_anonymous')
+    list_filter = ('status', 'is_anonymous', 'created_at')
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'donor_email')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id')
     actions = [export_as_csv]
-    
+
     def donor_name(self, obj):
-        return f"{obj.donor_first_name} {obj.donor_last_name}"
+        return obj.donor_display_name
     donor_name.short_description = "Donateur"
 
 @admin.register(FundPayment)
 class FundPaymentAdmin(admin.ModelAdmin):
-    list_display = ('public_id', 'funding_request_link', 'donor_name', 'amount', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
+    list_display = ('public_id', 'funding_request_link', 'donor_name', 'amount', 'status', 'created_at', 'is_anonymous')
+    list_filter = ('status', 'is_anonymous', 'created_at')
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'funding_request__title')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id')
     actions = [export_as_csv]
-    
+
     def funding_request_link(self, obj):
         url = reverse('admin:page_fundingrequest_change', args=[obj.funding_request.id])
         return format_html('<a href="{}">{}</a>', url, obj.funding_request.title)
     funding_request_link.short_description = "Demande de financement"
-    
+
     def donor_name(self, obj):
-        return f"{obj.donor_first_name} {obj.donor_last_name}"
+        return obj.donor_display_name
     donor_name.short_description = "Donateur"
 
 @admin.register(MessageContact)

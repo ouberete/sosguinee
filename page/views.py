@@ -876,12 +876,19 @@ def donation(request):
 
         amount = form.cleaned_data['amount']
         user_email = form.cleaned_data['donor_email']
-        donor_first_name = form.cleaned_data['donor_first_name']
-        donor_last_name = form.cleaned_data['donor_last_name']
-        donor_country = form.cleaned_data['donor_country']
-        donor_city = form.cleaned_data['donor_city']
         donor_phone = form.cleaned_data['donor_phone']
-        donor_address = form.cleaned_data['donor_address']
+        is_anonymous = bool(form.cleaned_data.get('is_anonymous'))
+        # En mode anonyme, on ne conserve QUE l'email et le téléphone : les
+        # champs d'identité sont ignorés côté serveur (même s'ils étaient
+        # préremplis/soumis).
+        if is_anonymous:
+            donor_first_name = donor_last_name = donor_address = donor_city = donor_country = ""
+        else:
+            donor_first_name = form.cleaned_data['donor_first_name']
+            donor_last_name = form.cleaned_data['donor_last_name']
+            donor_country = form.cleaned_data['donor_country']
+            donor_city = form.cleaned_data['donor_city']
+            donor_address = form.cleaned_data['donor_address']
         try:
             # Enregistrer le paiement dans la base de données
             payment = Donation.objects.create(
@@ -893,6 +900,7 @@ def donation(request):
                 donor_city=donor_city,
                 donor_country=donor_country,
                 donor_phone =donor_phone,
+                is_anonymous=is_anonymous,
                 transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
                 #reference=data.get('reference')
             )
@@ -1187,12 +1195,17 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
         if form.is_valid():
             amount = form.cleaned_data['amount']
             user_email = form.cleaned_data['donor_email']
-            donor_first_name = form.cleaned_data['donor_first_name']
-            donor_last_name = form.cleaned_data['donor_last_name']
-            donor_country = form.cleaned_data['donor_country']
-            donor_city = form.cleaned_data['donor_city']
             donor_phone = form.cleaned_data['donor_phone']
-            donor_address = form.cleaned_data['donor_address']
+            is_anonymous = bool(form.cleaned_data.get('is_anonymous'))
+            # En mode anonyme, on ne conserve QUE l'email et le téléphone.
+            if is_anonymous:
+                donor_first_name = donor_last_name = donor_address = donor_city = donor_country = ""
+            else:
+                donor_first_name = form.cleaned_data['donor_first_name']
+                donor_last_name = form.cleaned_data['donor_last_name']
+                donor_country = form.cleaned_data['donor_country']
+                donor_city = form.cleaned_data['donor_city']
+                donor_address = form.cleaned_data['donor_address']
             try:
                 amount_decimal = Decimal(str(amount))
             except (InvalidOperation, TypeError, ValueError):
@@ -1217,6 +1230,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                     donor_city=donor_city,
                     donor_country=donor_country,
                     donor_phone =donor_phone,
+                    is_anonymous=is_anonymous,
                     transaction_id=str(uuid.uuid4()),  # Générer un ID de transaction unique
                     #reference=data.get('reference')
                 )

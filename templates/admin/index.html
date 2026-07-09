@@ -181,7 +181,7 @@
             <tbody>
                 {% for donation in recent_donations %}
                 <tr>
-                    <td>{{ donation.donor_first_name }} {{ donation.donor_last_name }}</td>
+                    <td>{{ donation.donor_display_name }}</td>
                     <td>{{ donation.amount|floatformat:0 }} GNF</td>
                     <td>{{ donation.created_at|date:"d/m/Y H:i" }}</td>
                     <td>

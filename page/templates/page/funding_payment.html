@@ -62,10 +62,17 @@
             <p class="payment-description">{{ funding_request.description_needs|truncatechars:220 }}</p>
           </div>
 
+          <p class="payment-anonymous-toggle">
+            <label>
+              {{ form.is_anonymous }}
+              <span>{{ form.is_anonymous.label }}</span>
+            </label>
+          </p>
+
           <div class="payment-fields row">
             {% for field in form.visible_fields %}
-            {% if field.name != 'amount' %}
-            <div class="input-field col s12 {% if field.name == 'amount' or field.name == 'donor_address' %}m12{% else %}m6{% endif %}">
+            {% if field.name != 'amount' and field.name != 'is_anonymous' %}
+            <div class="input-field col s12 {% if field.name == 'donor_first_name' or field.name == 'donor_last_name' or field.name == 'donor_address' or field.name == 'donor_city' or field.name == 'donor_country' %}payment-identity-field {% endif %}{% if field.name == 'donor_address' %}m12{% else %}m6{% endif %}">
               {{ field }}
               <label for="{{ field.id_for_label }}">{{ field.label }}</label>
               {% if field.help_text %}
@@ -169,6 +176,24 @@
   document.addEventListener('DOMContentLoaded', function () {
     M.FormSelect.init(document.querySelectorAll('select'));
     M.updateTextFields();
+
+    // Paiement anonyme : masque les champs d'identité et ne garde que l'email
+    // et le téléphone. Les valeurs masquées sont vidées.
+    (function () {
+      var anon = document.getElementById('id_is_anonymous');
+      var identity = document.querySelectorAll('.payment-identity-field');
+      function applyAnon() {
+        var hide = anon && anon.checked;
+        identity.forEach(function (w) {
+          w.style.display = hide ? 'none' : '';
+          if (hide) {
+            w.querySelectorAll('input, select').forEach(function (el) { el.value = ''; });
+          }
+        });
+        if (window.M) { M.updateTextFields(); M.FormSelect.init(document.querySelectorAll('select')); }
+      }
+      if (anon) { anon.addEventListener('change', applyAnon); applyAnon(); }
+    })();
 
     // Anti double-soumission: on laisse le submit natif se faire (validation
     // du navigateur incluse) et on se contente de verrouiller le bouton.

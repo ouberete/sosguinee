@@ -382,35 +382,57 @@ class MessageContactForm(forms.ModelForm):
         
         
 
-class DonationForm(forms.ModelForm):
-    donor_first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre prénom.'}, label="Prénom du donateur")
-    donor_last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre nom.'}, label="Nom du donateur")
+# Champs d'identité rendus optionnels côté serveur : requis seulement si le
+# paiement n'est PAS anonyme (validé dans clean()).
+ANONYMIZABLE_IDENTITY_FIELDS = {
+    'donor_first_name': 'Veuillez renseigner votre prénom.',
+    'donor_last_name': 'Veuillez renseigner votre nom.',
+    'donor_address': 'Veuillez renseigner votre adresse.',
+    'donor_city': 'Veuillez renseigner votre ville.',
+}
+
+
+class _AnonymizablePaymentForm(forms.ModelForm):
+    """Valide les champs d'identité uniquement si le paiement n'est pas anonyme."""
+
+    def clean(self):
+        cleaned = super().clean()
+        if not cleaned.get('is_anonymous'):
+            for field_name, message in ANONYMIZABLE_IDENTITY_FIELDS.items():
+                if field_name in self.fields and not (cleaned.get(field_name) or '').strip():
+                    self.add_error(field_name, message)
+        return cleaned
+
+
+class DonationForm(_AnonymizablePaymentForm):
+    donor_first_name = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'validate'}), label="Prénom du donateur")
+    donor_last_name = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'validate'}), label="Nom du donateur")
     donor_phone = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre numéro de téléphone.'}, label="Téléphone du donateur")
     donor_email = forms.EmailField(widget=forms.EmailInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre email.'}, label="Email du donateur")
-    donor_address = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre adresse.'}, label="Adresse du donateur")
-    donor_city = forms.CharField(widget=forms.TextInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre ville.'}, label="Ville du donateur")
-    #Country field should be a dropdown list with countries from userdetails countries model
+    donor_address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Adresse du donateur")
+    donor_city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Ville du donateur")
     amount = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1000'}), error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'}, label="Montant (En GNF) à donner")
     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class':'materialize-textarea'}), label="Description", required=False)
+    is_anonymous = forms.BooleanField(required=False, label="Faire un don anonyme (nous ne demandons que l'email et le téléphone)")
 
     class Meta:
         model = Donation
-        fields = ['amount', 'donor_first_name', 'donor_last_name',  'donor_country','donor_city','donor_phone', 'donor_email', 'donor_address', 'description']
+        fields = ['amount', 'donor_first_name', 'donor_last_name',  'donor_country','donor_city','donor_phone', 'donor_email', 'donor_address', 'description', 'is_anonymous']
 
-class FundingPaymentForm(forms.ModelForm):
+class FundingPaymentForm(_AnonymizablePaymentForm):
     amount = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1'}),
         error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'},
         label="Montant (En GNF) à financer"
     )
     donor_first_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
-        error_messages={'required': 'Veuillez renseigner votre prénom.'},
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'validate'}),
         label="Prénom du donateur"
     )
     donor_last_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
-        error_messages={'required': 'Veuillez renseigner votre nom.'},
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'validate'}),
         label="Nom du donateur"
     )
     donor_phone = forms.CharField(
@@ -424,19 +446,20 @@ class FundingPaymentForm(forms.ModelForm):
         label="Email du donateur"
     )
     donor_address = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
-        error_messages={'required': 'Veuillez renseigner votre adresse.'},
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'validate'}),
         label="Adresse du donateur"
     )
     donor_city = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required'}),
-        error_messages={'required': 'Veuillez renseigner votre ville.'},
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'validate'}),
         label="Ville du donateur"
     )
+    is_anonymous = forms.BooleanField(required=False, label="Faire un paiement anonyme (nous ne demandons que l'email et le téléphone)")
 
     class Meta:
         model = FundPayment
-        fields = ['amount', 'donor_first_name', 'donor_last_name','donor_country','donor_city', 'donor_phone', 'donor_email', 'donor_address',  ]
+        fields = ['amount', 'donor_first_name', 'donor_last_name','donor_country','donor_city', 'donor_phone', 'donor_email', 'donor_address', 'is_anonymous']
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

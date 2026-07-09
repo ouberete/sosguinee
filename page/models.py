@@ -607,6 +607,7 @@ class Donation(BaseEntity):
     description = models.TextField(blank=True, null=True, verbose_name='Description')
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='paypal', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
+    is_anonymous = models.BooleanField(default=False, verbose_name='Don anonyme')
     transaction_id = models.CharField(max_length=255, verbose_name='ID Transaction', blank=True, null=True)
     reference = models.CharField(max_length=100, unique=True, verbose_name='Référence de don', help_text='Référence unique pour le don', blank=True, null=True)
     donation_date = models.DateTimeField(default=timezone.now, verbose_name='Date Don', blank=True, null=True)
@@ -620,6 +621,14 @@ class Donation(BaseEntity):
 
     def __str__(self):
         return f"{self.amount} GNF via {self.method} - {self.status}"
+
+    @property
+    def donor_display_name(self):
+        """Nom à afficher : « Donateur anonyme » si le don est anonyme."""
+        if self.is_anonymous:
+            return "Donateur anonyme"
+        full = f"{self.donor_first_name or ''} {self.donor_last_name or ''}".strip()
+        return full or "—"
         
 class EmailContent(BaseEntity):
     subjet = models.TextField(blank=True, null=True, verbose_name="Object du message")
@@ -698,6 +707,7 @@ class FundPayment(BaseEntity):
     amount = models.DecimalField(max_digits=18, decimal_places=2, verbose_name='Montant')
     payment_method = models.CharField(max_length=20, choices=Donation.PAYMENT_METHODS, default='PayCard', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=Donation.STATUS_CHOICES, default='en_attente', verbose_name='Statut')
+    is_anonymous = models.BooleanField(default=False, verbose_name='Paiement anonyme')
     reference = models.CharField(max_length=100, unique=True, verbose_name='Référence de paiement', help_text='Référence unique pour le paiement', blank=True, null=True)
     payment_date = models.DateTimeField(default=timezone.now, verbose_name='Date de paiement')
     objects = BaseManager()
@@ -710,6 +720,14 @@ class FundPayment(BaseEntity):
 
     def __str__(self):
         return f"{self.amount} GNF via {self.payment_method} - {self.status} - {self.funding_request.title}"
+
+    @property
+    def donor_display_name(self):
+        """Nom à afficher : « Donateur anonyme » si le paiement est anonyme."""
+        if self.is_anonymous:
+            return "Donateur anonyme"
+        full = f"{self.donor_first_name or ''} {self.donor_last_name or ''}".strip()
+        return full or "—"
 
 
 class Comment(BaseEntity):
