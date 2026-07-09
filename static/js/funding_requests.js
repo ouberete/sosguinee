@@ -195,7 +195,7 @@ function renderFundingCard(fundingRequest, index) {
 
 function GenerateFundingRequestList(response) {
     $('#pagination').empty();
-    $('#results-count').text(`${response.pagination.total_elements} demande(s) trouvee(s)`);
+    $('#results-count').text(`${response.pagination.total_elements} demande(s) trouvée(s)`);
 
     if (response.funding_requests.length === 0) {
         $('#fundings-container').append(`

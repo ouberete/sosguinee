@@ -97,7 +97,7 @@ function buildLocation(alert) {
 
 function GenerateLossAlertList(response) {
     $('#pagination').empty();
-    $('#results-count').text(`${response.pagination.total_elements} alerte(s) trouvee(s)`);
+    $('#results-count').text(`${response.pagination.total_elements} alerte(s) trouvée(s)`);
 
     if (response.loss_alerts.length === 0) {
         $('#alerts-container').append(`

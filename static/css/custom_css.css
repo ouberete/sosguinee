@@ -1377,6 +1377,11 @@
     right: 30px;
 }
 
+/* Bouton principal du FAB : rond (une regle .btn globale le rendait carre). */
+.fixed-action-btn > a.btn-floating {
+    border-radius: 50%;
+}
+
 .fixed-action-btn ul {
     padding: 10px;
 }
