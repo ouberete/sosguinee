@@ -1,5 +1,4 @@
 import logging
-from django.contrib import messages
 from django.core.cache import cache
 from page.models import LossAlertStatus, UserActionLog
 from sosguinee.utils.email_service import EmailService
@@ -33,16 +32,12 @@ class LossAlertService:
             metadata={'status': loss_alert.status_alert_name},
         )
         
-        # Envoi de l'email
+        # Envoi de l'email de confirmation. Un échec ne concerne pas
+        # l'utilisateur (l'alerte est bien enregistrée) : on le journalise
+        # seulement, sans message d'erreur à l'écran.
         try:
             EmailService.send_alert_notification(loss_alert)
         except Exception as e:
             logger.warning("Email alerte non envoye (alerte conservee): %s", e, exc_info=True)
-            messages.error(request, "L'envoi du mail a échoué. Votre alerte a bien été enregistrée.")
-        else:
-            if identifier:
-                # Supprimer le rate limit cache key, note : on a besoin de recréer la clé ou que la vue s'en occupe.
-                # Dans ce cas, la vue passera la clé cache ou l'identifier directement.
-                pass
-                
+
         return loss_alert

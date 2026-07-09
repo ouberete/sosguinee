@@ -46,6 +46,11 @@ ALLOWED_COMMENT_MODELS = {
     "lossalert": LossAlert,
 }
 PUBLIC_RATE_LIMIT_MESSAGE = "Trop de tentatives. Veuillez réessayer dans quelques minutes."
+# Message générique affiché à l'utilisateur en cas d'échec d'initiation de
+# paiement. Le détail technique reste journalisé (logger + _log_payment_event).
+GENERIC_PAYMENT_ERROR = (
+    "Une erreur interne est survenue. Veuillez réessayer plus tard ou contacter l'administrateur."
+)
 MAX_ITEMS_PER_PAGE = 50
 
 
@@ -926,7 +931,7 @@ def donation(request):
                     provider="djomy",
                 )
                 if not payment_url:
-                    messages.error(request, "Url de paiement introuvable dans la réponse de Djomy.")
+                    messages.error(request, GENERIC_PAYMENT_ERROR)
                     context = {'form': form}
                     context.update(_captcha_context())
                     return render(request, 'page/donation.html', context)
@@ -938,7 +943,7 @@ def donation(request):
                     error=str(e),
                     provider="djomy",
                 )
-                messages.error(request, "Erreur de communication avec l'API Djomy.")
+                messages.error(request, GENERIC_PAYMENT_ERROR)
                 # Erreur API Djomy
                 context = {'form': form}
                 context.update(_captcha_context())
@@ -955,7 +960,7 @@ def donation(request):
             return redirect(payment_url)
             
         except Exception as e:
-            messages.error(request, "Erreur interne système. Réessayez plus tard.")
+            messages.error(request, GENERIC_PAYMENT_ERROR)
             # Erreur interne transaction
             context = {'form': form}
             context.update(_captcha_context())
@@ -1254,7 +1259,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                         provider="djomy",
                     )
                     if not payment_url:
-                        messages.error(request, "Url de paiement introuvable dans la réponse de Djomy.")
+                        messages.error(request, GENERIC_PAYMENT_ERROR)
                         context = {'funding_request': funding_request, 'form': form}
                         context.update(_captcha_context())
                         return render(request, 'page/funding_payment.html', context)
@@ -1267,7 +1272,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                         error=str(e),
                         provider="djomy",
                     )
-                    messages.error(request, "Erreur de communication avec l'API Djomy.")
+                    messages.error(request, GENERIC_PAYMENT_ERROR)
                     # Erreur API Djomy
                     context = {'funding_request': funding_request, 'form': form}
                     context.update(_captcha_context())
@@ -1285,7 +1290,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                 return redirect(payment_url)
                 
             except Exception as e:
-                messages.error(request, "Erreur interne système. Réessayez plus tard.")
+                messages.error(request, GENERIC_PAYMENT_ERROR)
                 # Erreur interne transaction
                 context = {'funding_request': funding_request, 'form': form}
                 context.update(_captcha_context())

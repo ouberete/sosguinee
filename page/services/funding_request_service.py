@@ -1,5 +1,4 @@
 import logging
-from django.contrib import messages
 from page.models import FundingRequestStatus, UserActionLog
 from sosguinee.utils.email_service import EmailService
 
@@ -29,10 +28,12 @@ class FundingRequestService:
             metadata={'status': funding_request.funding_request_status_name},
         )
         
+        # Envoi de l'email de confirmation. Un échec ne concerne pas
+        # l'utilisateur (la demande est bien enregistrée) : on le journalise
+        # seulement, sans message d'erreur à l'écran.
         try:
             EmailService.send_funding_request_notification(funding_request)
         except Exception as e:
             logger.warning("Email demande de financement non envoye (demande conservee): %s", e, exc_info=True)
-            messages.error(request, "L'envoi du mail a échoué. Votre demande a bien été enregistrée.")
-        
+
         return funding_request

@@ -17,14 +17,6 @@
         <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 30px; margin-top: 20px;">
           <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 30px;">{% trans "Se connecter" %}</h4>
 
-          {% if messages %}
-            {% for message in messages %}
-              <div class="card-panel {{ message.tags }}">
-                {{ message }}
-              </div>
-            {% endfor %}
-          {% endif %}
-
           <form method="post" action="{% url 'login' %}" id="login-form" novalidate style="text-align: left;">
             {% csrf_token %}
 

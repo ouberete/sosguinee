@@ -39,13 +39,6 @@
     </div>
     {% endif %}
 
-    {% for message in messages %}
-    <div class="payment-alert {{ message.tags }}">
-      <i class="material-icons">info</i>
-      <span>{{ message }}</span>
-    </div>
-    {% endfor %}
-
     {% if form.non_field_errors %}
     <div class="payment-alert error">
       <i class="material-icons">error</i>

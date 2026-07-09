@@ -29,6 +29,17 @@
 <div class="main-wrapper">
     {% include 'page/components/nav.html' %}
 
+    {% if messages %}
+    <div class="container" style="margin-top: 16px;">
+        {% for message in messages %}
+        <div class="card-panel {% if message.tags == 'error' %}red lighten-4 red-text text-darken-4{% elif message.tags == 'success' %}green lighten-4 green-text text-darken-4{% elif message.tags == 'warning' %}amber lighten-4 orange-text text-darken-4{% else %}blue lighten-4 blue-text text-darken-4{% endif %}"
+             role="alert" style="border-radius: 8px; margin-bottom: 0;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <main>
         {% block content %}{% endblock %}
     </main>
