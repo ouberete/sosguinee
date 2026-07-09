@@ -133,9 +133,12 @@
               {% endif %}
             </div>
             <div class="bf-card-socials">
-              <a href="#" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              {% url 'loss_alert_detail_public' alert.public_id as al_detail_path %}
+              {% with al_abs=request.scheme|add:'://'|add:request.get_host|add:al_detail_path al_title='Alerte de perte : '|add:alert.name|add:' - SOS Guinee' %}
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ al_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://twitter.com/intent/tweet?url={{ al_abs|urlencode:'' }}&amp;text={{ al_title|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="https://wa.me/?text={{ al_title|urlencode:'' }}%20{{ al_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              {% endwith %}
             </div>
           </div>
         </article>
@@ -210,9 +213,12 @@
             </div>
 
             <div class="ws-card-socials">
-              <a href="#" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              {% url 'funding_request_details_public' req.public_id as fr_detail_path %}
+              {% with fr_abs=request.scheme|add:'://'|add:request.get_host|add:fr_detail_path fr_title='Aide '|add:req.beneficiary_name|add:' - '|add:req.title|add:' - SOS Guinee' %}
+              <a href="https://www.facebook.com/sharer/sharer.php?u={{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://twitter.com/intent/tweet?url={{ fr_abs|urlencode:'' }}&amp;text={{ fr_title|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="https://wa.me/?text={{ fr_title|urlencode:'' }}%20{{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              {% endwith %}
             </div>
           </div>
         </article>
