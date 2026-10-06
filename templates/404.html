@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Page introuvable" %} - Ensemble 224{% endblock %}
+{% block content %}
+<section class="section not-found-page" aria-labelledby="not-found-title">
+  <div class="container center-align">
+    <div class="card-panel">
+      <h1 id="not-found-title">404</h1>
+      <h2>{% trans "Page introuvable" %}</h2>
+      <p>{% trans "La page demandée n'existe pas ou a été déplacée." %}</p>
+      <a href="{% url 'home' %}" class="btn blue darken-2 waves-effect waves-light">{% trans "Retour à l'accueil" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato&family=Staatliches');
+
+/* Keep standalone forms and status cards aligned with the profile editor. */
+.form-shell {
+    max-width: 1280px;
+}
 :root{
     --primary-color: #c72727;
     --secondary-color: #f99500;

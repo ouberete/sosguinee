@@ -6,7 +6,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SOS Guinee{% endblock %}</title>
+    <title>{% block title %}Ensemble 224{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Ensemble 224 aide à publier des alertes de perte, suivre des demandes de financement et mobiliser la solidarité en Guinée.{% endblock %}">
+    <meta property="og:site_name" content="Ensemble 224">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Ensemble 224{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Plateforme solidaire pour les alertes de perte et les financements en Guinée.{% endblock %}">
+    <meta property="og:image" content="{% static 'img/mylogo.png' %}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +32,7 @@
     {% block extracss %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body data-image-fallback="{% static 'img/mylogo.png' %}"{% if plausible_domain %} data-plausible-domain="{{ plausible_domain }}"{% endif %}>
 <div class="site-bg-shape site-bg-shape-1"></div>
 <div class="site-bg-shape site-bg-shape-2"></div>
 
@@ -47,10 +57,44 @@
     {% include 'page/components/footer.html' %}
 </div>
 
+<div class="cookie-banner" id="cookie-banner" role="region" aria-label="{% trans 'Préférences cookies' %}" hidden>
+    <div>
+        <strong>{% trans "Cookies" %}</strong>
+        <p>{% trans "Nous utilisons des cookies nécessaires au fonctionnement du site. Les cookies de mesure d'audience ne seront activés qu'avec votre accord." %}</p>
+    </div>
+    <div class="cookie-actions">
+        <button type="button" class="btn-flat cookie-decline" data-cookie-choice="refused">{% trans "Refuser" %}</button>
+        <button type="button" class="btn blue darken-2" data-cookie-choice="accepted">{% trans "Accepter" %}</button>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
 <script>
+    document.addEventListener('error', function (event) {
+        var image = event.target;
+        if (!(image instanceof HTMLImageElement) || image.dataset.fallbackApplied) return;
+        var fallback = document.body.getAttribute('data-image-fallback');
+        if (!fallback || image.currentSrc === fallback) return;
+        image.dataset.fallbackApplied = 'true';
+        image.loading = 'eager';
+        image.src = fallback;
+    }, true);
+
     document.addEventListener('DOMContentLoaded', function () {
+        function replaceBrokenImages() {
+            var fallback = document.body.getAttribute('data-image-fallback');
+            if (!fallback) return;
+            document.querySelectorAll('img').forEach(function (image) {
+                if (image.naturalWidth > 0 || image.dataset.fallbackApplied) return;
+                image.dataset.fallbackApplied = 'true';
+                image.loading = 'eager';
+                image.src = fallback;
+            });
+        }
+        replaceBrokenImages();
+        window.setTimeout(replaceBrokenImages, 1500);
+
         if (!window.M) return;
 
         M.Sidenav.init(document.querySelectorAll('.sidenav'));
@@ -77,6 +121,31 @@
             });
             document.addEventListener('click', function (e) {
                 if (!fab.contains(e.target)) fab.classList.remove('active');
+            });
+        });
+
+        var cookieBanner = document.getElementById('cookie-banner');
+        var cookieConsent = localStorage.getItem('ensemble224_cookie_consent');
+        function loadAnalytics() {
+            var domain = document.body.getAttribute('data-plausible-domain');
+            if (!domain || document.querySelector('script[data-domain="' + domain + '"]')) return;
+            var script = document.createElement('script');
+            script.defer = true;
+            script.src = 'https://plausible.io/js/script.js';
+            script.setAttribute('data-domain', domain);
+            document.head.appendChild(script);
+        }
+        if (cookieBanner && !cookieConsent) {
+            cookieBanner.hidden = false;
+        } else if (cookieConsent === 'accepted') {
+            loadAnalytics();
+        }
+        document.querySelectorAll('[data-cookie-choice]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var choice = button.getAttribute('data-cookie-choice');
+                localStorage.setItem('ensemble224_cookie_consent', choice);
+                if (choice === 'accepted') loadAnalytics();
+                if (cookieBanner) cookieBanner.hidden = true;
             });
         });
     });

@@ -24,6 +24,8 @@ urlpatterns = [
     path('confirmation-funding-request-added/', views.confirmation_funding_request_added, name='confirmation_funding_request_added'),
     path('help-support/', views.help_support, name='help_support'),
     path('policy-privacy/', views.policy_privacy, name='policy_privacy'),
+    path('rgpd/', views.policy_privacy, name='rgpd'),
+    path('cgu/', views.terms, name='terms'),
     path('about-us', views.about, name='about_us'),
     path('api/', include('page.api_urls')),
     path('funding/<int:pk>/djomy/', views.djomy_funding, name='djomy_funding'),

@@ -8,10 +8,10 @@ from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 
 from page.models import EmailContent
-from sosguinee.utils.email_retry import resend_email_content
+from ensemble224.utils.email_retry import resend_email_content
 
 
-ACTIVATION_EMAIL_SUBJECT = "Activation de votre compte SOS Guinee"
+ACTIVATION_EMAIL_SUBJECT = "Activation de votre compte Ensemble 224"
 
 
 def site_protocol_domain():
@@ -53,7 +53,9 @@ def send_or_queue_activation_email(user, reuse_unsent=True):
     if reuse_unsent:
         existing_email = _existing_unsent_activation_email(user)
         if existing_email:
-            resend_email_content(existing_email)
+            sent_count = resend_email_content(existing_email)
+            if sent_count != 1:
+                raise RuntimeError("L'email d'activation n'a pas été envoyé.")
             return existing_email
 
     html_message = render_to_string(
@@ -68,5 +70,7 @@ def send_or_queue_activation_email(user, reuse_unsent=True):
         html_message=html_message,
         is_sent=False,
     )
-    resend_email_content(email_content)
+    sent_count = resend_email_content(email_content)
+    if sent_count != 1:
+        raise RuntimeError("L'email d'activation n'a pas été envoyé.")
     return email_content

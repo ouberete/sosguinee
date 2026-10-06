@@ -1,25 +1,25 @@
 # Configuration NON sensible de l'application.
 # Les secrets (SECRET_KEY, mots de passe, clés API) vont dans le Secret
-# "sosguinee-secrets" — voir secret.example.yaml.
+# "ensemble224-secrets" — voir secret.example.yaml.
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sosguinee-config
-  namespace: sosguinee
+  name: ensemble224-config
+  namespace: ensemble224
 data:
   ENVIRONMENT: "production"
   DEBUG: "False"
-  DJANGO_SETTINGS_MODULE: "sosguinee.settings_prod"
+  DJANGO_SETTINGS_MODULE: "ensemble224.settings_prod"
 
   # ⚠️ À adapter à votre domaine réel
-  ALLOWED_HOSTS: "sosguinee.example.com"
-  CSRF_TRUSTED_ORIGINS: "https://sosguinee.example.com"
-  SITE_URL: "https://sosguinee.example.com"
+  ALLOWED_HOSTS: "ensemble224.example.com"
+  CSRF_TRUSTED_ORIGINS: "https://ensemble224.example.com"
+  SITE_URL: "https://ensemble224.example.com"
 
   # Base de données (le mot de passe est dans le Secret)
   USE_POSTGRES: "True"
-  POSTGRES_NAME: "sosguinee"
-  POSTGRES_USER: "sosguinee"
+  POSTGRES_NAME: "ensemble224"
+  POSTGRES_USER: "ensemble224"
   POSTGRES_HOST: "postgres"
   POSTGRES_PORT: "5432"
 
@@ -41,14 +41,11 @@ data:
   # Réconciliation des paiements en attente (job Celery) — activer si besoin
   PAYMENT_RECONCILIATION_ENABLED: "False"
   PENDING_PAYMENT_EXPIRY_HOURS: "24"
-  # Plafonnement anti sur-financement à la confirmation — activer si besoin
-  DJOMY_ENFORCE_FUNDING_CAP: "False"
-
   # Stockage des médias sur S3 / Object Storage (les clés sont dans le Secret).
   # AWS_S3_ENDPOINT_URL vide = AWS S3 ; pour OVH: https://s3.<region>.io.cloud.ovh.net
   USE_S3: "True"
-  AWS_STORAGE_BUCKET_NAME: "sosguinee-media"          # ⚠️ bucket PUBLIC
-  AWS_PRIVATE_STORAGE_BUCKET_NAME: "sosguinee-private"  # ⚠️ bucket PRIVÉ (pièces d'identité)
+  AWS_STORAGE_BUCKET_NAME: "ensemble224-media"          # ⚠️ bucket PUBLIC
+  AWS_PRIVATE_STORAGE_BUCKET_NAME: "ensemble224-private"  # ⚠️ bucket PRIVÉ (pièces d'identité)
   AWS_S3_REGION_NAME: "gra"                            # ⚠️ à adapter (AWS: eu-west-3, OVH: gra...)
   AWS_S3_ENDPOINT_URL: ""                              # ⚠️ vide=AWS ; OVH: https://s3.gra.io.cloud.ovh.net
 

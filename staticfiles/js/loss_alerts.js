@@ -97,7 +97,7 @@ function buildLocation(alert) {
 
 function GenerateLossAlertList(response) {
     $('#pagination').empty();
-    $('#results-count').text(`${response.pagination.total_elements} alerte(s) trouvee(s)`);
+    $('#results-count').text(`${response.pagination.total_elements} alerte(s) trouvée(s)`);
 
     if (response.loss_alerts.length === 0) {
         $('#alerts-container').append(`
@@ -118,7 +118,7 @@ function GenerateLossAlertList(response) {
         const title = escapeHtml(lossAlert.name || 'Alerte de perte');
         const description = escapeHtml(truncateText(lossAlert.description || 'Signalement en attente de details complementaires.', 130));
         const fullUrl = `${window.location.origin}${lossAlert.details_url}`;
-        const shareTitle = `Alerte de perte : ${lossAlert.name} - SOS Guinee`;
+        const shareTitle = `Alerte de perte : ${lossAlert.name} - Ensemble 224`;
         const locationText = escapeHtml(buildLocation(lossAlert));
         const dateText = lossAlert.date_alert || 'Date inconnue';
         const hourText = lossAlert.hour_alert || 'Heure non precisee';

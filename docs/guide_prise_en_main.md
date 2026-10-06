@@ -1,4 +1,4 @@
-# Guide de prise en main — SOS Guinée
+# Guide de prise en main — Ensemble 224
 
 > Document de référence pour démarrer sur le projet : architecture, mise en
 > route locale, tests, et déploiement (Docker Compose, Fly.io, **Kubernetes**).
@@ -9,7 +9,7 @@
 
 ## 1. Le projet en bref
 
-SOS Guinée est une plateforme solidaire Django permettant de :
+Ensemble 224 est une plateforme solidaire Django permettant de :
 
 - **Signaler des alertes de perte** (personnes disparues, objets, documents) ;
 - **Créer des collectes de financement** (santé, urgences, projets
@@ -47,8 +47,8 @@ Bilingue français/anglais (i18n Django), interface Materialize CSS.
 ## 3. Arborescence utile
 
 ```
-sosguinee/
-├── sosguinee/            # Projet Django (settings, urls, celery, utils)
+ensemble224/
+├── ensemble224/            # Projet Django (settings, urls, celery, utils)
 │   ├── settings.py       # Configuration commune (env via python-decouple)
 │   ├── settings_prod.py  # Force ENVIRONMENT=production, DEBUG=False
 │   └── tasks.py          # Tâches Celery (emails)
@@ -77,7 +77,7 @@ sosguinee/
 ### 4.2 Installation
 
 ```bash
-git clone <repo> && cd sosguinee
+git clone <repo> && cd ensemble224
 python -m venv .venv
 # Windows : .venv\Scripts\activate   |   Linux/macOS : source .venv/bin/activate
 pip install -r requirements.txt
@@ -188,8 +188,8 @@ Tous les manifestes sont dans [`k8s/`](../k8s/README.md).
 ### 6.2 Construire et pousser l'image
 
 ```bash
-docker build -t ghcr.io/<org>/sosguinee:v1.0.0 .
-docker push ghcr.io/<org>/sosguinee:v1.0.0
+docker build -t ghcr.io/<org>/ensemble224:v1.0.0 .
+docker push ghcr.io/<org>/ensemble224:v1.0.0
 ```
 
 La même image sert aux 4 rôles (web, worker, beat, migrate) — seule la
@@ -199,16 +199,16 @@ commande change.
 
 Dans `k8s/` remplacez :
 
-- `REGISTRY/sosguinee:latest` → votre image **taguée** (via
+- `REGISTRY/ensemble224:latest` → votre image **taguée** (via
   `kustomize edit set image`, voir README k8s) ;
-- `sosguinee.example.com` → votre domaine (dans `configmap.yaml`,
+- `ensemble224.example.com` → votre domaine (dans `configmap.yaml`,
   `web.yaml` (probes) et `ingress.yaml`).
 
 ### 6.4 Secrets
 
 ```bash
 kubectl apply -f k8s/namespace.yaml
-kubectl -n sosguinee create secret generic sosguinee-secrets \
+kubectl -n ensemble224 create secret generic ensemble224-secrets \
   --from-literal=SECRET_KEY="$(python -c 'import secrets;print(secrets.token_urlsafe(64))')" \
   --from-literal=POSTGRES_PASSWORD='<fort>' \
   --from-literal=EMAIL_HOST_USER='...' \
@@ -232,16 +232,16 @@ kubectl -n sosguinee create secret generic sosguinee-secrets \
 ```bash
 kubectl apply -k k8s/                       # tout le reste
 # migrations (à refaire à CHAQUE déploiement) :
-kubectl -n sosguinee delete job sosguinee-migrate --ignore-not-found
-kubectl -n sosguinee apply -f k8s/migrate-job.yaml
-kubectl -n sosguinee wait --for=condition=complete job/sosguinee-migrate --timeout=300s
-kubectl -n sosguinee get pods               # tout doit être Running/Completed
+kubectl -n ensemble224 delete job ensemble224-migrate --ignore-not-found
+kubectl -n ensemble224 apply -f k8s/migrate-job.yaml
+kubectl -n ensemble224 wait --for=condition=complete job/ensemble224-migrate --timeout=300s
+kubectl -n ensemble224 get pods               # tout doit être Running/Completed
 ```
 
 Créez le premier admin :
 
 ```bash
-kubectl -n sosguinee exec -it deploy/sosguinee-web -- python manage.py createsuperuser
+kubectl -n ensemble224 exec -it deploy/ensemble224-web -- python manage.py createsuperuser
 ```
 
 Pointez le DNS du domaine vers l'IP du LoadBalancer de l'ingress
@@ -252,25 +252,61 @@ automatiquement. Enfin, déclarez le webhook Djomy :
 ### 6.6 Mettre à jour (déploiement continu)
 
 ```bash
-docker build -t ghcr.io/<org>/sosguinee:v1.0.1 . && docker push ghcr.io/<org>/sosguinee:v1.0.1
-cd k8s && kustomize edit set image REGISTRY/sosguinee=ghcr.io/<org>/sosguinee:v1.0.1 && cd ..
+docker build -t ghcr.io/<org>/ensemble224:v1.0.1 . && docker push ghcr.io/<org>/ensemble224:v1.0.1
+cd k8s && kustomize edit set image REGISTRY/ensemble224=ghcr.io/<org>/ensemble224:v1.0.1 && cd ..
 kubectl apply -k k8s/                       # rolling update sans coupure
 # + relancer le job de migration
 ```
 
-Retour arrière : `kubectl -n sosguinee rollout undo deploy/sosguinee-web`.
+Retour arrière : `kubectl -n ensemble224 rollout undo deploy/ensemble224-web`.
 
 ### 6.7 Opérations courantes
 
 | Besoin | Commande |
 |---|---|
-| Logs web | `kubectl -n sosguinee logs -f deploy/sosguinee-web` |
-| Logs worker | `kubectl -n sosguinee logs -f deploy/sosguinee-celery-worker` |
-| Shell Django | `kubectl -n sosguinee exec -it deploy/sosguinee-web -- python manage.py shell` |
-| État des pods | `kubectl -n sosguinee get pods -w` |
-| Redémarrer le web | `kubectl -n sosguinee rollout restart deploy/sosguinee-web` |
-| Sauvegarde DB | `kubectl -n sosguinee exec statefulset/postgres -- pg_dump -U sosguinee sosguinee > backup.sql` |
+| Logs web | `kubectl -n ensemble224 logs -f deploy/ensemble224-web` |
+| Logs worker | `kubectl -n ensemble224 logs -f deploy/ensemble224-celery-worker` |
+| Shell Django | `kubectl -n ensemble224 exec -it deploy/ensemble224-web -- python manage.py shell` |
+| État des pods | `kubectl -n ensemble224 get pods -w` |
+| Redémarrer le web | `kubectl -n ensemble224 rollout restart deploy/ensemble224-web` |
+| Sauvegarde DB | `kubectl -n ensemble224 exec statefulset/postgres -- pg_dump -U ensemble224 ensemble224 > backup.sql` |
 | Santé | `curl -H "Host: <domaine>" http://<ip>/healthz/` → `{"status": "ok"}` |
+
+### 6.8 Sauvegarde et restauration PostgreSQL
+
+Cette procédure est manuelle; elle ne configure pas de sauvegarde planifiée.
+Pour une base managée, activer aussi les sauvegardes natives et vérifier leur
+rétention dans le tableau de bord du fournisseur.
+
+Créer un dump PostgreSQL au format custom et calculer son empreinte :
+
+```bash
+kubectl -n ensemble224 exec statefulset/postgres -- \
+  pg_dump -U ensemble224 -Fc ensemble224 > backup.dump
+shasum -a 256 backup.dump > backup.dump.sha256
+```
+
+Transférer le dump vers un stockage hors du cluster, chiffré et à accès limité.
+Définir une rétention opérationnelle (par exemple 30 sauvegardes quotidiennes
+et 12 mensuelles) et conserver l’empreinte avec le dump. Les médias S3/Object
+Storage ne sont pas inclus dans ce dump : activer séparément versioning et
+rétention sur les buckets concernés.
+
+Pour tester une restauration, utiliser une base isolée, jamais la base active :
+
+```bash
+shasum -a 256 -c backup.dump.sha256
+kubectl -n ensemble224 exec statefulset/postgres -- \
+  createdb -U ensemble224 ensemble224_restore
+kubectl -n ensemble224 exec -i statefulset/postgres -- \
+  pg_restore -U ensemble224 -d ensemble224_restore < backup.dump
+```
+
+Pointer un environnement Django de test vers `ensemble224_restore`, puis
+exécuter `python manage.py check` et des tests de lecture métier. Comparer les
+comptages de lignes importants et vérifier les médias restaurés séparément.
+Consigner la date, la durée et le résultat; réaliser et documenter ce test au
+moins une fois par trimestre et après un changement majeur de schéma.
 
 ## 7. Alternatives de déploiement (déjà en place)
 

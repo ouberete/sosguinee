@@ -2,26 +2,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sosguinee-celery-worker
-  namespace: sosguinee
+  name: ensemble224-celery-worker
+  namespace: ensemble224
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sosguinee-celery-worker
+      app: ensemble224-celery-worker
   template:
     metadata:
       labels:
-        app: sosguinee-celery-worker
+        app: ensemble224-celery-worker
     spec:
       containers:
         - name: worker
           # ⚠️ Même image et même tag que web
-          image: REGISTRY/sosguinee:latest
+          image: REGISTRY/ensemble224:latest
           command:
             - celery
             - -A
-            - sosguinee
+            - ensemble224
             - worker
             - -l
             - info
@@ -30,9 +30,9 @@ spec:
             - --concurrency=2
           envFrom:
             - configMapRef:
-                name: sosguinee-config
+                name: ensemble224-config
             - secretRef:
-                name: sosguinee-secrets
+                name: ensemble224-secrets
           resources:
             requests:
               cpu: 100m
@@ -45,7 +45,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - celery -A sosguinee inspect ping -d celery@$HOSTNAME --timeout 10
+                - celery -A ensemble224 inspect ping -d celery@$HOSTNAME --timeout 10
             initialDelaySeconds: 60
             periodSeconds: 120
             timeoutSeconds: 15

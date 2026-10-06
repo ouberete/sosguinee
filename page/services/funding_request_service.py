@@ -1,6 +1,6 @@
 import logging
 from page.models import FundingRequestStatus, UserActionLog
-from sosguinee.utils.email_service import EmailService
+from ensemble224.utils.email_service import EmailService
 
 logger = logging.getLogger(__name__)
 

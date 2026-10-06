@@ -1,4 +1,4 @@
-# Déploiement Kubernetes — SOS Guinée
+# Déploiement Kubernetes — Ensemble 224
 
 Manifestes de production. Le guide détaillé (prérequis, construction de
 l'image, pas-à-pas complet, opérations courantes) est dans
@@ -8,7 +8,7 @@ l'image, pas-à-pas complet, opérations courantes) est dans
 
 | Fichier | Rôle |
 |---|---|
-| `namespace.yaml` | Namespace `sosguinee` |
+| `namespace.yaml` | Namespace `ensemble224` |
 | `configmap.yaml` | Configuration non sensible (hôtes, DB, Redis, email…) |
 | `secret.example.yaml` | **Modèle** de secrets — ne jamais committer le vrai |
 | `postgres.yaml` | PostgreSQL (StatefulSet + PVC) — ou base managée |
@@ -25,12 +25,12 @@ l'image, pas-à-pas complet, opérations courantes) est dans
 
 ```bash
 # 1. Adapter les placeholders
-#    - REGISTRY/sosguinee:latest  -> votre image (web, worker, beat, migrate)
-#    - sosguinee.example.com      -> votre domaine (configmap, web, ingress)
+#    - REGISTRY/ensemble224:latest  -> votre image (web, worker, beat, migrate)
+#    - ensemble224.example.com      -> votre domaine (configmap, web, ingress)
 
 # 2. Namespace + secrets (JAMAIS dans git)
 kubectl apply -f k8s/namespace.yaml
-kubectl -n sosguinee create secret generic sosguinee-secrets \
+kubectl -n ensemble224 create secret generic ensemble224-secrets \
   --from-literal=SECRET_KEY='...' \
   --from-literal=POSTGRES_PASSWORD='...' \
   # ... voir secret.example.yaml pour la liste complète
@@ -39,20 +39,20 @@ kubectl -n sosguinee create secret generic sosguinee-secrets \
 kubectl apply -k k8s/
 
 # 4. Migrations (à refaire à chaque déploiement)
-kubectl -n sosguinee delete job sosguinee-migrate --ignore-not-found
-kubectl -n sosguinee apply -f k8s/migrate-job.yaml
-kubectl -n sosguinee wait --for=condition=complete job/sosguinee-migrate --timeout=300s
+kubectl -n ensemble224 delete job ensemble224-migrate --ignore-not-found
+kubectl -n ensemble224 apply -f k8s/migrate-job.yaml
+kubectl -n ensemble224 wait --for=condition=complete job/ensemble224-migrate --timeout=300s
 
 # 5. Vérifier
-kubectl -n sosguinee get pods
-kubectl -n sosguinee logs deploy/sosguinee-web
+kubectl -n ensemble224 get pods
+kubectl -n ensemble224 logs deploy/ensemble224-web
 ```
 
 ## Mise à jour applicative
 
 ```bash
-docker build -t REGISTRY/sosguinee:v1.x.y . && docker push REGISTRY/sosguinee:v1.x.y
-cd k8s && kustomize edit set image REGISTRY/sosguinee=REGISTRY/sosguinee:v1.x.y
+docker build -t REGISTRY/ensemble224:v1.x.y . && docker push REGISTRY/ensemble224:v1.x.y
+cd k8s && kustomize edit set image REGISTRY/ensemble224=REGISTRY/ensemble224:v1.x.y
 kubectl apply -k k8s/            # rolling update sans coupure
 # puis relancer le job de migration (étape 4 ci-dessus)
 ```

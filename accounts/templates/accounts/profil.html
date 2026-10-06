@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load custom_filters %}
 
-{% block title %}Profil Utilisateur - SOS Guinée{% endblock %}
+{% block title %}Profil Utilisateur - Ensemble 224{% endblock %}
 
 {% block content %}
 <main role="main" class="profile-page">
@@ -56,39 +56,6 @@
                                     <li class="collection-item"><strong>Quartier:</strong> {{ profile.quarter.name }}</li>
                                     {% endif %}
                                     <li class="collection-item"><strong>Code Postal:</strong> {{ profile.zip_code }}</li>
-                                    <li class="collection-item"><strong>Diplôme le plus récent:</strong> {{ profile.high_education }}</li>
-                                    <li class="collection-item"><strong>Secteur d'activité:</strong> {{ profile.activity_sector }}</li>
-                                    <li class="collection-item"><strong>Profession:</strong> {{ profile.profession }}</li>
-                                    <li class="collection-item"><strong>Personne à contacter en cas de succession:</strong> {{ profile.person_contact }}</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <h5 class="mt-4">Biographie</h5>
-                                <p>{{ profile.bio|default:"Non renseignée" }}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <h5 class="mt-4">Réseaux Sociaux</h5>
-                                <ul class="collection">
-                                    <li class="collection-item">
-                                        <i class="fab fa-facebook blue-text text-darken-3"></i> <strong>Facebook:</strong> 
-                                        {% if profile.facebook %}<a href="{% if 'http' in profile.facebook %}{{ profile.facebook }}{% elif '/' in profile.facebook or '.com' in profile.facebook %}https://{{ profile.facebook }}{% else %}https://facebook.com/{{ profile.facebook }}{% endif %}" target="_blank" rel="noopener noreferrer">Facebook / {{ profile.facebook }}</a>{% else %}Non renseigné{% endif %}
-                                    </li>
-                                    <li class="collection-item">
-                                        <i class="fab fa-twitter blue-text"></i> <strong>Twitter:</strong> 
-                                        {% if profile.twitter %}<a href="{% if 'http' in profile.twitter %}{{ profile.twitter }}{% elif '/' in profile.twitter or '.com' in profile.twitter %}https://{{ profile.twitter }}{% else %}https://twitter.com/{{ profile.twitter }}{% endif %}" target="_blank" rel="noopener noreferrer">Twitter / {{ profile.twitter }}</a>{% else %}Non renseigné{% endif %}
-                                    </li>
-                                    <li class="collection-item">
-                                        <i class="fab fa-linkedin blue-text text-darken-1"></i> <strong>Linkedin:</strong> 
-                                        {% if profile.linkedin %}<a href="{% if 'http' in profile.linkedin %}{{ profile.linkedin }}{% elif '/' in profile.linkedin or '.com' in profile.linkedin %}https://{{ profile.linkedin }}{% else %}https://linkedin.com/in/{{ profile.linkedin }}{% endif %}" target="_blank" rel="noopener noreferrer">Linkedin / {{ profile.linkedin }}</a>{% else %}Non renseigné{% endif %}
-                                    </li>
-                                    <li class="collection-item">
-                                        <i class="fab fa-instagram pink-text"></i> <strong>Instagram:</strong> 
-                                        {% if profile.instagram %}<a href="{% if 'http' in profile.instagram %}{{ profile.instagram }}{% elif '/' in profile.instagram or '.com' in profile.instagram %}https://{{ profile.instagram }}{% else %}https://instagram.com/{{ profile.instagram }}{% endif %}" target="_blank" rel="noopener noreferrer">Instagram / {{ profile.instagram }}</a>{% else %}Non renseigné{% endif %}
-                                    </li>
                                 </ul>
                             </div>
                         </div>

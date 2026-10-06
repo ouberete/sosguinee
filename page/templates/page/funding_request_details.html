@@ -3,12 +3,12 @@
 {% load i18n %}
 {% load custom_filters %}
 
-{% block title %}Détails de la demande - SOS Guinée{% endblock %}
+{% block title %}Détails de la demande - Ensemble 224{% endblock %}
 {% block extra_head %}
 <meta name="description" content="Détails de la demande pour {{ funding_request.beneficiary_name }}.">
 <meta property="og:title" content="Demande - {{ funding_request.beneficiary_name }}">
 <meta property="og:description" content="{{ funding_request.description_needs|truncatechars:100 }}">
-<meta property="og:image" content="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/og-image.png' %}{% endif %}">
+<meta property="og:image" content="{{ funding_request.principal_image|existing_image_url:'img/mylogo.png' }}">
 {% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
@@ -17,7 +17,7 @@
 <main role="main">
   <section class="parallax-container valign-wrapper hero-section hero-details-page" aria-label="Bannière détails demande de financement">
     <div class="parallax">
-      <img src="{% static 'img/hero_2.png' %}" alt="Image de fond pour les détails de demande de financement">
+      <img src="{% static 'img/hero_2.jpg' %}" alt="Image de fond pour les détails de demande de financement">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
@@ -35,7 +35,7 @@
         <div class="card hoverable">
           <div class="card-image">
             <span class="yellow category">{{ funding_request.funding_request_status_name }}</span>
-            <img src="{% if funding_request.principal_image %}{{ funding_request.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
+            <img src="{{ funding_request.principal_image|existing_image_url:'img/hero_1.jpg' }}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
           </div>
         </div>
@@ -218,7 +218,7 @@
             <div class="card">
               <div class="card-image">
                 {% if doc.document|is_image_file %}
-                <img src="{{ doc.document.url }}" alt="Document image" class="materialboxed" loading="lazy">
+                <img src="{{ doc.document.url }}" alt="Document justificatif de la demande de financement" class="materialboxed" loading="lazy">
                 {% else %}
                 <div class="document-preview center-align">
                   <i class="material-icons large grey-text text-darken-2">description</i>
@@ -264,4 +264,3 @@
 </script>
 <script src="{% static 'js/comments.js' %}"></script>
 {% endblock %}
-

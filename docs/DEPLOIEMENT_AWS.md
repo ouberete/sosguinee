@@ -1,4 +1,4 @@
-# Déploiement SOS Guinée sur AWS (EKS + S3)
+# Déploiement Ensemble 224 sur AWS (EKS + S3)
 
 > Guide pas-à-pas pour déployer la plateforme sur **Amazon EKS** (Kubernetes
 > managé) avec les médias sur **Amazon S3** (bucket public + bucket privé).
@@ -15,12 +15,12 @@ décrit que les spécificités AWS ; la logique applicative est identique à OVH
 
 - Un compte AWS avec droits d'admin sur EKS, ECR, S3, IAM (et RDS si base managée).
 - CLI installées : `aws`, `eksctl`, `kubectl`, `kustomize`, `docker`, `helm`.
-- Un nom de domaine (ex: `sosguinee.org`) dont vous gérez le DNS.
+- Un nom de domaine (ex: `ensemble224.org`) dont vous gérez le DNS.
 - `aws configure` effectué (région ex. `eu-west-3` = Paris).
 
 ```bash
 export AWS_REGION=eu-west-3
-export CLUSTER=sosguinee
+export CLUSTER=ensemble224
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ```
 
@@ -29,14 +29,14 @@ export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ## 1. Registre d'images (ECR)
 
 ```bash
-aws ecr create-repository --repository-name sosguinee --region $AWS_REGION
+aws ecr create-repository --repository-name ensemble224 --region $AWS_REGION
 
 # Connexion Docker à ECR
 aws ecr get-login-password --region $AWS_REGION \
   | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
 # Build + push (tag versionné, jamais latest)
-export IMAGE=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sosguinee:v1.0.0
+export IMAGE=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ensemble224:v1.0.0
 docker build -t $IMAGE .
 docker push $IMAGE
 ```
@@ -78,7 +78,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@sosguinee.org
+    email: admin@ensemble224.org
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
@@ -93,8 +93,8 @@ EOF
 ## 3. Stockage objet (S3) — 2 buckets
 
 ```bash
-export BUCKET_PUBLIC=sosguinee-media
-export BUCKET_PRIVATE=sosguinee-private
+export BUCKET_PUBLIC=ensemble224-media
+export BUCKET_PRIVATE=ensemble224-private
 
 aws s3api create-bucket --bucket $BUCKET_PUBLIC  --region $AWS_REGION \
   --create-bucket-configuration LocationConstraint=$AWS_REGION
@@ -140,8 +140,8 @@ aws s3api put-public-access-block --bucket $BUCKET_PRIVATE \
 Créez un utilisateur IAM programmatique avec une policy limitée aux deux buckets :
 
 ```bash
-aws iam create-user --user-name sosguinee-app
-aws iam put-user-policy --user-name sosguinee-app --policy-name s3-access --policy-document "{
+aws iam create-user --user-name ensemble224-app
+aws iam put-user-policy --user-name ensemble224-app --policy-name s3-access --policy-document "{
   \"Version\": \"2012-10-17\",
   \"Statement\": [{
     \"Effect\": \"Allow\",
@@ -152,7 +152,7 @@ aws iam put-user-policy --user-name sosguinee-app --policy-name s3-access --poli
     ]
   }]
 }"
-aws iam create-access-key --user-name sosguinee-app
+aws iam create-access-key --user-name ensemble224-app
 # -> notez AccessKeyId et SecretAccessKey pour le Secret Kubernetes
 ```
 
@@ -169,7 +169,7 @@ l'application dessus avec `DATABASE_URL` (prioritaire sur les `POSTGRES_*`).
 Dans ce cas, **supprimez `postgres.yaml`** de `k8s/kustomization.yaml`.
 
 ```
-DATABASE_URL=postgres://<user>:<pass>@<endpoint-rds>:5432/sosguinee
+DATABASE_URL=postgres://<user>:<pass>@<endpoint-rds>:5432/ensemble224
 ```
 
 Sinon, gardez le PostgreSQL in-cluster fourni (`postgres.yaml`) — acceptable
@@ -184,14 +184,14 @@ pour démarrer, mais prévoyez sauvegardes et volume adéquat.
 Éditez `k8s/configmap.yaml` :
 
 ```yaml
-ALLOWED_HOSTS: "sosguinee.org"
-CSRF_TRUSTED_ORIGINS: "https://sosguinee.org"
-SITE_URL: "https://sosguinee.org"
+ALLOWED_HOSTS: "ensemble224.org"
+CSRF_TRUSTED_ORIGINS: "https://ensemble224.org"
+SITE_URL: "https://ensemble224.org"
 DJOMY_BASE_URL: "https://api.djomy.africa/v1"
 
 USE_S3: "True"
-AWS_STORAGE_BUCKET_NAME: "sosguinee-media"
-AWS_PRIVATE_STORAGE_BUCKET_NAME: "sosguinee-private"
+AWS_STORAGE_BUCKET_NAME: "ensemble224-media"
+AWS_PRIVATE_STORAGE_BUCKET_NAME: "ensemble224-private"
 AWS_S3_REGION_NAME: "eu-west-3"
 AWS_S3_ENDPOINT_URL: ""          # VIDE pour AWS S3
 ```
@@ -200,12 +200,12 @@ AWS_S3_ENDPOINT_URL: ""          # VIDE pour AWS S3
 
 ```bash
 kubectl apply -f k8s/namespace.yaml
-kubectl -n sosguinee create secret generic sosguinee-secrets \
+kubectl -n ensemble224 create secret generic ensemble224-secrets \
   --from-literal=SECRET_KEY="$(python -c 'import secrets;print(secrets.token_urlsafe(64))')" \
   --from-literal=POSTGRES_PASSWORD='<si postgres in-cluster>' \
-  --from-literal=EMAIL_HOST_USER='notifications@sosguinee.org' \
+  --from-literal=EMAIL_HOST_USER='notifications@ensemble224.org' \
   --from-literal=EMAIL_HOST_PASSWORD='<mot de passe application>' \
-  --from-literal=CONTACT_NOTIFY_EMAIL='equipe@sosguinee.org' \
+  --from-literal=CONTACT_NOTIFY_EMAIL='equipe@ensemble224.org' \
   --from-literal=DJOMY_CLIENT_ID='<...>' \
   --from-literal=DJOMY_CLIENT_SECRET='<...>' \
   --from-literal=DJOMY_WEBHOOK_SECRET='<= DJOMY_CLIENT_SECRET sauf indication contraire de Djomy>' \
@@ -217,7 +217,7 @@ kubectl -n sosguinee create secret generic sosguinee-secrets \
 ```
 
 > Le domaine de l'ingress (`k8s/ingress.yaml`) et le header `Host` des probes
-> (`k8s/web.yaml`) doivent aussi contenir `sosguinee.org`.
+> (`k8s/web.yaml`) doivent aussi contenir `ensemble224.org`.
 
 ---
 
@@ -225,17 +225,17 @@ kubectl -n sosguinee create secret generic sosguinee-secrets \
 
 ```bash
 # Pointer l'image ECR
-cd k8s && kustomize edit set image REGISTRY/sosguinee=$IMAGE && cd ..
+cd k8s && kustomize edit set image REGISTRY/ensemble224=$IMAGE && cd ..
 
 kubectl apply -k k8s/
 
 # Migrations (à relancer à CHAQUE déploiement)
-kubectl -n sosguinee delete job sosguinee-migrate --ignore-not-found
-kubectl -n sosguinee apply -f k8s/migrate-job.yaml
-kubectl -n sosguinee wait --for=condition=complete job/sosguinee-migrate --timeout=300s
+kubectl -n ensemble224 delete job ensemble224-migrate --ignore-not-found
+kubectl -n ensemble224 apply -f k8s/migrate-job.yaml
+kubectl -n ensemble224 wait --for=condition=complete job/ensemble224-migrate --timeout=300s
 
-kubectl -n sosguinee get pods
-kubectl -n sosguinee exec -it deploy/sosguinee-web -- python manage.py createsuperuser
+kubectl -n ensemble224 get pods
+kubectl -n ensemble224 exec -it deploy/ensemble224-web -- python manage.py createsuperuser
 ```
 
 ### DNS
@@ -257,7 +257,7 @@ Le certificat TLS est émis automatiquement par cert-manager sous 1–2 min.
 Dans le dashboard Djomy, déclarez l'URL de webhook :
 
 ```
-https://sosguinee.org/djomy/webhook/
+https://ensemble224.org/djomy/webhook/
 ```
 
 (URL stable, hors préfixe i18n, HTTPS.)
@@ -266,25 +266,25 @@ https://sosguinee.org/djomy/webhook/
 
 ## 8. Validation post-déploiement
 
-1. `curl -H "Host: sosguinee.org" http://<LB>/healthz/` → `{"status": "ok"}`.
+1. `curl -H "Host: ensemble224.org" http://<LB>/healthz/` → `{"status": "ok"}`.
 2. Uploader une **image d'alerte** → elle doit s'afficher (servie depuis le
-   bucket public, URL `https://sosguinee-media.s3.eu-west-3.amazonaws.com/...`).
+   bucket public, URL `https://ensemble224-media.s3.eu-west-3.amazonaws.com/...`).
 3. Uploader une **pièce d'identité** → visible **seulement** par le
    propriétaire/staff via `/media/user_images/...`, et **inaccessible** en
    direct sur S3 (403).
 4. Faire un **don test** Djomy → paiement confirmé + email reçu.
-5. Vérifier les logs : `kubectl -n sosguinee logs -f deploy/sosguinee-web`.
+5. Vérifier les logs : `kubectl -n ensemble224 logs -f deploy/ensemble224-web`.
 
 ---
 
 ## 9. Mises à jour
 
 ```bash
-docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sosguinee:v1.0.1 .
-docker push  $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sosguinee:v1.0.1
-cd k8s && kustomize edit set image REGISTRY/sosguinee=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sosguinee:v1.0.1 && cd ..
+docker build -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ensemble224:v1.0.1 .
+docker push  $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ensemble224:v1.0.1
+cd k8s && kustomize edit set image REGISTRY/ensemble224=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ensemble224:v1.0.1 && cd ..
 kubectl apply -k k8s/            # rolling update
 # relancer le job de migration (cf. §6)
 ```
 
-Rollback : `kubectl -n sosguinee rollout undo deploy/sosguinee-web`.
+Rollback : `kubectl -n ensemble224 rollout undo deploy/ensemble224-web`.

@@ -114,7 +114,7 @@ function renderFundingCard(fundingRequest, index) {
     const fullUrl = `${window.location.origin}${fundingRequest.details_url}`;
     const paymentUrl = fundingRequest.payment_url || `/funding/${fundingRequest.public_id}/djomy/`;
     const canFund = fundingRequest.can_fund === true || fundingRequest.funding_request_status === 'En cours';
-    const shareTitle = `Aide ${fundingRequest.beneficiary_name} - ${fundingRequest.title} - SOS Guinee`;
+    const shareTitle = `Aide ${fundingRequest.beneficiary_name} - ${fundingRequest.title} - Ensemble 224`;
     const animDelay = `animation-delay: ${index * 0.07}s`;
     const statusClass = getStatusClass(statusLabel, fundingRequest.days_remaining, fundingRequest.progress);
     const progressClass = getProgressClass(fundingRequest.progress);

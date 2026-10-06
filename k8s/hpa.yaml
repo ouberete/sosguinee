@@ -2,13 +2,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: sosguinee-web
-  namespace: sosguinee
+  name: ensemble224-web
+  namespace: ensemble224
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: sosguinee-web
+    name: ensemble224-web
   minReplicas: 2
   maxReplicas: 5
   metrics:

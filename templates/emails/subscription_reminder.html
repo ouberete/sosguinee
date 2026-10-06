@@ -48,7 +48,7 @@
         <div class="content">
             <p>Cher(e) {{ user.username }},</p>
             <p>Nous espérons que vous vous portez bien. Nous vous rappelons que votre abonnement arrive à échéance dans quelques jours.</p>
-            <p>Pour continuer à bénéficier de tous les avantages de SOS Guinée, n'oubliez pas de renouveler votre abonnement.</p>
+            <p>Pour continuer à bénéficier de tous les avantages de Ensemble 224, n'oubliez pas de renouveler votre abonnement.</p>
             <p>Avantages de votre abonnement :</p>
             <ul>
                 <li>Accès illimité à toutes les fonctionnalités</li>
@@ -59,8 +59,8 @@
             <a href="{{ site_url }}{% url 'profile' %}" class="button">Renouveler mon abonnement</a>
         </div>
         <div class="footer">
-            <p>© {% now "Y" %} SOS Guinée. Tous droits réservés.</p>
-            <p>Si vous ne souhaitez plus recevoir ces rappels, vous pouvez vous désabonner <a href="#">ici</a>.</p>
+            <p>© {% now "Y" %} Ensemble 224. Tous droits réservés.</p>
+            <p>Si vous ne souhaitez plus recevoir ces rappels, vous pouvez gérer vos préférences depuis <a href="{{ site_url }}{% url 'profile' %}">votre profil</a>.</p>
         </div>
     </div>
 </body>

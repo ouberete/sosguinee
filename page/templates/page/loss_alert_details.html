@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static custom_filters %}
 
-{% block title %}Détails de l'alerte - SOS Guinée{% endblock %}
+{% block title %}Détails de l'alerte - Ensemble 224{% endblock %}
 {% block extra_head %}
-<meta name="description" content="Détails de l'alerte: {{ alert.name }} sur SOS Guinée.">
+<meta name="description" content="Détails de l'alerte: {{ alert.name }} sur Ensemble 224.">
 <meta property="og:title" content="Alerte - {{ alert.name }}">
 <meta property="og:description" content="{{ alert.description|truncatechars:140 }}">
-<meta property="og:image" content="{% if alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/og-image.png' %}{% endif %}">
+<meta property="og:image" content="{{ alert.principal_image|existing_image_url:'img/mylogo.png' }}">
 {% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
@@ -15,7 +15,7 @@
 <main role="main">
   <section class="parallax-container valign-wrapper hero-section hero-details-page" aria-label="Bannière détails alerte">
     <div class="parallax">
-      <img src="{% static 'img/hero_3.png' %}" alt="Image de fond pour les détails d'alerte">
+      <img src="{% static 'img/hero_3.jpg' %}" alt="Image de fond pour les détails d'alerte">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
@@ -33,7 +33,7 @@
         <div class="card hoverable">
           <div class="card-image">
             <span class="badge">{{ alert.status_alert_name }}</span>
-            <img src="{% if alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}"
+            <img src="{{ alert.principal_image|existing_image_url:'img/hero_1.jpg' }}"
                  alt="Image alerte {{ alert.name }}" loading="lazy" class="materialboxed">
           </div>
         </div>
@@ -144,7 +144,7 @@
             <div class="card">
               <div class="card-image">
                 {% if doc.document|is_image_file %}
-                <img src="{{ doc.document.url }}" alt="Document image" class="materialboxed" loading="lazy">
+                <img src="{{ doc.document.url }}" alt="Document justificatif de l'alerte" class="materialboxed" loading="lazy">
                 {% else %}
                 <div class="document-preview center-align">
                   <i class="material-icons large grey-text text-darken-2">description</i>

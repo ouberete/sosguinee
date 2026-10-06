@@ -59,19 +59,6 @@
     let presets = [];
     if (mode === "funding") {
       const remaining = parseNumeric(container.dataset.remaining);
-      if (remaining > 0) {
-        amountInput.setAttribute("max", String(Math.floor(remaining)));
-        minAmount = Math.min(minAmount, Math.floor(remaining));
-        amountInput.addEventListener("input", function () {
-          const currentValue = parseNumeric(amountInput.value);
-          if (Number.isFinite(currentValue) && currentValue > remaining) {
-            amountInput.value = String(Math.floor(remaining));
-            if (typeof M !== "undefined" && typeof M.updateTextFields === "function") {
-              M.updateTextFields();
-            }
-          }
-        });
-      }
       presets = buildFundingPresets(remaining, minAmount, step);
       if (!presets.length) {
         const fallbackAmount = Math.floor(remaining);

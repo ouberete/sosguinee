@@ -1,19 +1,14 @@
 {# page/components/alert_card.html #}
 {% load static custom_filters %}
-{% if item.funding_request_status %}
-  {% with is_funding=item.funding_request_status == 'Funding' %}
-{% else %}
-  {% with is_funding=False %}
-{% endif %}
 <div class="col s12 m6 l4">
-  <div class="card hoverable {% if is_funding %}funding-card{% else %}alert-card{% endif %}">
+  <div class="card hoverable {% if item.funding_request_status %}funding-card{% else %}alert-card{% endif %}">
     <div class="card-image">
-      <span class="badge {% if is_funding %}orange{% else %}yellow darken-2{% endif %} white-text">{{ item.status_alert_name|default:item.funding_request_status }}</span>
-      <img src="{% if item.principal_image %}{{ item.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ item.name|default:item.title }}" class="materialboxed">
+      <span class="badge {% if item.funding_request_status %}orange{% else %}yellow darken-2{% endif %} white-text">{{ item.status_alert_name|default:item.funding_request_status }}</span>
+      <img src="{{ item.principal_image|existing_image_url:'img/hero_1.jpg' }}" alt="{{ item.name|default:item.title }}" class="materialboxed">
     </div>
     <div class="card-content">
       <span class="card-title truncate">{{ item.name|default:item.title }}</span>
-      {% if is_funding %}
+      {% if item.funding_request_status %}
       <p><strong>Bénéficiaire :</strong> {{ item.beneficiary_name }}</p>
       <p><strong>Montant:</strong> {{ item.funding_amount }} GNF</p>
       <div class="progress">
@@ -27,18 +22,27 @@
       {% endif %}
     </div>
     <div class="card-action">
-      {% if is_funding %}
+      {% if item.funding_request_status %}
       <a href="{% url 'funding_request_details_public' item.public_id %}" class="blue-text text-darken-2">PLUS D'INFOS</a>
       {% if item.funding_request_status_name == 'En cours' %}
       <a href="{% url 'djomy_funding_public' item.public_id %}" class="btn-small green waves-effect waves-light">
         <i class="material-icons left">payments</i> Financer
       </a>
       {% endif %}
-      <a href="#" class="right social-icon"><i class="fab fa-facebook-f"></i></a>
-      <a href="#" class="right social-icon"><i class="fab fa-twitter"></i></a>
+      {% url 'funding_request_details_public' item.public_id as card_detail_path %}
+      {% with card_abs=request.scheme|add:'://'|add:request.get_host|add:card_detail_path card_title='Demande de financement - Ensemble 224' %}
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ card_abs|urlencode:'' }}" target="_blank" rel="noopener" class="right social-icon" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://twitter.com/intent/tweet?url={{ card_abs|urlencode:'' }}&amp;text={{ card_title|urlencode:'' }}" target="_blank" rel="noopener" class="right social-icon" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
+      {% endwith %}
       {% else %}
       <a href="{% url 'loss_alert_detail_public' item.public_id %}" class="btn-small red waves-effect waves-light">Voir Détails</a>
-      <a href="#" class="btn-small blue right waves-effect waves-light">Contacter</a>
+      {% if item.phone %}
+      <a href="tel:{{ item.phone }}" class="btn-small blue right waves-effect waves-light" aria-label="Contacter {{ item.name|default:'cette alerte' }}">Contacter</a>
+      {% elif item.email %}
+      <a href="mailto:{{ item.email }}" class="btn-small blue right waves-effect waves-light" aria-label="Contacter {{ item.name|default:'cette alerte' }}">Contacter</a>
+      {% else %}
+      <a href="{% url 'loss_alert_detail_public' item.public_id %}" class="btn-small blue right waves-effect waves-light">Contacter</a>
+      {% endif %}
       {% endif %}
     </div>
   </div>

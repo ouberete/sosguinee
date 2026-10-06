@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.contrib import messages
 from ..models.subscription import SubscriptionPlan, UserSubscription, SubscriptionPayment
-from sosguinee.utils.email_service import EmailService
+from ensemble224.utils.email_service import EmailService
 import uuid
 from django.views.decorators.http import require_GET
 

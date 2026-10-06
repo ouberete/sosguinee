@@ -5,8 +5,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sosguinee
-  namespace: sosguinee
+  name: ensemble224
+  namespace: ensemble224
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     # Taille max des uploads (images, documents) — aligné sur nginx.conf
@@ -16,10 +16,10 @@ spec:
   tls:
     - hosts:
         # ⚠️ Votre domaine réel
-        - sosguinee.example.com
-      secretName: sosguinee-tls
+        - ensemble224.example.com
+      secretName: ensemble224-tls
   rules:
-    - host: sosguinee.example.com
+    - host: ensemble224.example.com
       http:
         paths:
           # Documents personnels (pièces d'identité): stockés dans le bucket
@@ -29,7 +29,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: sosguinee-web
+                name: ensemble224-web
                 port:
                   number: 80
           # Les autres médias (images d'alertes/financements) sont servis
@@ -39,6 +39,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: sosguinee-web
+                name: ensemble224-web
                 port:
                   number: 80

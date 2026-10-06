@@ -3,36 +3,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sosguinee-celery-beat
-  namespace: sosguinee
+  name: ensemble224-celery-beat
+  namespace: ensemble224
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: sosguinee-celery-beat
+      app: ensemble224-celery-beat
   template:
     metadata:
       labels:
-        app: sosguinee-celery-beat
+        app: ensemble224-celery-beat
     spec:
       containers:
         - name: beat
           # ⚠️ Même image et même tag que web
-          image: REGISTRY/sosguinee:latest
+          image: REGISTRY/ensemble224:latest
           command:
             - celery
             - -A
-            - sosguinee
+            - ensemble224
             - beat
             - -l
             - info
           envFrom:
             - configMapRef:
-                name: sosguinee-config
+                name: ensemble224-config
             - secretRef:
-                name: sosguinee-secrets
+                name: ensemble224-secrets
           resources:
             requests:
               cpu: 50m

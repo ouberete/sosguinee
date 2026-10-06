@@ -11,18 +11,18 @@
 
 <div class="parallax-container valign-wrapper hero-section">
   <div class="parallax">
-    <img src="{% static 'img/hero_1.png' %}" alt="Image de fond inspirante pour SOS Guinée">
+    <img src="{% static 'img/hero_1.jpg' %}" alt="Image de fond inspirante pour Ensemble 224">
   </div>
   <div class="container center-align white-text hero-content">
     <div class="row">
       <div class="col s12">
-        <h1 class="header light text-shadow">{% trans "SOS Guinée : Ensemble, bâtissons l'espoir" %}</h1>
+        <h1 class="header light text-shadow">{% trans "Ensemble 224 : Ensemble, bâtissons l'espoir" %}</h1>
         <h5 class="light text-shadow">{% trans "Votre plateforme pour les alertes de perte et le soutien aux maladies graves." %}</h5>
         <br>
-        <a href="{% url 'add_loss_alert' %}" class="btn-large waves-effect waves-light red darken-2 pulse">
+        <a href="{% url 'add_loss_alert' %}" class="btn-large waves-effect waves-light red darken-2">
           <i class="material-icons left">add_alert</i> {% trans "Signaler une Alerte" %}
         </a>
-        <a href="{% url 'add_funding_request' %}" class="btn-large waves-effect waves-light orange darken-2">
+        <a href="{% url 'add_funding_request' %}" class="btn-large waves-effect btn-flat hero-secondary-action">
           <i class="material-icons left">volunteer_activism</i> {% trans "Demander un Financement" %}
         </a>
       </div>
@@ -110,7 +110,7 @@
       <div class="col s12 m6 l4">
         <article class="bf-card bf-alert-card" role="article" aria-labelledby="alert-title-{{ alert.id }}">
           <a class="bf-card-image" href="{% url 'loss_alert_detail_public' alert.public_id %}" aria-label="{% trans 'Voir l alerte' %} {{ alert.name }}">
-            <img src="{% if alert.principal_image and alert.principal_image %}{{ alert.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ alert.name }}" loading="lazy">
+            <img src="{{ alert.principal_image|existing_image_url:'img/hero_1.jpg' }}" alt="{{ alert.name }}" loading="lazy">
             <span class="bf-card-badge {% if alert.status_alert_name == 'Clos' or alert.status_alert_name == 'Trouvé' or alert.status_alert_name == 'Résolu' or alert.status_alert_name == 'Retrouvé' %}bf-status-closed{% else %}bf-status-open{% endif %}">
               <i class="material-icons">campaign</i> {{ alert.status_alert_name }}
             </span>
@@ -134,7 +134,7 @@
             </div>
             <div class="bf-card-socials">
               {% url 'loss_alert_detail_public' alert.public_id as al_detail_path %}
-              {% with al_abs=request.scheme|add:'://'|add:request.get_host|add:al_detail_path al_title='Alerte de perte : '|add:alert.name|add:' - SOS Guinee' %}
+              {% with al_abs=request.scheme|add:'://'|add:request.get_host|add:al_detail_path al_title='Alerte de perte : '|add:alert.name|add:' - Ensemble 224' %}
               <a href="https://www.facebook.com/sharer/sharer.php?u={{ al_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
               <a href="https://twitter.com/intent/tweet?url={{ al_abs|urlencode:'' }}&amp;text={{ al_title|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
               <a href="https://wa.me/?text={{ al_title|urlencode:'' }}%20{{ al_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
@@ -167,7 +167,7 @@
       <div class="col s12 m12 l4">
         <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-{{ req.id }}">
           <a class="ws-card-image" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
-            <img src="{% if req.principal_image and req.principal_image %}{{ req.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ req.beneficiary_name }}" loading="lazy">
+            <img src="{{ req.principal_image|existing_image_url:'img/hero_1.jpg' }}" alt="{{ req.beneficiary_name }}" loading="lazy">
           </a>
           <div class="ws-card-body">
             <div class="ws-card-status">
@@ -214,7 +214,7 @@
 
             <div class="ws-card-socials">
               {% url 'funding_request_details_public' req.public_id as fr_detail_path %}
-              {% with fr_abs=request.scheme|add:'://'|add:request.get_host|add:fr_detail_path fr_title='Aide '|add:req.beneficiary_name|add:' - '|add:req.title|add:' - SOS Guinee' %}
+              {% with fr_abs=request.scheme|add:'://'|add:request.get_host|add:fr_detail_path fr_title='Aide '|add:req.beneficiary_name|add:' - '|add:req.title|add:' - Ensemble 224' %}
               <a href="https://www.facebook.com/sharer/sharer.php?u={{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
               <a href="https://twitter.com/intent/tweet?url={{ fr_abs|urlencode:'' }}&amp;text={{ fr_title|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
               <a href="https://wa.me/?text={{ fr_title|urlencode:'' }}%20{{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
@@ -248,21 +248,11 @@
         <p class="flow-text">{% trans "Faites un don pour nous aider à atteindre nos objectifs et transformer plus de vies en Guinée." %}</p>
       </div>
       <div class="col s12 m4 right-align">
-        <a href="{% url 'donation' %}" class="btn-large white blue-text text-darken-4 waves-effect waves-light">{% trans "Faire un don" %}</a>
+        <a href="{% url 'donation' %}" class="btn-flat donate-secondary-action waves-effect">{% trans "Faire un don" %}</a>
       </div>
     </div>
   </div>
 </section>
-
-<div class="fixed-action-btn no-autoinit">
-  <a class="btn-floating btn-large red">
-    <i class="large material-icons">add</i>
-  </a>
-  <ul>
-    <li><a class="btn-floating red tooltipped" data-position="left" data-tooltip="{% trans 'Alerte de perte' %}" href="{% url 'add_loss_alert' %}"><i class="material-icons">add_alert</i></a></li>
-    <li><a class="btn-floating orange tooltipped" data-position="left" data-tooltip="{% trans 'Demande de financement' %}" href="{% url 'add_funding_request' %}"><i class="material-icons">volunteer_activism</i></a></li>
-  </ul>
-</div>
 
 {% block extrajs %}
 <script>

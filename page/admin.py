@@ -30,13 +30,13 @@ from .models import (
     EmailContent,
     UserDetails,
 )
-from sosguinee.utils.email_retry import resend_email_content
+from ensemble224.utils.email_retry import resend_email_content
 
 # Register your models here.
-admin.site.site_header = "SOS Guinee Admin"
-admin.site.site_title = "SOS Guinee Admin Portal"
-admin.site.index_title = "Welcome to SOS Guinee Admin Portal"
-admin.site.site_url = "https://sosguinee.com"
+admin.site.site_header = "Ensemble 224 Admin"
+admin.site.site_title = "Ensemble 224 Admin Portal"
+admin.site.index_title = "Welcome to Ensemble 224 Admin Portal"
+admin.site.site_url = "https://ensemble224.com"
 
 
 def export_as_csv(modeladmin, request, queryset):

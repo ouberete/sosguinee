@@ -1,22 +1,22 @@
-# SOS Guinée : Dossier de Présentation aux Partenaires
+# Ensemble 224 : Dossier de Présentation aux Partenaires
 
 > **"La technologie au service de l'entraide et de la solidarité guinéenne."**
 
 ---
 
-## 1. Notre Vision : Pourquoi SOS Guinée ?
+## 1. Notre Vision : Pourquoi Ensemble 224 ?
 
 En Guinée, l'entraide et la solidarité sont des valeurs fondamentales. Cependant, face aux urgences quotidiennes, les citoyens manquent souvent d'outils centralisés et sécurisés pour agir efficacement. 
 
 Qu'il s'agisse de retrouver un enfant égaré, de signaler la perte d'un document officiel (carte d'identité, passeport), ou de mobiliser des fonds pour une urgence médicale, les appels à l'aide se perdent souvent dans le bruit des réseaux sociaux, sans garantie de fiabilité ni de transparence.
 
-**SOS Guinée** est née d'une ambition simple : **centraliser, sécuriser et amplifier la solidarité guinéenne grâce au numérique.**
+**Ensemble 224** est née d'une ambition simple : **centraliser, sécuriser et amplifier la solidarité guinéenne grâce au numérique.**
 
 ---
 
 ## 2. La Solution : Une plateforme tout-en-un
 
-SOS Guinée est une application web moderne et accessible, conçue pour répondre à deux besoins critiques :
+Ensemble 224 est une application web moderne et accessible, conçue pour répondre à deux besoins critiques :
 
 ### A. La gestion des alertes (Pertes et Disparitions)
 Un espace public et vérifié permettant à tout citoyen de :
@@ -34,7 +34,7 @@ Une solution sécurisée pour la collecte de fonds (frais médicaux, aide aux si
 
 ## 3. Notre Valeur Ajoutée et Notre Impact
 
-Soutenir SOS Guinée, c'est investir dans un projet à fort **impact social** (RSE).
+Soutenir Ensemble 224, c'est investir dans un projet à fort **impact social** (RSE).
 
 * **Sécurité & Confiance** : Les profils utilisateurs sont vérifiés (KYC, upload de pièces d'identité). Les transactions financières sont protégées par des standards professionnels et des mesures anti-fraude.
 * **Accessibilité** : Une interface claire, pensée pour les utilisateurs guinéens, disponible sur mobile comme sur ordinateur.
@@ -45,7 +45,7 @@ Soutenir SOS Guinée, c'est investir dans un projet à fort **impact social** (R
 
 ## 4. Opportunités de Partenariat
 
-Nous sommes à la recherche de partenaires stratégiques (entreprises, ONG, institutions publiques, opérateurs téléphoniques, médias) pour nous aider à déployer SOS Guinée à grande échelle.
+Nous sommes à la recherche de partenaires stratégiques (entreprises, ONG, institutions publiques, opérateurs téléphoniques, médias) pour nous aider à déployer Ensemble 224 à grande échelle.
 
 ### Ce que nous recherchons :
 1. **Soutien Financier & Sponsoring** : Pour couvrir les frais d'hébergement, la sécurité des serveurs, et le déploiement technique continu.
@@ -61,7 +61,7 @@ Nous sommes à la recherche de partenaires stratégiques (entreprises, ONG, inst
 
 ## 5. La Technologie au service de la fiabilité
 
-Bien que conçue pour être simple d'utilisation, SOS Guinée repose sur une architecture technologique robuste :
+Bien que conçue pour être simple d'utilisation, Ensemble 224 repose sur une architecture technologique robuste :
 - Une base de données performante et des serveurs sécurisés.
 - Une conformité avec les standards de sécurité web (protection contre les cyberattaques, protection des données personnelles).
 - Une infrastructure capable de supporter de forts pics de trafic lors d'urgences nationales.
@@ -77,4 +77,4 @@ L'application est prête. Les fondations technologiques sont solides. Il est mai
 *Contactez-nous pour organiser une démonstration complète de la plateforme et discuter de la manière dont nous pouvons collaborer.*
 
 ---
-*SOS Guinée — La solidarité à portée de clic.*
+*Ensemble 224 — La solidarité à portée de clic.*

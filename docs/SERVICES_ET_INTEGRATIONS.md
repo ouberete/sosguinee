@@ -27,7 +27,7 @@
 
 **Rôle** : encaissement des dons et financements (Mobile Money OM/MoMo, carte).
 
-### Configuration (`sosguinee/settings.py:403-409`)
+### Configuration (`ensemble224/settings.py:428-434`)
 | Variable | Rôle |
 |---|---|
 | `DJOMY_CLIENT_ID` / `DJOMY_CLIENT_SECRET` | Identifiants API (le `clientSecret` sert aussi à signer le webhook). |
@@ -43,20 +43,23 @@
   - `init_gateway_payment(...)` : `POST {BASE}/payments/gateway` (création du lien).
   - `get_payment_status(tx)` : `GET {BASE}/payments/{tx}/status`.
   - `verify_webhook_signature(...)` : HMAC-SHA256(corps, clientSecret), format `v1:<hex>`.
-- **Initiation d'un paiement** : `page/views.py` — dons `start_...` (~ligne 889) et
-  financements `start_djomy_funding_payment` (~ligne 1216) appellent
-  `DjomyService().init_gateway_payment(...)`.
-- **Retour navigateur** : `djomy_payment_callback` (`page/views.py:1283`) — ne fait
+- **Initiation d'un paiement** : `page/views.py` — dons `donation` (~ligne 850,
+  appel ~924) et financements `start_djomy_funding_payment` (~ligne 1171,
+  appel ~1257) appellent `DjomyService().init_gateway_payment(...)`. En cas
+  d'échec d'initiation, l'utilisateur voit le message générique
+  `GENERIC_PAYMENT_ERROR` (`page/views.py:51`) ; le détail technique est
+  journalisé côté serveur uniquement.
+- **Retour navigateur** : `djomy_payment_callback` (`page/views.py:1324`) — ne fait
   **jamais** foi ; il revérifie le statut via l'API (`_verify_payment_status_with_djomy`).
 - **Webhook (source de vérité)** : `POST /djomy/webhook/` →
-  `page/views.py:djomy_webhook` (~1344). Vérifie la signature
-  (`_verify_djomy_webhook_signature`, `page/views.py:324`), puis confirme via
-  `_apply_payment_success` (`page/views.py:222` — verrou en base, idempotent,
+  `page/views.py:djomy_webhook` (~1385). Vérifie la signature
+  (`_verify_djomy_webhook_signature`, `page/views.py:346`), puis confirme via
+  `_apply_payment_success` (`page/views.py:227` — verrou en base, idempotent,
   crédit du financement, email).
 - **Confirmation idempotente** : `_apply_payment_success` est le **seul** point qui
   passe un paiement à « réussi ». Le signal `django_djomy` y délègue aussi
   (`page/signals.py`).
-- **URLs** : `sosguinee/urls.py:38` (`/djomy/webhook/`, hors i18n) ; admin de suivi
+- **URLs** : `ensemble224/urls.py:38` (`/djomy/webhook/`, hors i18n) ; admin de suivi
   dans `django_djomy/urls.py`.
 
 ### Débogage
@@ -85,9 +88,6 @@
     (délai avant expiration, défaut 24 h), `PAYMENT_RECONCILIATION_EVERY_SECONDS`
     (fréquence, défaut 3600 s). Revérifie via Djomy puis confirme / marque échoué /
     expire les `en_attente` périmés.
-- **Plafond anti sur-financement** : `DJOMY_ENFORCE_FUNDING_CAP` (off par défaut) —
-  une fois activé, plafonne `amount_received` au montant cible lors de la
-  confirmation (dans `_apply_payment_success`).
 
 ### Améliorer
 - Mettre en cache le JWT (`get_access_token` est rappelé à chaque requête).
@@ -101,37 +101,37 @@
 **Rôle** : envoi des emails hors requête HTTP + tâches planifiées (rappels/nettoyages).
 
 ### Configuration
-- **App** : `sosguinee/celery.py` (`Celery("sosguinee")`, autodiscover).
-  ⚠️ `DJANGO_SETTINGS_MODULE` y a pour **défaut `sosguinee.settings_dev`** — en prod,
-  forcez `sosguinee.settings_prod` via l'environnement (fait dans les manifests K8s
+- **App** : `ensemble224/celery.py` (`Celery("ensemble224")`, autodiscover).
+  ⚠️ `DJANGO_SETTINGS_MODULE` y a pour **défaut `ensemble224.settings_dev`** — en prod,
+  forcez `ensemble224.settings_prod` via l'environnement (fait dans les manifests K8s
   et `docker-compose.prod.yml`).
-- **Réglages** (`sosguinee/settings.py:461-485`) : `CELERY_TASK_ROUTES` (routage vers
+- **Réglages** (`ensemble224/settings.py:496-525`) : `CELERY_TASK_ROUTES` (routage vers
   la file `email`), `CELERY_TASK_TIME_LIMIT` / `SOFT_TIME_LIMIT`, `ACKS_LATE`,
   `PREFETCH_MULTIPLIER=1`, et `CELERY_BEAT_SCHEDULE`.
 - **Activation** : `ASYNC_EMAIL_ENABLED=True` bascule les emails en asynchrone
   (sinon envoi synchrone dans la requête).
 
 ### Où c'est appelé
-- **Tâches emails** : `sosguinee/tasks.py` (`send_email_task`,
+- **Tâches emails** : `ensemble224/tasks.py` (`send_email_task`,
   `send_donation_notification_task`, etc.) — toutes avec `autoretry_for=(Exception,)`,
   backoff, `max_retries=5`.
-- **Mise en file** : `EmailService._queue_task` (`sosguinee/utils/email_service.py:19`)
+- **Mise en file** : `EmailService._queue_task` (`ensemble224/utils/email_service.py:19`)
   appelle `task.delay(...)`. Si le broker est indisponible → **fallback synchrone**
   (log `Queue email indisponible`).
 - **Tâches planifiées (beat)** : `accounts/tasks.py`
   (`send_subscription_reminders`, `cleanup_expired_subscriptions`) — schedule dans
   `CELERY_BEAT_SCHEDULE` (quotidien par défaut).
 - **Commandes** :
-  - worker : `celery -A sosguinee worker -l info -Q default,email`
-  - beat : `celery -A sosguinee beat -l info` (**1 seule instance**, sinon doublons).
+  - worker : `celery -A ensemble224 worker -l info -Q default,email`
+  - beat : `celery -A ensemble224 beat -l info` (**1 seule instance**, sinon doublons).
 
 ### Débogage
 - **Emails ne partent plus** : vérifier que le worker tourne et que Redis répond
-  (`kubectl -n sosguinee logs -f deploy/sosguinee-celery-worker`). En dépannage,
+  (`kubectl -n ensemble224 logs -f deploy/ensemble224-celery-worker`). En dépannage,
   basculer `ASYNC_EMAIL_ENABLED=False` (envoi synchrone).
 - **Rappels en double** : plus d'une réplique `celery-beat`. → `replicas: 1`.
 - **Tâche qui tourne trop longtemps** : coupée par `TASK_TIME_LIMIT` (120 s).
-- **Inspecter** : `celery -A sosguinee inspect active` / `... ping`.
+- **Inspecter** : `celery -A ensemble224 inspect active` / `... ping`.
 
 ### Améliorer
 - Séparer les files (`email` déjà routée) si le volume grandit.
@@ -144,7 +144,7 @@
 **Rôle double** : (a) **broker + backend** Celery, (b) **cache** partagé
 (rate limiting effectif entre plusieurs pods).
 
-### Configuration (`sosguinee/settings.py:440-460`)
+### Configuration (`ensemble224/settings.py:474-493`)
 | Variable | Rôle |
 |---|---|
 | `CELERY_BROKER_URL` | File Celery (défaut `redis://127.0.0.1:6379/0`). |
@@ -153,7 +153,7 @@
 | `USE_REDIS_CACHE` | En dev, `True` pour tester le cache Redis (sinon LocMemCache). |
 
 - En **dev** (`DEBUG=True` sans `USE_REDIS_CACHE`) → `LocMemCache` (mémoire process).
-- En **prod** → `RedisCache` (django-redis), `KEY_PREFIX="sosguinee"`.
+- En **prod** → `RedisCache` (django-redis), `KEY_PREFIX="ensemble224"`.
 
 ### Où c'est appelé
 - **Broker** : implicitement par Celery (cf. §2).
@@ -165,8 +165,8 @@
 - **Rate limiting incohérent entre pods** : le cache n'est pas partagé → vérifier
   que `RedisCache` est actif (pas `LocMemCache`) en prod.
 - **Connexion refusée** : vérifier l'URL Redis et que le service `redis` tourne
-  (`kubectl -n sosguinee get pods`).
-- **Inspecter** : `redis-cli -u $REDIS_CACHE_URL keys 'sosguinee*'`.
+  (`kubectl -n ensemble224 get pods`).
+- **Inspecter** : `redis-cli -u $REDIS_CACHE_URL keys 'ensemble224*'`.
 
 ### Améliorer
 - Séparer physiquement broker (`/0`) et cache (`/1`) — déjà prévu par convention.
@@ -176,16 +176,16 @@
 
 ## 4. Emails — SMTP & backend personnalisé
 
-### Configuration (`sosguinee/settings.py:330-348`)
-- `EMAIL_BACKEND = sosguinee.utils.custom_email_backend.CustomEmailBackend`.
+### Configuration (`ensemble224/settings.py:331-348`)
+- `EMAIL_BACKEND = ensemble224.utils.custom_email_backend.CustomEmailBackend`.
 - `EMAIL_HOST/PORT`, `EMAIL_USE_TLS` (587) **ou** `EMAIL_USE_SSL` (465),
   `EMAIL_HOST_USER/PASSWORD`, `EMAIL_CLIENT_DOMAIN` (HELO), `EMAIL_TIMEOUT`.
 - `CONTACT_NOTIFY_EMAIL` : destinataire des messages de contact.
 
 ### Où c'est appelé
-- **Backend** : `sosguinee/utils/custom_email_backend.py` — gère SSL implicite (465)
+- **Backend** : `ensemble224/utils/custom_email_backend.py` — gère SSL implicite (465)
   vs STARTTLS (587) et un HELO valide (utile chez certains hébergeurs).
-- **Service** : `sosguinee/utils/email_service.py` (`EmailService`) — rend le template,
+- **Service** : `ensemble224/utils/email_service.py` (`EmailService`) — rend le template,
   **enregistre chaque email** dans le modèle `EmailContent` (`is_sent`, `date_sent`),
   et route vers Celery si `ASYNC_EMAIL_ENABLED`.
 - **Renvoi des échecs** : commande `python manage.py resend_unsent_emails`.
@@ -229,7 +229,7 @@
 | Manifeste | Rôle |
 |---|---|
 | `configmap.yaml` | Config non sensible (hôtes, DB, Redis, email, S3, Djomy). |
-| `secret.example.yaml` | Modèle du Secret `sosguinee-secrets` (clés). |
+| `secret.example.yaml` | Modèle du Secret `ensemble224-secrets` (clés). |
 | `postgres.yaml` | PostgreSQL in-cluster (ou base managée). |
 | `redis.yaml` | Redis (broker + cache). |
 | `web.yaml` | Django/gunicorn ×2, probes `/healthz/`. |
@@ -240,18 +240,18 @@
 
 ### Configuration & appels
 - Les pods lisent la config via `envFrom` (ConfigMap + Secret) — cf. `web.yaml`.
-- `DJANGO_SETTINGS_MODULE=sosguinee.settings_prod` fixé dans la ConfigMap.
-- Sonde de vivacité `/healthz/` (`sosguinee/urls.py:healthz`) — **exemptée** de la
-  redirection HTTPS (`settings.py:390`).
+- `DJANGO_SETTINGS_MODULE=ensemble224.settings_prod` fixé dans la ConfigMap.
+- Sonde de vivacité `/healthz/` (`ensemble224/urls.py:healthz`) — **exemptée** de la
+  redirection HTTPS (`settings.py:415`).
 
 ### Débogage
 - **Pod en `Pending`** : souvent un volume/PVC ou une ressource manquante.
 - **Probe qui échoue** : le header `Host` des probes (`web.yaml`) doit figurer dans
   `ALLOWED_HOSTS`.
 - **Migrations** : relancer le `migrate-job` à chaque déploiement.
-- **Commandes** : `kubectl -n sosguinee get pods -w`,
-  `kubectl -n sosguinee logs -f deploy/sosguinee-web`,
-  `kubectl -n sosguinee exec -it deploy/sosguinee-web -- python manage.py shell`.
+- **Commandes** : `kubectl -n ensemble224 get pods -w`,
+  `kubectl -n ensemble224 logs -f deploy/ensemble224-web`,
+  `kubectl -n ensemble224 exec -it deploy/ensemble224-web -- python manage.py shell`.
 
 ---
 
@@ -262,8 +262,8 @@
 [AWS](DEPLOIEMENT_AWS.md) / [OVH](DEPLOIEMENT_OVH.md).
 
 - **Config** : `USE_S3`, `AWS_*` (2 buckets, clés, région, endpoint) —
-  `sosguinee/settings.py`.
-- **Code** : `sosguinee/utils/storages.py` (`PublicMediaStorage` /
+  `ensemble224/settings.py`.
+- **Code** : `ensemble224/utils/storages.py` (`PublicMediaStorage` /
   `PrivateMediaStorage`). Les pièces d'identité passent par la vue gardée
   `accounts/views/documents.py:protected_user_document`.
 - **Débogage** : image publique absente → *bucket policy* du bucket public /
@@ -273,11 +273,11 @@
 
 ## 8. Cloudflare Turnstile — captcha
 
-### Configuration (`sosguinee/settings.py:507-513`)
+### Configuration (`ensemble224/settings.py:547-551`)
 - `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_VERIFY_URL`.
 
 ### Où c'est appelé
-- `sosguinee/utils/captcha.py` : `is_turnstile_enabled()`, `verify_turnstile_request()`
+- `ensemble224/utils/captcha.py` : `is_turnstile_enabled()`, `verify_turnstile_request()`
   (`POST` vers `.../siteverify`). Utilisé dans `accounts/views/auth_views.py` et
   `page/views.py` (dons/contact) via `_captcha_context()`.
 
@@ -291,7 +291,7 @@
 ## 9. django-allauth & Google OAuth
 
 ### Configuration
-- `sosguinee/settings.py` : `AUTHENTICATION_BACKENDS`, `ACCOUNT_LOGIN_METHODS`,
+- `ensemble224/settings.py` : `AUTHENTICATION_BACKENDS`, `ACCOUNT_LOGIN_METHODS`,
   `ACCOUNT_EMAIL_VERIFICATION='mandatory'`, `SOCIALACCOUNT_PROVIDERS['google']`,
   `SITE_ID=1`.
 - La `SocialApp` Google (client id/secret) est stockée **en base** (admin Django),
@@ -308,7 +308,7 @@
 
 ## 10. Sentry — monitoring
 
-- **Config** (`sosguinee/settings.py:488-505`) : activé **seulement si** `SENTRY_DSN`
+- **Config** (`ensemble224/settings.py:527-546`) : activé **seulement si** `SENTRY_DSN`
   est défini. `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE` (0.05 en prod),
   `send_default_pii=False`.
 - **Débogage** : pas d'événements ? Vérifier `SENTRY_DSN` et les logs de démarrage

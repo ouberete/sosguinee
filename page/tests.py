@@ -1,12 +1,18 @@
 from datetime import timedelta
 from decimal import Decimal
+import hashlib
+import hmac
+import json
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
+from page.forms import DonationForm, FundingPaymentForm, MultipleFileField
 from page.models import Comment, Donation, FundPayment, FundingRequest, LossAlert
 from page.tasks import reconcile_pending_payments
 
@@ -96,6 +102,187 @@ class PaymentCallbackTests(TestCase):
         self.assertEqual(second.status_code, 200)
         funding.refresh_from_db()
         self.assertEqual(funding.amount_received, Decimal("150.00"))
+
+    def test_funding_callback_keeps_amount_above_target(self):
+        funding = self._funding()
+        payment = FundPayment.objects.create(
+            funding_request=funding,
+            amount=Decimal("1500.00"),
+            donor_email="donor@example.com",
+            transaction_id="tok_over_target",
+        )
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
+
+        with patch("page.views._verify_payment_status_with_djomy", return_value="réussi"):
+            response = self.client.get(f"{url}?token={payment.transaction_id}")
+
+        self.assertEqual(response.status_code, 200)
+        funding.refresh_from_db()
+        self.assertEqual(funding.amount_received, Decimal("1500.00"))
+        self.assertEqual(funding.progress, 100)
+
+
+class FundingPaymentInitiationTests(TestCase):
+    def test_initiation_accepts_amount_above_remaining_target(self):
+        funding = FundingRequest.objects.create(
+            beneficiary_name="Test Beneficiary",
+            funding_amount=Decimal("1000.00"),
+            description_needs="Need support",
+            principal_image="img/Fundings/test.png",
+            amount_received=Decimal("0.00"),
+        )
+        url = reverse(
+            "funding_djomy_payment_public",
+            kwargs={"funding_public_id": funding.public_id},
+        )
+
+        with (
+            patch("page.views.verify_turnstile_request", return_value=(True, None)),
+            patch("page.views._is_rate_limited", return_value=False),
+            patch(
+                "django_djomy.services.DjomyService.init_gateway_payment",
+                return_value={"paymentUrl": "https://pay.example.test/checkout"},
+            ),
+        ):
+            response = self.client.post(url, {
+                "amount": "15000",
+                "donor_email": "donor@example.com",
+                "donor_phone": "+224600000000",
+                "is_anonymous": "on",
+            })
+
+        self.assertEqual(response.status_code, 302)
+        payment = FundPayment.objects.get(funding_request=funding)
+        self.assertEqual(payment.amount, Decimal("15000.00"))
+
+
+class FundingPaymentAmountValidationTests(TestCase):
+    def _form(self, amount):
+        return FundingPaymentForm(data={
+            "amount": amount,
+            "donor_email": "donor@example.com",
+            "donor_phone": "+224600000000",
+            "is_anonymous": "on",
+        })
+
+    def test_positive_integer_amount_is_valid_without_a_target_ceiling(self):
+        form = self._form("15000")
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_amount_below_minimum_is_rejected_server_side(self):
+        form = self._form("9999")
+        self.assertFalse(form.is_valid())
+        self.assertIn("amount", form.errors)
+
+    def test_negative_amount_is_rejected_server_side(self):
+        form = self._form("-10000")
+        self.assertFalse(form.is_valid())
+        self.assertIn("amount", form.errors)
+
+    def test_fractional_gnf_amount_is_rejected_server_side(self):
+        form = self._form("10000.50")
+        self.assertFalse(form.is_valid())
+        self.assertIn("amount", form.errors)
+
+
+class DonationAmountValidationTests(TestCase):
+    def _form(self, amount):
+        return DonationForm(data={
+            "amount": amount,
+            "donor_email": "donor@example.com",
+            "donor_phone": "+224600000000",
+            "is_anonymous": "on",
+        })
+
+    def test_positive_integer_donation_is_valid(self):
+        form = self._form("10000")
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_fractional_donation_is_rejected_server_side(self):
+        form = self._form("10000.50")
+        self.assertFalse(form.is_valid())
+        self.assertIn("amount", form.errors)
+
+    def test_donation_below_minimum_is_rejected_server_side(self):
+        form = self._form("9999")
+        self.assertFalse(form.is_valid())
+        self.assertIn("amount", form.errors)
+
+
+class MultipleFileFieldValidationTests(TestCase):
+    def test_pdf_with_matching_signature_is_accepted(self):
+        field = MultipleFileField(required=False)
+        result = field.clean([SimpleUploadedFile("proof.pdf", b"%PDF-1.4 content")])
+        self.assertEqual(len(result), 1)
+
+    def test_pdf_extension_with_non_pdf_content_is_rejected(self):
+        field = MultipleFileField(required=False)
+        with self.assertRaises(ValidationError):
+            field.clean([SimpleUploadedFile("proof.pdf", b"MZ executable")])
+
+
+@override_settings(DEBUG=False, DJOMY_WEBHOOK_SECRET="webhook-test-secret")
+class PaymentWebhookAmountTests(TestCase):
+    def setUp(self):
+        self.funding = FundingRequest.objects.create(
+            beneficiary_name="Test Beneficiary",
+            funding_amount=Decimal("1000.00"),
+            description_needs="Need support",
+            principal_image="img/Fundings/test.png",
+            amount_received=Decimal("0.00"),
+        )
+        self.payment = FundPayment.objects.create(
+            funding_request=self.funding,
+            amount=Decimal("1500.00"),
+            donor_email="donor@example.com",
+            transaction_id="tok_webhook",
+            reference="FUND_tok_webhook",
+        )
+
+    def _post_webhook(self, amount):
+        payload = {
+            "eventType": "payment.success",
+            "data": {
+                "merchantPaymentReference": self.payment.reference,
+                "transactionId": "provider-transaction",
+                "amount": amount,
+            },
+        }
+        body = json.dumps(payload).encode("utf-8")
+        signature = hmac.new(b"webhook-test-secret", body, hashlib.sha256).hexdigest()
+        return self.client.generic(
+            "POST",
+            reverse("djomy_webhook"),
+            body,
+            content_type="application/json",
+            HTTP_X_DJOMY_SIGNATURE=signature,
+        )
+
+    @patch("page.views._send_payment_success_email")
+    def test_signed_webhook_confirms_matching_amount_above_target(self, send_email):
+        response = self._post_webhook("1500.00")
+
+        self.assertEqual(response.status_code, 200)
+        self.funding.refresh_from_db()
+        self.payment.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("1500.00"))
+        self.assertEqual(self.payment.status, "réussi")
+
+    def test_signed_webhook_rejects_mismatched_amount(self):
+        response = self._post_webhook("999.00")
+
+        self.assertEqual(response.status_code, 400)
+        self.funding.refresh_from_db()
+        self.payment.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("0.00"))
+        self.assertEqual(self.payment.status, "en_attente")
+
+    def test_signed_webhook_rejects_missing_amount(self):
+        response = self._post_webhook(None)
+
+        self.assertEqual(response.status_code, 400)
+        self.funding.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("0.00"))
 
 
 class ReconcilePendingPaymentsTests(TestCase):

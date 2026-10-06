@@ -3,12 +3,12 @@ version: '3.8'
 services:
   redis:
     image: redis:7-alpine
-    container_name: sosguinee_redis
+    container_name: ensemble224_redis
     restart: always
 
   nginx:
     image: nginx:latest
-    container_name: sosguinee_nginx
+    container_name: ensemble224_nginx
     ports:
       - "80:80"
     volumes:
@@ -21,9 +21,9 @@ services:
     
   db:
     image: postgres:15
-    container_name: sosguinee_db
+    container_name: ensemble224_db
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-sosguinee}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
@@ -32,7 +32,7 @@ services:
 
   web:
     build: .
-    container_name: sosguinee_web
+    container_name: ensemble224_web
     env_file:
       - .env
     volumes:
@@ -42,13 +42,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=sosguinee.settings_prod
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
       - ENVIRONMENT=production
       - DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
       - USE_POSTGRES=True
-      - POSTGRES_NAME=${POSTGRES_NAME:-sosguinee}
-      - POSTGRES_DB=${POSTGRES_DB:-sosguinee}
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}
@@ -64,20 +64,20 @@ services:
 
   celery_worker:
     build: .
-    container_name: sosguinee_celery_worker
-    command: celery -A sosguinee worker -l info -Q default,email
+    container_name: ensemble224_celery_worker
+    command: celery -A ensemble224 worker -l info -Q default,email
     env_file:
       - .env
     volumes:
       - .:/app
     environment:
-      - DJANGO_SETTINGS_MODULE=sosguinee.settings_prod
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
       - ENVIRONMENT=production
       - DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
       - USE_POSTGRES=True
-      - POSTGRES_NAME=${POSTGRES_NAME:-sosguinee}
-      - POSTGRES_DB=${POSTGRES_DB:-sosguinee}
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}
@@ -91,20 +91,20 @@ services:
 
   celery_beat:
     build: .
-    container_name: sosguinee_celery_beat
-    command: celery -A sosguinee beat -l info
+    container_name: ensemble224_celery_beat
+    command: celery -A ensemble224 beat -l info
     env_file:
       - .env
     volumes:
       - .:/app
     environment:
-      - DJANGO_SETTINGS_MODULE=sosguinee.settings_prod
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
       - ENVIRONMENT=production
       - DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
       - USE_POSTGRES=True
-      - POSTGRES_NAME=${POSTGRES_NAME:-sosguinee}
-      - POSTGRES_DB=${POSTGRES_DB:-sosguinee}
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}

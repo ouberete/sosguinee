@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Conditions générales d'utilisation - Ensemble 224{% endblock %}
+{% block extra_head %}
+<meta name="description" content="Conditions générales d'utilisation de Ensemble 224: accès au service, publication d'alertes, demandes de financement, dons et responsabilités.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Conditions générales d'utilisation - Ensemble 224">
+<meta property="og:description" content="Les règles d'utilisation de la plateforme Ensemble 224.">
+<meta property="og:image" content="{% static 'img/og-image.jpg' %}">
+{% endblock %}
+{% block content %}
+<section class="section" aria-labelledby="terms-title">
+  <div class="container">
+    <div class="card-panel legal-page">
+      <h1 id="terms-title">Conditions générales d'utilisation</h1>
+      <p>Les présentes conditions encadrent l'utilisation de la plateforme <strong>Ensemble 224</strong>, qui permet de publier des alertes, de présenter des demandes de financement solidaire et de faciliter la mise en relation entre utilisateurs.</p>
+
+      <h2>1. Accès au service</h2>
+      <p>L'accès au site est ouvert aux visiteurs. Certaines fonctionnalités, comme la gestion d'un profil, la publication, le suivi ou les commentaires, peuvent nécessiter la création d'un compte.</p>
+
+      <h2>2. Responsabilités des utilisateurs</h2>
+      <p>Chaque utilisateur s'engage à fournir des informations exactes, licites et respectueuses des droits d'autrui. Les contenus frauduleux, diffamatoires, trompeurs, discriminatoires ou portant atteinte à la vie privée sont interdits.</p>
+
+      <h2>3. Alertes et demandes de financement</h2>
+      <p>Les publications doivent correspondre à une situation réelle. Ensemble 224 peut modérer, suspendre ou supprimer un contenu lorsqu'il paraît incomplet, abusif, frauduleux ou contraire à l'objet de la plateforme.</p>
+
+      <h2>4. Dons et paiements</h2>
+      <p>Les paiements sont traités par un prestataire externe sécurisé. Ensemble 224 ne demande jamais de communiquer un mot de passe bancaire par message. Les remboursements, contestations ou erreurs de paiement sont étudiés au cas par cas avec les justificatifs disponibles.</p>
+
+      <h2>5. Données personnelles</h2>
+      <p>Le traitement des données personnelles est décrit dans la <a href="{% url 'policy_privacy' %}">politique de confidentialité RGPD</a>.</p>
+
+      <h2>6. Disponibilité</h2>
+      <p>Nous faisons nos meilleurs efforts pour maintenir le site accessible, mais des interruptions peuvent survenir pour maintenance, incident technique ou contrainte externe.</p>
+
+      <h2>7. Modification des conditions</h2>
+      <p>Ces conditions peuvent être mises à jour. La version publiée sur cette page est celle applicable au moment de la consultation.</p>
+
+      {% include "page/components/address_contact.html" %}
+    </div>
+  </div>
+</section>
+{% endblock %}

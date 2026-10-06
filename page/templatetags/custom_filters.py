@@ -1,7 +1,19 @@
 from django import template
 import os
 
+from django.templatetags.static import static
+
 register = template.Library()
+
+
+@register.filter
+def existing_image_url(image_field, default_path):
+    """Return a stored image URL only when the referenced file still exists."""
+    if image_field and getattr(image_field, 'name', None):
+        storage = image_field.storage
+        if storage.exists(image_field.name):
+            return image_field.url
+    return static(default_path)
 
 @register.filter
 def startswith(value, arg):

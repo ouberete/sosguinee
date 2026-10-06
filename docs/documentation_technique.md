@@ -1,4 +1,4 @@
-# Documentation Technique Complète — SOS Guinée
+# Documentation Technique Complète — Ensemble 224
 
 > Plateforme solidaire guinéenne pour la gestion des alertes de perte/disparition, des demandes de financement et des dons en ligne.
 
@@ -6,7 +6,7 @@
 
 ## 1. Vue d'ensemble du projet
 
-SOS Guinée est une application web Django permettant aux citoyens guinéens de :
+Ensemble 224 est une application web Django permettant aux citoyens guinéens de :
 - Publier et consulter des **alertes de perte/disparition** (personnes, objets, documents).
 - Créer et financer des **demandes de financement solidaire** (collectes).
 - Effectuer des **dons** via le prestataire de paiement africain **Djomy**.
@@ -54,12 +54,12 @@ Sentry <----------------------------- Django + Celery (Capture d'exceptions)
 ## 3. Stack Technologique & Bibliothèques
 
 ### 3.1 Infrastructure & Backend
-- **Python** 3.11
+- **Python** 3.12+ (image Docker : `python:3.14-slim`)
 - **Django** 6.0.6 (Framework web)
 - **PostgreSQL** 15 (Base de données de production)
 - **SQLite** (Base de données de développement locale)
 - **Gunicorn** 26.0.0 (Serveur WSGI)
-- **Celery** 5.4.0 (File de tâches asynchrones)
+- **Celery** 5.6.3 (File de tâches asynchrones)
 - **Redis** 7 (Broker de messages pour Celery)
 - **Docker & Docker Compose** (Conteneurisation et orchestration)
 - **Nginx** (Serveur web)
@@ -87,8 +87,8 @@ Sentry <----------------------------- Django + Celery (Capture d'exceptions)
 ## 4. Architecture & Arborescence du projet
 
 ```text
-sosguinee/                          ← Racine du projet
-├── sosguinee/                      ← Paramètres globaux (settings, urls, celery, wsgi)
+ensemble224/                          ← Racine du projet
+├── ensemble224/                      ← Paramètres globaux (settings, urls, celery, wsgi)
 ├── page/                           ← Application principale (alertes, collectes, UI publique)
 │   ├── models.py                   ← Modèles métier (LossAlert, FundingRequest, etc.)
 │   ├── views.py                    ← Vues principales
@@ -115,7 +115,7 @@ sosguinee/                          ← Racine du projet
 - **Géographie :** `Region` → `Prefecture` → `Commune` → `Quarter`
 - **Alertes :** `LossAlert` (liée à `LossAlertType`, `LossAlertStatus`, `User`)
 - **Financements :** `FundingRequest` (liée à `FundingType`, `FundingRequestStatus`, `User`)
-- **Interactions :** `Donation`, `FundPayment` (liés aux collectes), `Comment`, `MessageContact`
+- **Interactions :** `Donation`, `FundPayment` (liés aux collectes ; champ `is_anonymous` pour les paiements anonymes — identité non conservée, affichage « Donateur anonyme »), `Comment`, `MessageContact`
 
 ### Application `accounts`
 - **Profil :** `UserDetails` (liée en OneToOne à `User`, contient les informations KYC, réseaux sociaux)
@@ -129,7 +129,9 @@ sosguinee/                          ← Racine du projet
 ## 6. Flux de données et d'intégration clés
 
 ### 6.1 Paiement (Djomy)
-1. L'utilisateur soumet un formulaire de don ou de financement.
+1. L'utilisateur soumet un formulaire de don ou de financement. Une case
+   « paiement anonyme » permet de ne fournir qu'email + téléphone (l'identité
+   est forcée à vide côté serveur, `is_anonymous=True`).
 2. Django crée une entrée locale (`Donation` ou `FundPayment`).
 3. Appel à `init_gateway_payment` du service Djomy.
 4. Redirection de l'utilisateur vers l'URL de paiement Djomy.
@@ -193,8 +195,8 @@ python manage.py runserver
 ```
 *(Optionnel)* Lancer Celery dans des terminaux séparés :
 ```bash
-celery -A sosguinee worker -l info -Q default,email
-celery -A sosguinee beat -l info
+celery -A ensemble224 worker -l info -Q default,email
+celery -A ensemble224 beat -l info
 ```
 
 ---
@@ -209,8 +211,8 @@ Le fichier `.env` contrôle le comportement du système.
 | `ENVIRONMENT` | `development` ou `production` |
 | `DEBUG` | `True` (dev) ou `False` (prod) |
 | `SECRET_KEY` | Clé cryptographique Django (Obligatoire en prod) |
-| `ALLOWED_HOSTS` | Noms de domaine autorisés, ex: `sosguinee.org,www.sosguinee.org` |
-| `SITE_URL` | URL de base pour les liens dans les emails (ex: `https://sosguinee.org`) |
+| `ALLOWED_HOSTS` | Noms de domaine autorisés, ex: `ensemble224.org,www.ensemble224.org` |
+| `SITE_URL` | URL de base pour les liens dans les emails (ex: `https://ensemble224.org`) |
 
 ### Base de données (PostgreSQL)
 | Variable | Description |
@@ -227,7 +229,6 @@ Le fichier `.env` contrôle le comportement du système.
 | `DJOMY_WEBHOOK_SECRET` | Secret de signature webhook (si vide, retombe sur `DJOMY_CLIENT_SECRET`). |
 | `PAYMENT_RECONCILIATION_ENABLED` | Active le job d'expiration des paiements en attente (défaut `False`). |
 | `PENDING_PAYMENT_EXPIRY_HOURS` | Délai avant expiration d'un paiement en attente (défaut 24 h). |
-| `DJOMY_ENFORCE_FUNDING_CAP` | Plafonne le montant reçu au montant cible à la confirmation (défaut `False`). |
 
 ### Stockage des médias (S3 / Object Storage)
 Portable AWS S3 ↔ OVH Object Storage (protocole S3). Deux buckets : un **public**
@@ -318,7 +319,7 @@ Capture automatiquement toutes les exceptions Python (Django & Celery).
 ### Sécurité
 - **En-têtes HTTP (Prod) :** HSTS, X-Frame-Options: DENY, CSRF & SESSION Cookies Sécurisés.
 - **Protection Bot :** Intégration stricte de Cloudflare Turnstile.
-- **CSRF :** Renseigner `CSRF_TRUSTED_ORIGINS` avec le domaine de production (ex: `https://sosguinee.org`).
+- **CSRF :** Renseigner `CSRF_TRUSTED_ORIGINS` avec le domaine de production (ex: `https://ensemble224.org`).
 
 ### Internationalisation (i18n)
 - Le site supporte le Français (défaut) et l'Anglais.
@@ -363,4 +364,4 @@ Avant l'ouverture au public, vérifiez impérativement :
 
 ---
 
-*Documentation générée en juin 2026 — SOS Guinée*
+*Documentation mise à jour en juillet 2026 — Ensemble 224*

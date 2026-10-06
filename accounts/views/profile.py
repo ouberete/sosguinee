@@ -15,7 +15,7 @@ from ..forms import ProfileForm, UserInfosForm, UserDocumentForm, UserLinkForm
 # Stockage temporaire des fichiers du wizard (pièces d'identité). L'ancien
 # chemin '/tmp' codé en dur n'existe pas sous Windows et faisait planter le
 # wizard; on utilise le répertoire temporaire du système, multiplateforme.
-_WIZARD_TMP_DIR = Path(tempfile.gettempdir()) / "sosguinee_wizard_uploads"
+_WIZARD_TMP_DIR = Path(tempfile.gettempdir()) / "ensemble224_wizard_uploads"
 _WIZARD_TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 @login_required
@@ -118,13 +118,11 @@ class UserLinkView(LoginRequiredMixin, FormView):
 FORMS = [
     ("user_infos", UserInfosForm),
     ("user_document", UserDocumentForm),
-    ("user_link", UserLinkForm),
 ]
 
 TEMPLATES = {
     "user_infos": "accounts/user_infos.html",
     "user_document": "accounts/user_document.html",
-    "user_link": "accounts/user_link.html",
 }
 
 class UpdateUserProfileWizard(LoginRequiredMixin, SessionWizardView):

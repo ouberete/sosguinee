@@ -31,14 +31,14 @@ from page.services.loss_alert_service import LossAlertService
 from page.services.funding_request_service import FundingRequestService
 from django.core.paginator import Paginator
 from page.models import UserDetails
-from sosguinee.utils.email_service import EmailService
+from ensemble224.utils.email_service import EmailService
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.conf import settings
 from django.contrib import messages
 import requests
 from requests.exceptions import RequestException
 from django.http import HttpResponseForbidden
-from sosguinee.utils.captcha import get_turnstile_site_key, verify_turnstile_request
+from ensemble224.utils.captcha import get_turnstile_site_key, verify_turnstile_request
 User = get_user_model()
 logger = logging.getLogger(__name__)
 ALLOWED_COMMENT_MODELS = {
@@ -200,8 +200,8 @@ def _finalize_funding_request_status(funding_request):
 def _send_payment_success_email(payment):
     try:
         if isinstance(payment, Donation):
-            EmailService.send_donation_notification(payment)
-            return True
+            sent = EmailService.send_donation_notification(payment)
+            return sent > 0 if isinstance(sent, int) else bool(sent)
         if isinstance(payment, FundPayment):
             context = {
                 'name': str(payment.donor_first_name or '').capitalize() + ' ' + str(payment.donor_last_name or '').upper(),
@@ -212,8 +212,10 @@ def _send_payment_success_email(payment):
             template_email = 'page/template_email/funding_payment_email.html'
             to_email = [payment.donor_email] if payment.donor_email else []
             if to_email:
-                EmailService.send_template_email(to_email, "Financement de demande de financement", template_email, context)
-                return True
+                sent = EmailService.send_template_email(
+                    to_email, "Financement de demande de financement", template_email, context
+                )
+                return sent > 0 if isinstance(sent, int) else bool(sent)
     except Exception as exc:
         logger.warning("Email de confirmation de paiement non envoyé: %s", exc, exc_info=True)
     return False
@@ -245,16 +247,6 @@ def _apply_payment_success(payment):
                 pk=locked.funding_request_id
             )
             new_total = (funding_request.amount_received or 0) + locked.amount
-            # Anti sur-financement (point b) — désactivé par défaut. Une fois
-            # DJOMY_ENFORCE_FUNDING_CAP=True, le montant reçu est plafonné au
-            # montant cible de la collecte lors de la confirmation (sous verrou).
-            if getattr(settings, "DJOMY_ENFORCE_FUNDING_CAP", False) and funding_request.funding_amount:
-                if new_total > funding_request.funding_amount:
-                    logger.warning(
-                        "funding_overfunded: paiement %s dépasse le plafond (%s > %s), montant reçu plafonné.",
-                        locked.pk, new_total, funding_request.funding_amount,
-                    )
-                    new_total = funding_request.funding_amount
             funding_request.amount_received = new_total
             funding_request.save(update_fields=["amount_received", "updated_at"])
             _finalize_funding_request_status(funding_request)
@@ -270,6 +262,15 @@ def _mark_payment_failed(payment):
     payment.status = "échoué"
     payment.save(update_fields=["status", "updated_at"])
     return True
+
+
+def _provider_amount_matches(payment, raw_amount):
+    if raw_amount in (None, ""):
+        return False
+    try:
+        return Decimal(str(raw_amount)) == payment.amount
+    except (InvalidOperation, TypeError, ValueError):
+        return False
 
 
 def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
@@ -301,6 +302,17 @@ def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
         )
         normalized = _normalize_payment_status(raw_status)
         if normalized in {"réussi", "échoué", "en_attente"}:
+            if normalized == "réussi":
+                provider_amount = _extract_first_non_empty(
+                    data,
+                    ("amount", "paid_amount", "paidAmount", "paymentAmount"),
+                )
+                if not _provider_amount_matches(payment, provider_amount):
+                    logger.warning(
+                        "Statut Djomy positif ignoré: montant manquant ou différent pour le paiement %s.",
+                        payment.pk,
+                    )
+                    continue
             return normalized
     return None
 
@@ -346,14 +358,16 @@ def _extract_signature_candidates(signature_header):
 def _verify_djomy_webhook_signature(request):
     secret = (getattr(settings, "DJOMY_WEBHOOK_SECRET", "") or "").strip()
     if not secret:
-        # Djomy signe le webhook avec le clientSecret (il n'existe pas de secret
-        # webhook dédié côté Djomy). On retombe donc sur DJOMY_CLIENT_SECRET, ce
-        # qui rend l'endpoint fonctionnel sans dupliquer le secret.
+        # Fallback to DJOMY_CLIENT_SECRET only if WEBHOOK_SECRET is not set
         secret = (getattr(settings, "DJOMY_CLIENT_SECRET", "") or "").strip()
-    if not secret:
+
+    # Refuse to process webhooks without a valid, non-default secret
+    if not secret or secret.startswith("votre_"):
         if settings.DEBUG:
-            logger.warning("DJOMY_WEBHOOK_SECRET absent: signature webhook non vérifiée (mode DEBUG).")
+            logger.warning("DJOMY_WEBHOOK_SECRET or DJOMY_CLIENT_SECRET missing or using default value: "
+                         "webhook signature not verified in DEBUG mode.")
             return True
+        logger.error("Webhook signature verification failed: secret not configured properly.")
         return False
 
     signature_header = (
@@ -425,9 +439,9 @@ def _normalize_payment_status(raw_status):
     if raw_status is None:
         return None
     status = str(raw_status).strip().lower()
-    if status in {"success", "succeeded", "paid", "completed", "complete", "réussi", "reussi"}:
+    if status in {"success", "succeeded", "paid", "completed", "complete", "payment.success", "réussi", "reussi"}:
         return "réussi"
-    if status in {"failed", "failure", "error", "cancelled", "canceled", "declined", "échoué", "echoue"}:
+    if status in {"failed", "failure", "error", "cancelled", "canceled", "declined", "payment.failed", "payment.failure", "échoué", "echoue"}:
         return "échoué"
     if status in {"pending", "en_attente", "processing"}:
         return "en_attente"
@@ -667,7 +681,7 @@ def close_loss_alert(request, public_id):
             obj=alert,
             metadata={'previous_status': previous_status, 'new_status': found_status.name},
         )
-        messages.success(request, "Alerte clôturée avec succès. Merci d'avoir tenu SOS Guinée informé !")
+        messages.success(request, "Alerte clôturée avec succès. Merci d'avoir tenu Ensemble 224 informé !")
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': 'Alerte clôturée avec succès.', 'new_status': found_status.name})
     else:
@@ -796,7 +810,7 @@ def loss_alert_detail(request, pk=None, public_id=None):
 
 def _send_contact_notification(name, email, message):
     """
-    Notifie l'équipe SOS Guinée d'un nouveau message de contact.
+    Notifie l'équipe Ensemble 224 d'un nouveau message de contact.
     Le message est déjà conservé en base; l'email est un best-effort.
     N'envoie jamais vers l'adresse fournie par le visiteur (anti-relais spam).
     """
@@ -806,13 +820,13 @@ def _send_contact_notification(name, email, message):
         return False
     context = {'name': name, 'email': email, 'message': message}
     try:
-        EmailService.send_template_email(
+        sent = EmailService.send_template_email(
             [notify_email],
-            "Nouveau message de contact - SOS Guinée",
+            "Nouveau message de contact - Ensemble 224",
             'page/template_email/contact_form_email.html',
             context,
         )
-        return True
+        return sent > 0 if isinstance(sent, int) else bool(sent)
     except Exception as e:
         logger.warning("Email de contact non envoyé, message conservé en base: %s", e)
         return False
@@ -832,7 +846,15 @@ def contact(request):
                 contact.add_error(None, captcha_error)
             elif contact.is_valid():
                 contact.save()
-                _send_contact_notification(name, email, message)
+                if not _send_contact_notification(name, email, message):
+                    contact.add_error(
+                        None,
+                        "Votre message a été enregistré, mais l'email de notification n'a pas pu être envoyé. "
+                        "Veuillez réessayer plus tard.",
+                    )
+                    context = {'form': contact}
+                    context.update(_captcha_context())
+                    return render(request, 'page/contact.html', context)
                 if email:
                     cache.delete(_rate_limit_key("contact", request, email))
                 contact = MessageContactForm()
@@ -947,8 +969,7 @@ def donation(request):
                 _log_payment_event(
                     "donation_gateway_error",
                     amount=amount,
-                    donor_email=user_email,
-                    error=str(e),
+                    error_type=type(e).__name__,
                     provider="djomy",
                 )
                 messages.error(request, GENERIC_PAYMENT_ERROR)
@@ -962,7 +983,6 @@ def donation(request):
                 "donation_redirect_to_gateway",
                 payment_id=payment.id,
                 reference=payment.reference,
-                redirect_url=payment_url,
                 provider="djomy",
             )
             return redirect(payment_url)
@@ -990,6 +1010,14 @@ def help_support(request):
 
 def policy_privacy(request):
     return render(request, 'page/help_policy/policy_privacy.html')
+
+
+def terms(request):
+    return render(request, 'page/help_policy/terms.html')
+
+
+def custom_404(request, exception):
+    return render(request, "404.html", status=404)
 
 def about(request):
     return render(request, 'page/about.html')
@@ -1213,11 +1241,6 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                 context = {'funding_request': funding_request, 'form': form}
                 context.update(_captcha_context())
                 return render(request, 'page/funding_payment.html', context)
-            if amount_decimal > funding_request.remaining_amount:
-                form.add_error('amount', "Le montant ne doit pas dépasser le reste à payer.")
-                context = {'funding_request': funding_request, 'form': form}
-                context.update(_captcha_context())
-                return render(request, 'page/funding_payment.html', context)
             try:
                 # Enregistrer le paiement dans la base de données
                 payment = FundPayment.objects.create(
@@ -1282,8 +1305,7 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                         "funding_gateway_error",
                         funding_public_id=str(funding_request.public_id),
                         amount=amount,
-                        donor_email=user_email,
-                        error=str(e),
+                        error_type=type(e).__name__,
                         provider="djomy",
                     )
                     messages.error(request, GENERIC_PAYMENT_ERROR)
@@ -1298,7 +1320,6 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                     payment_id=payment.id,
                     reference=payment.reference,
                     funding_public_id=str(funding_request.public_id),
-                    redirect_url=payment_url,
                     provider="djomy",
                 )
                 return redirect(payment_url)
@@ -1400,7 +1421,7 @@ def djomy_webhook(request):
             transaction_id=tx_id,
             provider="djomy",
         )
-        logger.warning("Webhook Djomy reçu sans paiement correspondant: %s", payload)
+        logger.warning("Webhook Djomy reçu sans paiement correspondant.")
         return JsonResponse({"ok": True, "ignored": True, "reason": "payment_not_found"}, status=200)
 
     status_raw = _extract_first_non_empty(
@@ -1408,8 +1429,22 @@ def djomy_webhook(request):
         ("status", "payment_status", "transaction_status", "state"),
     )
     if status_raw is None:
-        status_raw = _extract_first_non_empty(payload, ("event", "event_type", "type", "name"))
+        status_raw = _extract_first_non_empty(payload, ("event", "event_type", "eventType", "type", "name"))
     normalized_status = _normalize_payment_status(status_raw)
+    if normalized_status == "réussi":
+        provider_amount = _extract_first_non_empty(
+            payload,
+            ("amount", "paid_amount", "paidAmount", "paymentAmount"),
+        )
+        if not _provider_amount_matches(payment, provider_amount):
+            _log_payment_event(
+                "payment_webhook_rejected",
+                payment_id=payment.id,
+                reference=reference or payment.reference,
+                reason="amount_missing_or_mismatched",
+                provider="djomy",
+            )
+            return JsonResponse({"ok": False, "error": "Montant du paiement invalide."}, status=400)
     _log_payment_event(
         "payment_webhook_received",
         payment_type="funding" if model is FundPayment else "donation",

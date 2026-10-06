@@ -15,7 +15,7 @@ jobs:
         python-version: ["3.12", "3.14"]
 
     env:
-      DJANGO_SETTINGS_MODULE: sosguinee.settings_dev
+      DJANGO_SETTINGS_MODULE: ensemble224.settings_dev
       SECRET_KEY: ci-test-secret-key
       DEBUG: "True"
       ENVIRONMENT: development
@@ -63,4 +63,4 @@ jobs:
         run: pip-audit -r requirements.txt
 
       - name: Static security scan
-        run: bandit -r accounts page sosguinee -x migrations,__pycache__,.venv
+        run: bandit -r accounts page ensemble224 -x migrations,__pycache__,.venv

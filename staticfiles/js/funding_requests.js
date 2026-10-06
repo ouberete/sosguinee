@@ -9,6 +9,7 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
+
 function escapeHtml(value) {
     if (value === null || value === undefined) {
         return '';
@@ -110,11 +111,10 @@ function renderFundingCard(fundingRequest, index) {
     const description = escapeHtml(truncateText(fundingRequest.description_needs || 'Aucune description disponible.', 160));
     const collectedAmount = formatCurrency(fundingRequest.amount_received || 0);
     const targetAmount = formatCurrency(fundingRequest.amount || 0);
-    const remainingAmount = formatCurrency(fundingRequest.remaining_amount || 0);
     const fullUrl = `${window.location.origin}${fundingRequest.details_url}`;
     const paymentUrl = fundingRequest.payment_url || `/funding/${fundingRequest.public_id}/djomy/`;
     const canFund = fundingRequest.can_fund === true || fundingRequest.funding_request_status === 'En cours';
-    const shareTitle = `Aide ${fundingRequest.beneficiary_name} - ${fundingRequest.title} - SOS Guinee`;
+    const shareTitle = `Aide ${fundingRequest.beneficiary_name} - ${fundingRequest.title} - Ensemble 224`;
     const animDelay = `animation-delay: ${index * 0.07}s`;
     const statusClass = getStatusClass(statusLabel, fundingRequest.days_remaining, fundingRequest.progress);
     const progressClass = getProgressClass(fundingRequest.progress);
@@ -171,10 +171,6 @@ function renderFundingCard(fundingRequest, index) {
                             <div class="ws-card-stat-value">${collectedAmount}</div>
                             <div class="ws-card-stat-label">Collecte</div>
                         </div>
-                        <div class="ws-card-stat">
-                            <div class="ws-card-stat-value">${remainingAmount}</div>
-                            <div class="ws-card-stat-label">Reste</div>
-                        </div>
                     </div>
 
                     <div class="ws-card-action">
@@ -199,7 +195,7 @@ function renderFundingCard(fundingRequest, index) {
 
 function GenerateFundingRequestList(response) {
     $('#pagination').empty();
-    $('#results-count').text(`${response.pagination.total_elements} demande(s) trouvee(s)`);
+    $('#results-count').text(`${response.pagination.total_elements} demande(s) trouvée(s)`);
 
     if (response.funding_requests.length === 0) {
         $('#fundings-container').append(`

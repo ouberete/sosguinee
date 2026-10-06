@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from page.middleware import get_current_user
-from sosguinee.utils.storages import select_private_storage
+from ensemble224.utils.storages import select_private_storage
 
 
 class BaseEntity(models.Model):
@@ -382,7 +382,7 @@ class FundingRequest(BaseEntity):
     def progress(self):
         if self.funding_amount > 0:
             mr = self.amount_received if self.amount_received else 0
-            return int((mr / self.funding_amount) * 100)
+            return min(int((mr / self.funding_amount) * 100), 100)
         return 0
 
     @property

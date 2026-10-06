@@ -32,6 +32,20 @@
     text-transform: uppercase;
 }
 
+.hero-secondary-action {
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    color: #ffffff;
+    margin-left: 10px;
+    background: rgba(15, 23, 42, 0.18);
+    box-shadow: none;
+}
+
+.hero-secondary-action:hover,
+.hero-secondary-action:focus {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
 .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
@@ -1371,6 +1385,25 @@
     line-height: 54px;
 }
 
+.donate-secondary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 999px;
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: none;
+}
+
+.donate-secondary-action:hover,
+.donate-secondary-action:focus {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
 /* --- Fixed action button --- */
 .fixed-action-btn {
     bottom: 30px;
@@ -1499,6 +1532,30 @@
 
 /* Mobile */
 @media (max-width: 600px) {
+    .bf-card-body {
+        min-width: 0;
+    }
+
+    .bf-card-title,
+    .bf-card-description,
+    .bf-card-tag {
+        overflow-wrap: anywhere;
+    }
+
+    .bf-card-actions .btn,
+    .bf-card-actions .btn-small {
+        min-width: 0;
+        white-space: normal;
+        height: auto;
+        min-height: 36px;
+        line-height: 1.25;
+        padding: 8px 10px;
+    }
+
+    .bf-card-tags {
+        min-width: 0;
+    }
+
     .details-content-section .action-buttons-wrapper {
         align-items: stretch;
     }
@@ -3601,4 +3658,3 @@ body:has(.update-profile-page) .main-wrapper > main {
     color: #6b7280;
     text-align: right;
 }
-

@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from page.models import Donation, FundPayment, FundingRequest, LossAlert
-from sosguinee.utils.email_service import EmailService
+from ensemble224.utils.email_service import EmailService
 
 
 @shared_task(

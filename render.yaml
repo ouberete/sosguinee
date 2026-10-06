@@ -1,16 +1,16 @@
 databases:
-  - name: sosguinee-db
-    databaseName: sosguinee
+  - name: ensemble224-db
+    databaseName: ensemble224
     user: postgres
     plan: starter # Change if you need more DB resources
 
 services:
   - type: redis
-    name: sosguinee-redis
+    name: ensemble224-redis
     plan: free # Change if you need a paid redis
 
   - type: web
-    name: sosguinee-web
+    name: ensemble224-web
     env: docker
     plan: starter # Django often needs more than the free tier RAM
     numInstances: 1
@@ -27,70 +27,150 @@ services:
         value: True
       - key: DATABASE_URL
         fromDatabase:
-          name: sosguinee-db
+          name: ensemble224-db
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString
       - key: ASYNC_EMAIL_ENABLED
         value: True
+      - key: RUN_CELERY_PROCESSES
+        value: False
       - key: ALLOWED_HOSTS
-        value: sosguinee-web.onrender.com # You will add your custom domain here later
+        value: ensemble224-web.onrender.com # You will add your custom domain here later
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://sosguinee-web.onrender.com
+        value: https://ensemble224-web.onrender.com
       # API Djomy de PRODUCTION (le default du code est la sandbox).
       # Les identifiants DJOMY_CLIENT_ID/SECRET/WEBHOOK_SECRET restent à définir
       # comme variables secrètes dans le dashboard Render.
       - key: DJOMY_BASE_URL
         value: https://api.djomy.africa/v1
+      - key: USE_S3
+        value: True
+      - key: AWS_STORAGE_BUCKET_NAME
+        value: ensemble224-media
+      - key: AWS_PRIVATE_STORAGE_BUCKET_NAME
+        value: ensemble224-private
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_REGION_NAME
+        sync: false
+      - key: AWS_S3_ENDPOINT_URL
+        sync: false
 
   - type: worker
-    name: sosguinee-celery-worker
+    name: ensemble224-celery-worker
     env: docker
     plan: starter
-    dockerCommand: "celery -A sosguinee worker -l info -Q default,email"
+    dockerCommand: "celery -A ensemble224 worker -l info -Q default,email"
     envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ensemble224.settings_prod
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: 0
+      - key: SECRET_KEY
+        sync: false
+      - key: SITE_URL
+        value: https://ensemble224-web.onrender.com
+      - key: ALLOWED_HOSTS
+        value: ensemble224-web.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://ensemble224-web.onrender.com
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: True
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DJOMY_CLIENT_ID
+        sync: false
+      - key: DJOMY_CLIENT_SECRET
+        sync: false
+      - key: DJOMY_WEBHOOK_SECRET
+        sync: false
+      - key: DJOMY_BASE_URL
+        value: https://api.djomy.africa/v1
       - key: DATABASE_URL
         fromDatabase:
-          name: sosguinee-db
+          name: ensemble224-db
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString
       - key: ASYNC_EMAIL_ENABLED
         value: True
 
   - type: worker
-    name: sosguinee-celery-beat
+    name: ensemble224-celery-beat
     env: docker
     plan: free
-    dockerCommand: "celery -A sosguinee beat -l info"
+    dockerCommand: "celery -A ensemble224 beat -l info"
     envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: ensemble224.settings_prod
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: 0
+      - key: SECRET_KEY
+        sync: false
+      - key: SITE_URL
+        value: https://ensemble224-web.onrender.com
+      - key: ALLOWED_HOSTS
+        value: ensemble224-web.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://ensemble224-web.onrender.com
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: True
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DJOMY_CLIENT_ID
+        sync: false
+      - key: DJOMY_CLIENT_SECRET
+        sync: false
+      - key: DJOMY_WEBHOOK_SECRET
+        sync: false
+      - key: DJOMY_BASE_URL
+        value: https://api.djomy.africa/v1
       - key: DATABASE_URL
         fromDatabase:
-          name: sosguinee-db
+          name: ensemble224-db
           property: connectionString
       - key: CELERY_BROKER_URL
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString
       - key: CELERY_RESULT_BACKEND
         fromService:
           type: redis
-          name: sosguinee-redis
+          name: ensemble224-redis
           property: connectionString

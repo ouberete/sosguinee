@@ -8,14 +8,60 @@ from django.utils.html import format_html
 #from django.forms.widgets import RadioSelect
 from django.forms.utils import flatatt
 from django.contrib.auth import authenticate
-from smtplib import SMTPException
-import logging
 from crispy_forms.helper import FormHelper
+from PIL import Image
+import os
 
 from accounts.utils import send_or_queue_activation_email
 User = get_user_model()
 
-logger = logging.getLogger(__name__)
+MAX_PRIVATE_UPLOAD_SIZE = 3 * 1024 * 1024
+PRIVATE_IMAGE_FORMATS = {
+    ".jpg": "JPEG",
+    ".jpeg": "JPEG",
+    ".png": "PNG",
+    ".webp": "WEBP",
+}
+PRIVATE_DOCUMENT_EXTENSIONS = set(PRIVATE_IMAGE_FORMATS) | {".pdf"}
+
+
+def _validate_private_upload(uploaded_file, allowed_extensions):
+    if not uploaded_file:
+        return uploaded_file
+
+    extension = os.path.splitext(uploaded_file.name)[1].lower()
+    if extension not in allowed_extensions:
+        raise forms.ValidationError("Format de fichier non autorisé.")
+    if uploaded_file.size > MAX_PRIVATE_UPLOAD_SIZE:
+        raise forms.ValidationError("Le fichier ne doit pas dépasser 3 Mo.")
+
+    uploaded_file.seek(0)
+    try:
+        if extension == ".pdf":
+            valid_content = uploaded_file.read(5) == b"%PDF-"
+        else:
+            with Image.open(uploaded_file) as image:
+                valid_content = image.format == PRIVATE_IMAGE_FORMATS[extension]
+                image.verify()
+    except Exception:
+        valid_content = False
+    finally:
+        uploaded_file.seek(0)
+
+    if not valid_content:
+        raise forms.ValidationError("Le contenu du fichier ne correspond pas au format annoncé.")
+    return uploaded_file
+
+
+class PrivateDocumentValidationMixin:
+    def clean_photo(self):
+        return _validate_private_upload(self.cleaned_data.get("photo"), PRIVATE_IMAGE_FORMATS)
+
+    def clean_id_card(self):
+        return _validate_private_upload(self.cleaned_data.get("id_card"), PRIVATE_DOCUMENT_EXTENSIONS)
+
+    def clean_birth_piece(self):
+        return _validate_private_upload(self.cleaned_data.get("birth_piece"), PRIVATE_DOCUMENT_EXTENSIONS)
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -185,10 +231,9 @@ class RegisterForm(UserCreationForm):
         return user
 
     def _send_activation_email(self, user):
-        try:
-            send_or_queue_activation_email(user, reuse_unsent=True)
-        except Exception as e:
-            logger.exception("Email activation non envoye: %s", e)
+        # Let the view keep the user on the signup form when the email
+        # backend fails; displaying account_created would be misleading.
+        send_or_queue_activation_email(user, reuse_unsent=True)
 
 
 class ResendActivationForm(forms.Form):
@@ -201,7 +246,7 @@ class ResendActivationForm(forms.Form):
     )
 
 
-class UserInfosForm(forms.ModelForm):
+class _LegacyUserInfosForm(forms.ModelForm):
     user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Veuillez renseigner votre categorie d\'utilisateur.'}) 
     civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Veuillez renseigner votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
     
@@ -225,7 +270,7 @@ class UserInfosForm(forms.ModelForm):
             model = UserDetails
             fields = ['user_category', 'civility','first_name','last_name', 'birth_date','birth_city', 'nationality', 'actual_city', 'zip_code', 'address', 'phone', 'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact']
 
-class UserInfosForm(forms.ModelForm):
+class _LegacyUserInfosFormWithLocations(forms.ModelForm):
     user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Veuillez renseigner votre categorie d\'utilisateur.'})
     civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Veuillez renseigner votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
 
@@ -273,7 +318,7 @@ class UserInfosForm(forms.ModelForm):
 
     class Meta:
             model = UserDetails
-            fields = ['user_category', 'civility','first_name','last_name', 'birth_date','birth_city', 'nationality', 'actual_city', 'zip_code', 'address', 'phone', 'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact', 'region', 'prefecture', 'commune', 'quarter']
+            fields = ['civility','first_name','last_name', 'birth_date','birth_city', 'nationality', 'actual_city', 'zip_code', 'address', 'phone', 'region', 'prefecture', 'commune', 'quarter']
 
     def __init__(self, *args, **kwargs):
         super(UserInfosForm, self).__init__(*args, **kwargs)
@@ -312,6 +357,36 @@ class UserInfosForm(forms.ModelForm):
         except (ValueError, TypeError):
             pass
 
+
+# Canonical profile forms used by the wizard.  Keep the model fields themselves
+# for backwards-compatible data, but do not expose secondary profile metadata.
+class UserInfosForm(forms.ModelForm):
+    class Meta:
+        model = UserDetails
+        fields = [
+            'civility', 'first_name', 'last_name', 'birth_date', 'birth_city',
+            'nationality', 'actual_city', 'zip_code', 'address', 'phone',
+            'region', 'prefecture', 'commune', 'quarter',
+        ]
+
+
+class ProfileForm(PrivateDocumentValidationMixin, forms.ModelForm):
+    class Meta:
+        model = UserDetails
+        fields = [
+            'civility', 'first_name', 'last_name', 'birth_date', 'birth_city',
+            'nationality', 'actual_city', 'zip_code', 'address', 'phone',
+            'photo', 'id_card', 'id_card_country', 'birth_piece',
+            'birth_piece_country', 'region', 'prefecture', 'commune', 'quarter',
+        ]
+
+    def clean(self):
+        cleaned = super().clean()
+        for document, country in (('id_card', 'id_card_country'), ('birth_piece', 'birth_piece_country')):
+            if not (cleaned.get(document) or getattr(self.instance, document, None)):
+                cleaned[country] = None
+        return cleaned
+
     # def clean(self):
     #         cleaned_data = super().clean()
     #         is_actual_country_as_birth_country = cleaned_data.get('is_actual_country_as_birth_country')
@@ -324,17 +399,24 @@ class UserInfosForm(forms.ModelForm):
     #             if not actual_country:
     #                 self.add_error('actual_country', 'Veuillez renseigner votre pays.')
 
-class UserDocumentForm(forms.ModelForm):
-    bio = forms.CharField(max_length=100, required=False, label="Biographie", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    photo = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
-    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}), label="Pièce d'identité")
-    id_card_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays d'acquisition de la pièce d'Identité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    birth_piece = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}), label="Carte de naissance")
-    birth_piece_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays d'acquisition de la pièce de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+class UserDocumentForm(PrivateDocumentValidationMixin, forms.ModelForm):
+    photo = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.jpg,.jpeg,.png,.webp'}))
+    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png,.webp'}), label="Pièce d'identité")
+    id_card_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays d'acquisition de la pièce d'identité", widget=forms.Select(attrs={'class': 'form-control'}))
+    birth_piece = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png,.webp'}), label="Carte de naissance")
+    birth_piece_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays d'acquisition de la pièce de naissance", widget=forms.Select(attrs={'class': 'form-control'}))
   
     class Meta:
         model = UserDetails
-        fields = ['photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country','bio'] 
+        fields = ['photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country']
+
+    def clean(self):
+        cleaned = super().clean()
+        for document, country in (('id_card', 'id_card_country'), ('birth_piece', 'birth_piece_country')):
+            has_document = cleaned.get(document) or getattr(self.instance, document, None)
+            if not has_document:
+                cleaned[country] = None
+        return cleaned
     
 class UserLinkForm(forms.ModelForm):
     facebook = forms.CharField(max_length=100, required=False, label="Facebook", widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -346,7 +428,7 @@ class UserLinkForm(forms.ModelForm):
         model = UserDetails
         fields = ['facebook', 'twitter', 'linkedin', 'instagram', 'website']
    
-class ProfileForm(forms.ModelForm):
+class _LegacyProfileForm(PrivateDocumentValidationMixin, forms.ModelForm):
    
     #Model UserDetails fields
     user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, label="Catégorie d'utilisateur", widget=forms.Select(attrs={'class': 'form-control'}))
@@ -371,10 +453,10 @@ class ProfileForm(forms.ModelForm):
    
     bio = forms.CharField(max_length=100, label="Biographie", widget=forms.TextInput(attrs={'class': 'form-control'}))
     photo = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
-    id_card = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}), label="Pièce d'identité")
-    id_card_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}), label="Pièce d'identité")
+    id_card_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays", widget=forms.Select(attrs={'class': 'form-control'}))
     birth_piece = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}), label="Pièce de naissance")
-    birth_piece_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    birth_piece_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays", widget=forms.Select(attrs={'class': 'form-control'}))
 
     facebook = forms.CharField(max_length=100, label="Facebook", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     twitter = forms.CharField(max_length=100, label="Twitter", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -407,9 +489,17 @@ class ProfileForm(forms.ModelForm):
     
     class Meta:
         model = UserDetails
-        fields = ['user_category', 'civility', 'birth_date', 'birth_city','nationality', 'actual_city','zip_code', 'address', 'phone',
-                  'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact', 'bio', 'photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country',
-                  'facebook', 'twitter', 'instagram', 'linkedin', 'region', 'prefecture', 'commune', 'quarter'] 
+        fields = ['civility', 'birth_date', 'birth_city','nationality', 'actual_city','zip_code', 'address', 'phone',
+                  'photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country',
+                  'region', 'prefecture', 'commune', 'quarter'] 
+
+    def clean(self):
+        cleaned = super().clean()
+        for document, country in (('id_card', 'id_card_country'), ('birth_piece', 'birth_piece_country')):
+            has_document = cleaned.get(document) or getattr(self.instance, document, None)
+            if not has_document:
+                cleaned[country] = None
+        return cleaned
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.fields['birth_date'].required = True  # Rendre le champ obligatoire
@@ -444,6 +534,3 @@ class ProfileForm(forms.ModelForm):
                 self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=int(commune_id)).order_by('name')
         except (ValueError, TypeError):
             pass
-
-
-

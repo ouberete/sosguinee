@@ -1,7 +1,7 @@
 import logging
 from django.core.cache import cache
 from page.models import LossAlertStatus, UserActionLog
-from sosguinee.utils.email_service import EmailService
+from ensemble224.utils.email_service import EmailService
 
 logger = logging.getLogger(__name__)
 

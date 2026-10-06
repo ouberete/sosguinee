@@ -1,5 +1,5 @@
 """
-URL configuration for sosguinee project.
+URL configuration for ensemble224 project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -16,7 +16,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import include, path, reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
@@ -31,6 +31,43 @@ def healthz(request):
     return JsonResponse({"status": "ok"})
 
 
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri("/sitemap.xml")
+    content = "\n".join(
+        [
+            "User-agent: *",
+            "Disallow: /admin/",
+            "Disallow: /accounts/",
+            "Allow: /",
+            f"Sitemap: {sitemap_url}",
+            "",
+        ]
+    )
+    return HttpResponse(content, content_type="text/plain")
+
+
+def sitemap_xml(request):
+    static_paths = [
+        reverse_lazy("home"),
+        reverse_lazy("loss_alert_list"),
+        reverse_lazy("funding_request_list"),
+        reverse_lazy("add_loss_alert"),
+        reverse_lazy("add_funding_request"),
+        reverse_lazy("donation"),
+        reverse_lazy("about_us"),
+        reverse_lazy("contact"),
+        reverse_lazy("help_support"),
+        reverse_lazy("policy_privacy"),
+        reverse_lazy("terms"),
+    ]
+    urls = "\n".join(
+        f"  <url><loc>{request.build_absolute_uri(path)}</loc></url>"
+        for path in static_paths
+    )
+    content = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}\n</urlset>\n'
+    return HttpResponse(content, content_type="application/xml")
+
+
 urlpatterns = [
     # Pour le changement de langue (set_language)
     path("i18n/", include("django.conf.urls.i18n")),
@@ -38,6 +75,8 @@ urlpatterns = [
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
     # Sonde de santé (probes Kubernetes, load balancer)
     path("healthz/", healthz, name="healthz"),
+    path("robots.txt", robots_txt, name="robots_txt"),
+    path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
     # Documents personnels (pièces d'identité...): accès contrôlé par Django.
     # Déclaré AVANT les patterns statiques de DEBUG pour les intercepter;
     # en production, nginx/l'ingress route ce préfixe vers Django.
@@ -60,3 +99,6 @@ urlpatterns  += i18n_patterns(
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+handler404 = "page.views.custom_404"

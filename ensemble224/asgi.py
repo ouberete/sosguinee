@@ -1,5 +1,5 @@
 """
-ASGI config for sosguinee project.
+ASGI config for ensemble224 project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sosguinee.settings_dev')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ensemble224.settings_dev')
 
 application = get_asgi_application()

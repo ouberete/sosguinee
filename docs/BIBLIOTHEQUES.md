@@ -1,4 +1,4 @@
-# Bibliothèques & dépendances — SOS Guinée
+# Bibliothèques & dépendances — Ensemble 224
 
 > Inventaire complet des bibliothèques du projet : dépendances **directes**
 > (déclarées dans `requirements.txt`) et **transitives** (tirées automatiquement

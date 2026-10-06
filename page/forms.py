@@ -23,6 +23,13 @@ ALLOWED_PRINCIPAL_IMAGE_EXTENSIONS = {
     ".webp",
     ".avif",
 }
+IMAGE_FORMAT_BY_EXTENSION = {
+    ".jpg": "JPEG",
+    ".jpeg": "JPEG",
+    ".png": "PNG",
+    ".webp": "WEBP",
+    ".avif": "AVIF",
+}
 
 
 class CustomClearableFileInput(forms.ClearableFileInput):
@@ -125,6 +132,24 @@ class MultipleFileField(forms.FileField):
                         "extension": extension or "sans extension",
                         "allowed": ", ".join(sorted(ALLOWED_OPTIONAL_DOC_EXTENSIONS)),
                     }
+                )
+
+            file.seek(0)
+            try:
+                if extension == ".pdf":
+                    valid_content = file.read(5) == b"%PDF-"
+                else:
+                    with Image.open(file) as image:
+                        valid_content = image.format == IMAGE_FORMAT_BY_EXTENSION[extension]
+                        image.verify()
+            except Exception:
+                valid_content = False
+            finally:
+                file.seek(0)
+
+            if not valid_content:
+                raise forms.ValidationError(
+                    "Le contenu du fichier ne correspond pas au format annoncé."
                 )
 
     def value_from_datadict(self, data, files, name):
@@ -395,6 +420,12 @@ ANONYMIZABLE_IDENTITY_FIELDS = {
 class _AnonymizablePaymentForm(forms.ModelForm):
     """Valide les champs d'identité uniquement si le paiement n'est pas anonyme."""
 
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is not None and amount != amount.to_integral_value():
+            raise forms.ValidationError("Le montant doit être un nombre entier de GNF.")
+        return amount
+
     def clean(self):
         cleaned = super().clean()
         if not cleaned.get('is_anonymous'):
@@ -411,7 +442,7 @@ class DonationForm(_AnonymizablePaymentForm):
     donor_email = forms.EmailField(widget=forms.EmailInput(attrs={'class':  'validate', 'required': 'required'}), error_messages={'required': 'Veuillez renseigner votre email.'}, label="Email du donateur")
     donor_address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Adresse du donateur")
     donor_city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Ville du donateur")
-    amount = forms.CharField(widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1000'}), error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'}, label="Montant (En GNF) à donner")
+    amount = forms.DecimalField(max_digits=18, decimal_places=0, min_value=10000, widget=forms.NumberInput(attrs={'class': 'validate', 'required': 'required', 'min': '10000', 'step': '1000'}), error_messages={'required': 'Veuillez renseigner votre montant.', 'min_value': 'Le montant doit au moins atteindre 10000 GNF'}, label="Montant (En GNF) à donner")
     description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class':'materialize-textarea'}), label="Description", required=False)
     is_anonymous = forms.BooleanField(required=False, label="Faire un don anonyme (nous ne demandons que l'email et le téléphone)")
 
@@ -420,9 +451,12 @@ class DonationForm(_AnonymizablePaymentForm):
         fields = ['amount', 'donor_first_name', 'donor_last_name',  'donor_country','donor_city','donor_phone', 'donor_email', 'donor_address', 'description', 'is_anonymous']
 
 class FundingPaymentForm(_AnonymizablePaymentForm):
-    amount = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'validate', 'required': 'required', 'type': 'number', 'min': '10000', 'step': '1'}),
-        error_messages={'required': 'Veuillez renseigner votre montant.', 'min': 'Le montant doit au moins atteindre 10000 GNF'},
+    amount = forms.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        min_value=10000,
+        widget=forms.NumberInput(attrs={'class': 'validate', 'required': 'required', 'min': '10000', 'step': '1'}),
+        error_messages={'required': 'Veuillez renseigner votre montant.', 'min_value': 'Le montant doit au moins atteindre 10000 GNF'},
         label="Montant (En GNF) à financer"
     )
     donor_first_name = forms.CharField(

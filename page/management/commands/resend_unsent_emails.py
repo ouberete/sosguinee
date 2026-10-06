@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from page.models import EmailContent
-from sosguinee.utils.email_retry import parse_recipients, resend_email_content
+from ensemble224.utils.email_retry import parse_recipients, resend_email_content
 
 
 class Command(BaseCommand):

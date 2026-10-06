@@ -13,7 +13,7 @@ jobs:
         python-version: ["3.12", "3.14"]
 
     env:
-      DJANGO_SETTINGS_MODULE: sosguinee.settings_dev
+      DJANGO_SETTINGS_MODULE: ensemble224.settings_dev
       SECRET_KEY: ci-test-secret-key
       DEBUG: "True"
       ENVIRONMENT: development
@@ -54,6 +54,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only --app sosguinee
+        run: flyctl deploy --remote-only --app ensemble224
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

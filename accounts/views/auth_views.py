@@ -16,8 +16,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 
-from sosguinee.utils.captcha import get_turnstile_site_key, verify_turnstile_request
-from sosguinee.utils.utilities import Utilities
+from ensemble224.utils.captcha import get_turnstile_site_key, verify_turnstile_request
+from ensemble224.utils.utilities import Utilities
 
 from accounts.utils import send_or_queue_activation_email
 from page.models import UserDetails
@@ -105,11 +105,20 @@ def register(request):
             if not captcha_ok:
                 form.add_error(None, captcha_error)
             elif form.is_valid():
-                form.save()
-                cache.delete(_rate_limit_key("register", request, email))
-                return render(request, "accounts/account_created.html", {
-                    "email": form.cleaned_data["email"],
-                })
+                try:
+                    form.save()
+                except Exception:
+                    logger.exception("Email activation non envoyé après inscription.")
+                    form.add_error(
+                        None,
+                        "Votre compte a été créé, mais l'email d'activation n'a pas pu être envoyé. "
+                        "Veuillez réessayer plus tard.",
+                    )
+                else:
+                    cache.delete(_rate_limit_key("register", request, email))
+                    return render(request, "accounts/account_created.html", {
+                        "email": form.cleaned_data["email"],
+                    })
     else:
         form = RegisterForm()
 
@@ -137,15 +146,20 @@ def resend_activation(request):
             if user and not user.is_active:
                 profile = UserDetails.objects.filter(user=user).order_by("-created_at").first()
                 if profile and profile.user_status == "Blocked":
-                    messages.success(
+                    messages.error(
                         request,
-                        "Si un compte inactif existe, un lien d'activation a été envoyé.",
+                        "Impossible d'envoyer un lien d'activation pour ce compte.",
                     )
                     return redirect("login")
                 try:
                     send_or_queue_activation_email(user, reuse_unsent=True)
-                except Exception as e:
-                    logger.exception("Renvoi du lien d'activation non envoyé: %s", e)
+                except Exception:
+                    logger.exception("Renvoi du lien d'activation non envoyé.")
+                    messages.error(
+                        request,
+                        "Le lien d'activation n'a pas pu être envoyé. Veuillez réessayer plus tard.",
+                    )
+                    return redirect("login")
 
             # Ne pas remettre le compteur à zéro en cas de succès : la limite
             # doit couvrir les envois répétés (anti-spam de la boîte cible).
@@ -214,6 +228,7 @@ def reset_password(request):
             protocol, domain = _site_protocol_domain()
             users = list(form.get_users(form.cleaned_data.get("email")))
 
+            email_failed = False
             for user in users:
                 context = {
                     "user": user,
@@ -223,15 +238,23 @@ def reset_password(request):
                     "token": default_token_generator.make_token(user),
                 }
                 try:
-                    Utilities.sending_email(
+                    sent_count = Utilities.sending_email(
                         "accounts/emails/password_reset_email.html",
                         [user.email],
                         context,
                         "Réinitialisation de votre mot de passe",
                     )
+                    if sent_count != 1:
+                        email_failed = True
                 except Exception:
-                    if settings.DEBUG:
-                        raise
+                    email_failed = True
+                    logger.exception("Email de réinitialisation non envoyé.")
+            if email_failed:
+                form.add_error(
+                    None,
+                    "Le lien de réinitialisation n'a pas pu être envoyé. Veuillez réessayer plus tard.",
+                )
+                return render(request, "accounts/reset_password.html", {"form": form})
             # Ne pas remettre le compteur à zéro en cas de succès : la limite
             # doit couvrir les envois répétés (anti-spam de la boîte cible).
             messages.success(

@@ -18,7 +18,7 @@ class EmailService:
     @staticmethod
     def _queue_task(task_name, *args, **kwargs):
         try:
-            from sosguinee import tasks as async_tasks
+            from ensemble224 import tasks as async_tasks
 
             task = getattr(async_tasks, task_name)
             return task.delay(*args, **kwargs)

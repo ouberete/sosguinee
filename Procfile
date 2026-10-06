@@ -1,1 +1,1 @@
-web: gunicorn sosguinee.wsgi:application
+web: gunicorn ensemble224.wsgi:application

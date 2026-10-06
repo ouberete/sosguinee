@@ -3,11 +3,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: sosguinee-web
-  namespace: sosguinee
+  name: ensemble224-web
+  namespace: ensemble224
 spec:
   selector:
-    app: sosguinee-web
+    app: ensemble224-web
   ports:
     - port: 80
       targetPort: 8000
@@ -15,13 +15,13 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sosguinee-web
-  namespace: sosguinee
+  name: ensemble224-web
+  namespace: ensemble224
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: sosguinee-web
+      app: ensemble224-web
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -30,17 +30,17 @@ spec:
   template:
     metadata:
       labels:
-        app: sosguinee-web
+        app: ensemble224-web
     spec:
       containers:
         - name: web
           # ⚠️ Remplacez par votre image (registre + tag versionné, pas latest)
-          image: REGISTRY/sosguinee:latest
+          image: REGISTRY/ensemble224:latest
           command: ["/bin/sh", "-c"]
           args:
             - >-
               python manage.py collectstatic --noinput &&
-              exec gunicorn sosguinee.wsgi:application
+              exec gunicorn ensemble224.wsgi:application
               --bind 0.0.0.0:8000
               --workers 3
               --timeout 60
@@ -50,9 +50,9 @@ spec:
             - containerPort: 8000
           envFrom:
             - configMapRef:
-                name: sosguinee-config
+                name: ensemble224-config
             - secretRef:
-                name: sosguinee-secrets
+                name: ensemble224-secrets
           resources:
             requests:
               cpu: 250m
@@ -67,7 +67,7 @@ spec:
               httpHeaders:
                 # ⚠️ Doit figurer dans ALLOWED_HOSTS
                 - name: Host
-                  value: sosguinee.example.com
+                  value: ensemble224.example.com
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3
@@ -77,7 +77,7 @@ spec:
               port: 8000
               httpHeaders:
                 - name: Host
-                  value: sosguinee.example.com
+                  value: ensemble224.example.com
             initialDelaySeconds: 30
             periodSeconds: 20
             failureThreshold: 3

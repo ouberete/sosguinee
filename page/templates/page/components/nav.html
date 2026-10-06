@@ -4,9 +4,9 @@
 <nav class="page-nav" role="navigation" aria-label="Main navigation">
   <div class="nav-wrapper container">
     <a href="{% url 'home' %}" class="brand-logo">
-      <img src="{% static 'img/mylogo.png' %}" alt="SOS Guinée logo" class="responsive-img">
+      <img src="{% static 'img/mylogo.png' %}" alt="Ensemble 224 logo" class="responsive-img">
     </a>
-    <a href="#" data-target="mobile-menu" class="sidenav-trigger" aria-label="Menu mobile"><i class="material-icons">menu</i></a>
+    <a href="#!" data-target="mobile-menu" class="sidenav-trigger" aria-label="Menu mobile"><i class="material-icons">menu</i></a>
 
     <ul class="right hide-on-med-and-down">
       <li class="{% if request.resolver_match.url_name == 'loss_alert_list' %}active{% endif %}">

@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal, InvalidOperation
 from django.dispatch import receiver
 from django_djomy.signals import djomy_payment_success
 from page.models import Donation, FundPayment
@@ -27,6 +28,17 @@ def handle_djomy_payment_success(sender, reference, transaction_id, amount, **kw
     if payment is None:
         logger.warning(
             "Référence de paiement %s introuvable dans Donation et FundPayment.",
+            reference,
+        )
+        return
+
+    try:
+        received_amount = Decimal(str(amount))
+    except (InvalidOperation, TypeError, ValueError):
+        received_amount = None
+    if received_amount != payment.amount:
+        logger.warning(
+            "Confirmation Djomy ignorée: montant manquant ou différent pour la référence %s.",
             reference,
         )
         return
