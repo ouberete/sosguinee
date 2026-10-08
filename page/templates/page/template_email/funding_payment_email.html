@@ -9,7 +9,8 @@
 </head>
 <body>
     <p>Bonjour Madame/Monsieur {{ name }},</p>
-    <p>Vous avez fait une contribution de {{ amount|format_fr }} GNF à <strong>{{ beneficiary_name }}</strong> pour <strong>{{ title }}</strong>.</p>
+    <p>Vous avez payé {{ amount|format_fr }} GNF pour contribuer à <strong>{{ beneficiary_name }}</strong> dans le cadre de <strong>{{ title }}</strong>.</p>
+    <p>Après {{ fees|format_fr }} GNF de frais Djomy, {{ received_amount|format_fr }} GNF ont été reçus par la collecte.</p>
     <p>Merci pour votre contribution.</p>
 </body>
 </html>

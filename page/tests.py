@@ -8,12 +8,16 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 
 from page.forms import DonationForm, FundingPaymentForm, MultipleFileField
-from page.models import Comment, Donation, FundPayment, FundingRequest, LossAlert
+from django_djomy.models import DjomyPayment
+from page.models import Comment, Donation, FundPayment, FundingRequest, FundingRequestStatus, FundingType, LossAlert
 from page.tasks import reconcile_pending_payments
 
 
@@ -120,6 +124,118 @@ class PaymentCallbackTests(TestCase):
         funding.refresh_from_db()
         self.assertEqual(funding.amount_received, Decimal("1500.00"))
         self.assertEqual(funding.progress, 100)
+        self.assertEqual(funding.progress_percentage, 150)
+        self.assertEqual(funding.excess_amount, Decimal("500.00"))
+
+    def test_funding_callback_credits_net_amount_after_fees(self):
+        funding = self._funding()
+        payment = FundPayment.objects.create(
+            funding_request=funding,
+            amount=Decimal("150.00"),
+            received_amount=Decimal("135.00"),
+            fees=Decimal("15.00"),
+            donor_email="donor@example.com",
+            transaction_id="tok_net_funding",
+        )
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
+
+        with patch("page.views._verify_payment_status_with_djomy", return_value="réussi"):
+            response = self.client.get(f"{url}?token={payment.transaction_id}")
+
+        self.assertEqual(response.status_code, 200)
+        funding.refresh_from_db()
+        self.assertEqual(funding.amount_received, Decimal("135.00"))
+
+    @patch("page.views._send_payment_success_email")
+    @patch(
+        "django_djomy.services.DjomyService.get_payment_status",
+        return_value={
+            "data": {
+                "transactionId": "provider-status-id",
+                "status": "SUCCESS",
+                "paidAmount": 150,
+                "receivedAmount": 135,
+                "fees": 15,
+                "paymentMethod": "OM",
+                "currency": "GNF",
+            }
+        },
+    )
+    def test_callback_verifies_using_provider_id_and_credits_net(self, get_status, send_email):
+        funding = self._funding()
+        payment = FundPayment.objects.create(
+            funding_request=funding,
+            amount=Decimal("150.00"),
+            provider_transaction_id="provider-status-id",
+            donor_email="donor@example.com",
+            transaction_id="local-token",
+        )
+        url = reverse("djomy_payment_callback", kwargs={"payment_id": payment.id, "type": "Financement"})
+
+        response = self.client.get(f"{url}?token={payment.transaction_id}")
+
+        self.assertEqual(response.status_code, 200)
+        get_status.assert_called_once_with("provider-status-id")
+        funding.refresh_from_db()
+        payment.refresh_from_db()
+        self.assertEqual(funding.amount_received, Decimal("135.00"))
+        self.assertEqual(payment.fees, Decimal("15.00"))
+
+
+class FundingRequestContributionAvailabilityTests(TestCase):
+    def _funding_request(self, status, received, target=Decimal("1000.00")):
+        funding_status = FundingRequestStatus.objects.create(name=status, description=status)
+        return FundingRequest.objects.create(
+            beneficiary_name="Test Beneficiary",
+            funding_amount=target,
+            amount_received=received,
+            description_needs="Need support",
+            principal_image="img/Fundings/test.png",
+            funding_request_status=funding_status,
+        )
+
+    def test_completed_goal_still_accepts_contributions(self):
+        funding = self._funding_request("Terminé", Decimal("1000.00"))
+        self.assertTrue(funding.can_receive_contributions)
+
+    def test_completed_goal_page_keeps_the_finance_call_to_action(self):
+        funding = self._funding_request("Terminé", Decimal("1000.00"))
+        response = self.client.get(
+            reverse("funding_request_details_public", kwargs={"public_id": funding.public_id})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Collecté")
+        self.assertContains(response, reverse("djomy_funding_public", kwargs={"public_id": funding.public_id}))
+
+    def test_completed_goal_still_renders_payment_form(self):
+        funding = self._funding_request("Terminé", Decimal("1000.00"))
+        response = self.client.get(
+            reverse("djomy_funding_public", kwargs={"public_id": funding.public_id})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Financer maintenant")
+        self.assertNotContains(response, "Cette collecte est déjà financée")
+
+    def test_expired_below_goal_does_not_accept_contributions(self):
+        funding = self._funding_request("Terminé", Decimal("500.00"))
+        self.assertFalse(funding.can_receive_contributions)
+
+    def test_manually_closed_goal_does_not_accept_contributions(self):
+        funding = self._funding_request("Clos", Decimal("1500.00"))
+        self.assertFalse(funding.can_receive_contributions)
+
+    def test_manually_closed_request_cannot_open_payment_form(self):
+        funding = self._funding_request("Clôturé", Decimal("1000.00"))
+        response = self.client.get(
+            reverse("djomy_funding_public", kwargs={"public_id": funding.public_id})
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], reverse(
+            "funding_request_details_public", kwargs={"public_id": funding.public_id}
+        ))
 
 
 class FundingPaymentInitiationTests(TestCase):
@@ -129,7 +245,11 @@ class FundingPaymentInitiationTests(TestCase):
             funding_amount=Decimal("1000.00"),
             description_needs="Need support",
             principal_image="img/Fundings/test.png",
-            amount_received=Decimal("0.00"),
+            amount_received=Decimal("1000.00"),
+            funding_request_status=FundingRequestStatus.objects.create(
+                name="Terminé",
+                description="Objectif atteint",
+            ),
         )
         url = reverse(
             "funding_djomy_payment_public",
@@ -141,7 +261,10 @@ class FundingPaymentInitiationTests(TestCase):
             patch("page.views._is_rate_limited", return_value=False),
             patch(
                 "django_djomy.services.DjomyService.init_gateway_payment",
-                return_value={"paymentUrl": "https://pay.example.test/checkout"},
+                return_value={"data": {
+                    "transactionId": "provider-init-id",
+                    "redirectUrl": "https://pay.example.test/checkout",
+                }},
             ),
         ):
             response = self.client.post(url, {
@@ -154,6 +277,28 @@ class FundingPaymentInitiationTests(TestCase):
         self.assertEqual(response.status_code, 302)
         payment = FundPayment.objects.get(funding_request=funding)
         self.assertEqual(payment.amount, Decimal("15000.00"))
+        self.assertEqual(payment.provider_transaction_id, "provider-init-id")
+
+    def test_manually_closed_funding_request_rejects_payment_post(self):
+        funding = FundingRequest.objects.create(
+            beneficiary_name="Test Beneficiary",
+            funding_amount=Decimal("1000.00"),
+            description_needs="Need support",
+            principal_image="img/Fundings/test.png",
+            funding_request_status=FundingRequestStatus.objects.create(
+                name="Clôturé",
+                description="Fermeture manuelle",
+            ),
+        )
+        url = reverse(
+            "funding_djomy_payment_public",
+            kwargs={"funding_public_id": funding.public_id},
+        )
+
+        response = self.client.post(url, {"amount": "15000"})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(FundPayment.objects.filter(funding_request=funding).count(), 0)
 
 
 class FundingPaymentAmountValidationTests(TestCase):
@@ -239,13 +384,25 @@ class PaymentWebhookAmountTests(TestCase):
             reference="FUND_tok_webhook",
         )
 
-    def _post_webhook(self, amount):
+    def _post_webhook(self, paid_amount, received_amount=None, fees=None):
+        if paid_amount is not None:
+            fees = Decimal("150.00") if fees is None else Decimal(str(fees))
+            received_amount = (
+                Decimal(str(paid_amount)) - fees
+                if received_amount is None
+                else Decimal(str(received_amount))
+            )
         payload = {
             "eventType": "payment.success",
             "data": {
                 "merchantPaymentReference": self.payment.reference,
                 "transactionId": "provider-transaction",
-                "amount": amount,
+                "status": "SUCCESS",
+                "paidAmount": paid_amount,
+                "receivedAmount": str(received_amount) if received_amount is not None else None,
+                "fees": str(fees) if fees is not None else None,
+                "paymentMethod": "OM",
+                "currency": "GNF",
             },
         }
         body = json.dumps(payload).encode("utf-8")
@@ -265,8 +422,76 @@ class PaymentWebhookAmountTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.funding.refresh_from_db()
         self.payment.refresh_from_db()
-        self.assertEqual(self.funding.amount_received, Decimal("1500.00"))
+        self.assertEqual(self.funding.amount_received, Decimal("1350.00"))
         self.assertEqual(self.payment.status, "réussi")
+        self.assertEqual(self.payment.received_amount, Decimal("1350.00"))
+        self.assertEqual(self.payment.fees, Decimal("150.00"))
+        self.assertEqual(self.payment.provider_transaction_id, "provider-transaction")
+        self.assertEqual(self.payment.provider_payment_method, "OM")
+
+
+@override_settings(DEBUG=False, DJOMY_CLIENT_ID="test-client", DJOMY_CLIENT_SECRET="legacy-webhook-secret")
+class LegacyPaymentWebhookTests(TestCase):
+    def setUp(self):
+        self.funding = FundingRequest.objects.create(
+            beneficiary_name="Test Beneficiary",
+            funding_amount=Decimal("1000.00"),
+            description_needs="Need support",
+            principal_image="img/Fundings/test.png",
+            amount_received=Decimal("0.00"),
+        )
+        self.payment = FundPayment.objects.create(
+            funding_request=self.funding,
+            amount=Decimal("1500.00"),
+            reference="FUND_legacy_reference",
+            transaction_id="local-legacy-token",
+        )
+        DjomyPayment.objects.create(
+            merchant_reference=self.payment.reference,
+            amount=Decimal("1500.00"),
+        )
+
+    def _post_webhook(self, received_amount="1350.00", fees="150.00"):
+        payload = {
+            "eventType": "payment.success",
+            "data": {
+                "merchantPaymentReference": self.payment.reference,
+                "transactionId": "legacy-provider-id",
+                "status": "SUCCESS",
+                "paidAmount": "1500.00",
+                "receivedAmount": received_amount,
+                "fees": fees,
+                "paymentMethod": "OM",
+                "currency": "GNF",
+            },
+        }
+        body = json.dumps(payload).encode("utf-8")
+        digest = hmac.new(b"legacy-webhook-secret", body, hashlib.sha256).hexdigest()
+        return self.client.generic(
+            "POST",
+            reverse("django_djomy:djomy_webhook"),
+            body,
+            content_type="application/json",
+            HTTP_X_WEBHOOK_SIGNATURE=f"v1:{digest}",
+        )
+
+    @patch("page.views._send_payment_success_email")
+    def test_legacy_webhook_records_fee_breakdown_and_credits_net(self, send_email):
+        response = self._post_webhook()
+
+        self.assertEqual(response.status_code, 200)
+        self.funding.refresh_from_db()
+        self.payment.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("1350.00"))
+        self.assertEqual(self.payment.provider_transaction_id, "legacy-provider-id")
+        self.assertEqual(self.payment.fees, Decimal("150.00"))
+
+    def test_legacy_webhook_rejects_inconsistent_fee_breakdown(self):
+        response = self._post_webhook(received_amount="1300.00", fees="100.00")
+
+        self.assertEqual(response.status_code, 400)
+        self.funding.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("0.00"))
 
     def test_signed_webhook_rejects_mismatched_amount(self):
         response = self._post_webhook("999.00")
@@ -279,6 +504,13 @@ class PaymentWebhookAmountTests(TestCase):
 
     def test_signed_webhook_rejects_missing_amount(self):
         response = self._post_webhook(None)
+
+        self.assertEqual(response.status_code, 400)
+        self.funding.refresh_from_db()
+        self.assertEqual(self.funding.amount_received, Decimal("0.00"))
+
+    def test_signed_webhook_rejects_inconsistent_fee_breakdown(self):
+        response = self._post_webhook(received_amount="1300.00", fees="100.00")
 
         self.assertEqual(response.status_code, 400)
         self.funding.refresh_from_db()
@@ -419,3 +651,135 @@ class CommentEndpointTests(TestCase):
         payload = response.json()
         self.assertTrue(payload.get("success"))
         self.assertFalse(Comment.objects.filter(id=comment.id).exists())
+
+
+class PublicListApiTests(TestCase):
+    def test_invalid_list_pages_return_generic_errors(self):
+        funding_response = self.client.get(reverse("funding_request_list_api"), {"page": "not-a-page"})
+        alert_response = self.client.get(reverse("loss_alert_list_api"), {"page": "not-a-page"})
+
+        self.assertEqual(funding_response.status_code, 400)
+        self.assertEqual(funding_response.json(), {"error": "Numéro de page invalide."})
+        self.assertEqual(alert_response.status_code, 400)
+        self.assertEqual(alert_response.json(), {"error": "Numéro de page invalide."})
+
+    def test_funding_list_query_count_does_not_grow_per_result(self):
+        funding_type = FundingType.objects.create(name="Type test", description="Type test")
+        funding_status = FundingRequestStatus.objects.create(name="En cours", description="En cours")
+
+        def create_request(name):
+            return FundingRequest.objects.create(
+                beneficiary_name=name,
+                funding_amount=Decimal("1000.00"),
+                description_needs="Need support",
+                principal_image="img/Fundings/test.png",
+                funding_request_type=funding_type,
+                funding_request_status=funding_status,
+            )
+
+        create_request("Beneficiary one")
+        with CaptureQueriesContext(connection) as one_result_queries:
+            one_result_response = self.client.get(reverse("funding_request_list_api"))
+
+        create_request("Beneficiary two")
+        with CaptureQueriesContext(connection) as two_result_queries:
+            two_result_response = self.client.get(reverse("funding_request_list_api"))
+
+        self.assertEqual(one_result_response.status_code, 200)
+        self.assertEqual(two_result_response.status_code, 200)
+        self.assertEqual(len(one_result_queries), len(two_result_queries))
+
+
+class ReadinessEndpointTests(TestCase):
+    def test_health_endpoint_does_not_depend_on_database(self):
+        with patch("ensemble224.urls.connection.cursor", side_effect=RuntimeError("db unavailable")):
+            response = self.client.get(reverse("healthz"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    def test_readiness_endpoint_requires_database(self):
+        with patch("ensemble224.urls.connection.cursor", side_effect=RuntimeError("db unavailable")):
+            response = self.client.get(reverse("readyz"))
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json(), {"status": "unavailable"})
+
+
+class ReconcileLegacyPaymentsCommandTests(TestCase):
+    def setUp(self):
+        self.funding = FundingRequest.objects.create(
+            beneficiary_name="Beneficiary Legacy",
+            title="Soutien Medical",
+            funding_amount=Decimal("100000.00"),
+            amount_received=Decimal("50000.00"),
+            description_needs="Besoins medicaux",
+            principal_image="img/Fundings/test.png",
+        )
+        self.legacy_fund_payment = FundPayment.objects.create(
+            funding_request=self.funding,
+            amount=Decimal("50000.00"),
+            status="réussi",
+            reference="FUND_LEGACY_001",
+            received_amount=None,
+            fees=None,
+        )
+        self.legacy_donation = Donation.objects.create(
+            amount=Decimal("20000"),
+            status="réussi",
+            reference="DON_LEGACY_001",
+            received_amount=None,
+            fees=None,
+        )
+
+    def test_dry_run_leaves_fields_unchanged(self):
+        call_command("reconcile_legacy_payments", "--dry-run", "--assume-zero-fees")
+        self.legacy_fund_payment.refresh_from_db()
+        self.legacy_donation.refresh_from_db()
+        self.assertIsNone(self.legacy_fund_payment.received_amount)
+        self.assertIsNone(self.legacy_fund_payment.fees)
+        self.assertIsNone(self.legacy_donation.received_amount)
+        self.assertIsNone(self.legacy_donation.fees)
+
+    def test_assume_zero_fees_populates_net_and_zero_fees(self):
+        call_command(
+            "reconcile_legacy_payments",
+            "--assume-zero-fees",
+            "--recalculate-funding-totals",
+        )
+        self.legacy_fund_payment.refresh_from_db()
+        self.legacy_donation.refresh_from_db()
+        self.funding.refresh_from_db()
+
+        self.assertEqual(self.legacy_fund_payment.received_amount, Decimal("50000.00"))
+        self.assertEqual(self.legacy_fund_payment.fees, Decimal("0.00"))
+        self.assertEqual(self.legacy_donation.received_amount, Decimal("20000.00"))
+        self.assertEqual(self.legacy_donation.fees, Decimal("0.00"))
+        self.assertEqual(self.funding.amount_received, Decimal("50000.00"))
+
+    def test_reconcile_with_djomy_response(self):
+        djomy_payload = {
+            "status": "success",
+            "paidAmount": 50000,
+            "receivedAmount": 48500,
+            "fees": 1500,
+            "currency": "GNF",
+            "transactionId": "DJOMY_TX_999",
+            "paymentMethod": "orange_money",
+        }
+        with patch("django_djomy.services.DjomyService.get_payment_status", return_value=djomy_payload):
+            call_command(
+                "reconcile_legacy_payments",
+                "--model=fundpayment",
+                "--recalculate-funding-totals",
+            )
+
+        self.legacy_fund_payment.refresh_from_db()
+        self.funding.refresh_from_db()
+
+        self.assertEqual(self.legacy_fund_payment.received_amount, Decimal("48500.00"))
+        self.assertEqual(self.legacy_fund_payment.fees, Decimal("1500.00"))
+        self.assertEqual(self.legacy_fund_payment.provider_transaction_id, "DJOMY_TX_999")
+        # Funding request total is updated to the actual net received:
+        self.assertEqual(self.funding.amount_received, Decimal("48500.00"))
+

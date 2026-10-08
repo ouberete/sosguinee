@@ -79,9 +79,9 @@
           <div class="payment-fields row">
             {% for field in form.visible_fields %}
             {% if field.name != 'amount' and field.name != 'is_anonymous' %}
-            <div class="input-field col s12 {% if field.name == 'donor_first_name' or field.name == 'donor_last_name' or field.name == 'donor_address' or field.name == 'donor_city' or field.name == 'donor_country' %}payment-identity-field {% endif %}{% if field.name == 'donor_address' or field.name == 'description' %}m12{% else %}m6{% endif %}">
+            <div class="input-field col s12 {% if field.name == 'donor_first_name' or field.name == 'donor_last_name' or field.name == 'donor_address' or field.name == 'donor_city' or field.name == 'donor_country' %}payment-identity-field {% endif %}{% if field.name == 'donor_address' or field.name == 'description' %}m12{% else %}m6{% endif %}{% if field.name == 'description' %} payment-textarea-field{% endif %}">
               {{ field }}
-              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              <label for="{{ field.id_for_label }}"{% if field.name == 'description' %} class="textarea-label"{% endif %}>{{ field.label }}</label>
               {% if field.help_text %}
               <span class="helper-text">{{ field.help_text }}</span>
               {% endif %}
@@ -149,10 +149,14 @@
               </div>
             </div>
 
-            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment">
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" data-loading-label="Connexion à Djomy…">
               <i class="material-icons left">favorite</i>
-              {% trans "Faire un don sécurisé" %}
+              <span data-submit-button-label>{% trans "Faire un don sécurisé" %}</span>
             </button>
+            <p class="form-submit-status" id="payment-submit-status" role="status" aria-live="polite" aria-atomic="true" hidden>
+              <i class="material-icons form-submit-spinner" aria-hidden="true">autorenew</i>
+              <span>{% trans "Redirection sécurisée vers Djomy en cours. Veuillez patienter…" %}</span>
+            </p>
           </div>
         </aside>
       </div>
@@ -193,12 +197,29 @@
     // du navigateur incluse) et on se contente de verrouiller le bouton.
     var paymentForm = document.querySelector('form.payment-form');
     var submitBtn = document.getElementById('submit-payment');
+    var submitStatus = document.getElementById('payment-submit-status');
     if (paymentForm && submitBtn) {
-      paymentForm.addEventListener('submit', function () {
-        if (submitBtn.dataset.submitting === '1') return;
+      paymentForm.addEventListener('submit', function (event) {
+        if (submitBtn.dataset.submitting === '1') {
+          event.preventDefault();
+          return;
+        }
         submitBtn.dataset.submitting = '1';
+        submitBtn.disabled = true;
         submitBtn.classList.add('disabled');
-        submitBtn.innerHTML = '<i class="material-icons left">autorenew</i> Redirection...';
+        submitBtn.setAttribute('aria-disabled', 'true');
+        paymentForm.setAttribute('aria-busy', 'true');
+
+        var label = submitBtn.querySelector('[data-submit-button-label]');
+        if (label) {
+          label.textContent = submitBtn.dataset.loadingLabel || 'Redirection…';
+        }
+        var icon = submitBtn.querySelector('.material-icons');
+        if (icon) {
+          icon.textContent = 'autorenew';
+          icon.classList.add('form-submit-spinner');
+        }
+        if (submitStatus) submitStatus.hidden = false;
       });
     }
   });

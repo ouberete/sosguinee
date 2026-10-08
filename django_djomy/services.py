@@ -53,7 +53,7 @@ class DjomyService:
             "merchantPaymentReference": reference,
             "returnUrl": return_url if return_url else settings.DJOMY_RETURN_URL,
             "cancelUrl": cancel_url if cancel_url else settings.DJOMY_CANCEL_URL,
-            "allowedPaymentMethods": ["OM", "MOMO", "CARD", "PAYCARD"]
+            "allowedPaymentMethods": ["OM", "MOMO", "CARD", "PAYCARD","YMO","KULU","SOUTRA_MONEY"]
         }
         
         headers = {
@@ -71,15 +71,23 @@ class DjomyService:
             logger.error(f"Erreur lors de l'initiation du paiement Djomy : {e}")
             return None
         
+        payment_data = res_json.get("data") if isinstance(res_json.get("data"), dict) else res_json
+        provider_transaction_id = payment_data.get("transactionId") or payment_data.get("transaction_id")
+        payment_url = (
+            payment_data.get("paymentUrl")
+            or payment_data.get("redirectUrl")
+            or payment_data.get("url")
+        )
+
         # Enregistrement local
         DjomyPayment.objects.create(
+            transaction_id=provider_transaction_id,
             merchant_reference=reference,
             amount=amount,
             phone=phone,
-            payment_url=res_json.get('paymentUrl'),
+            payment_url=payment_url,
             status='PENDING'
         )
-        
         return res_json
 
     def verify_webhook_signature(self, raw_payload, received_signature_header):

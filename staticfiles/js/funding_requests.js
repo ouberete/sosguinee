@@ -101,6 +101,9 @@ function getProgressClass(progress) {
 
 function renderFundingCard(fundingRequest, index) {
     const statusLabel = fundingRequest.funding_request_status || 'En attente';
+    const goalReached = ['En cours', 'Terminé'].includes(statusLabel)
+        && Number(fundingRequest.amount_received || 0) >= Number(fundingRequest.amount || 0);
+    const displayStatusLabel = goalReached ? 'Collecté' : statusLabel;
     const typeLabel = fundingRequest.funding_request_type_name || 'Financement';
     const daysText = (fundingRequest.days_remaining !== null && fundingRequest.days_remaining !== undefined)
         ? `${fundingRequest.days_remaining} jours restants`
@@ -113,13 +116,17 @@ function renderFundingCard(fundingRequest, index) {
     const targetAmount = formatCurrency(fundingRequest.amount || 0);
     const fullUrl = `${window.location.origin}${fundingRequest.details_url}`;
     const paymentUrl = fundingRequest.payment_url || `/funding/${fundingRequest.public_id}/djomy/`;
-    const canFund = fundingRequest.can_fund === true || fundingRequest.funding_request_status === 'En cours';
+    const canFund = fundingRequest.can_fund === true
+        || statusLabel === 'En cours'
+        || (statusLabel === 'Terminé' && goalReached);
     const shareTitle = `Aide ${fundingRequest.beneficiary_name} - ${fundingRequest.title} - Ensemble 224`;
     const animDelay = `animation-delay: ${index * 0.07}s`;
-    const statusClass = getStatusClass(statusLabel, fundingRequest.days_remaining, fundingRequest.progress);
+    const statusClass = goalReached
+        ? 'status-open'
+        : getStatusClass(displayStatusLabel, fundingRequest.days_remaining, fundingRequest.progress);
     const progressClass = getProgressClass(fundingRequest.progress);
 
-    const closeBtn = fundingRequest.is_creator && !isClosedStatus(statusLabel)
+    const closeBtn = fundingRequest.is_creator && !isClosedStatus(displayStatusLabel)
         ? `<button class="btn waves-effect waves-light grey darken-1 close-btn" data-public-id="${fundingRequest.public_id}" data-close-url="${fundingRequest.close_url}" onclick="return confirm('Voulez-vous vraiment cloturer cette demande de financement ?')">
                 <i class="material-icons left">check_circle</i> Cloturer
            </button>`
@@ -136,7 +143,7 @@ function renderFundingCard(fundingRequest, index) {
                     <div class="ws-card-status">
                         <span class="ws-card-status-label ${statusClass}">
                             <i class="material-icons">bolt</i>
-                            ${escapeHtml(statusLabel)}
+                            ${escapeHtml(displayStatusLabel)}
                         </span>
                         <span class="ws-card-chip">${escapeHtml(typeLabel)}</span>
                     </div>
@@ -155,9 +162,12 @@ function renderFundingCard(fundingRequest, index) {
                             <div class="ws-card-progress-fill ${progressClass}" style="width: ${fundingRequest.progress}%"></div>
                         </div>
                         <div class="ws-card-progress-meta">
-                            <span>${fundingRequest.progress}% collecte</span>
+                            <span>${fundingRequest.progress_percentage ?? fundingRequest.progress}% collecte</span>
                             <span>${daysText}</span>
                         </div>
+                        ${Number(fundingRequest.excess_amount || 0) > 0
+                            ? `<p class="funding-over-target-note">Objectif dépassé de ${formatCurrency(fundingRequest.excess_amount)} GNF</p>`
+                            : ''}
                     </div>
 
                     <p class="ws-card-desc">${description}</p>

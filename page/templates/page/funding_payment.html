@@ -108,7 +108,7 @@
                 <span style="width: {{ funding_request.progress }}%"></span>
               </div>
               <div class="payment-progress-meta">
-                <strong>{{ funding_request.progress }}% {% trans "collecté" %}</strong>
+                <strong>{{ funding_request.progress_percentage }}% {% trans "collecté" %}</strong>
                 {% if funding_request.days_remaining != None %}
                 <span>{{ funding_request.days_remaining }} {% trans "jours restants" %}</span>
                 {% else %}
@@ -116,6 +116,11 @@
                 {% endif %}
               </div>
             </div>
+            {% if funding_request.excess_amount > 0 %}
+            <p class="funding-over-target-note" role="status">
+              {% trans "Objectif dépassé de" %} {{ funding_request.excess_amount|format_fr }} GNF
+            </p>
+            {% endif %}
 
             <dl class="payment-stats">
               <div>
@@ -123,12 +128,17 @@
                 <dd>{{ funding_request.funding_amount|format_fr }} GNF</dd>
               </div>
               <div>
-                <dt>{% trans "Montant payé" %}</dt>
+                <dt>{% if funding_request.amount_received >= funding_request.funding_amount %}{% trans "Montant collecté" %}{% else %}{% trans "Montant comptabilisé" %}{% endif %}</dt>
                 <dd>{{ funding_request.amount_received|format_fr }} GNF</dd>
               </div>
               <div class="payment-stat-highlight">
-                <dt>{% trans "Reste à payer" %}</dt>
+                {% if funding_request.remaining_amount > 0 %}
+                <dt>{% trans "Reste à financer" %}</dt>
                 <dd>{{ funding_request.remaining_amount|format_fr }} GNF</dd>
+                {% else %}
+                <dt>{% trans "Collecte" %}</dt>
+                <dd>{% trans "Objectif atteint" %}</dd>
+                {% endif %}
               </div>
             </dl>
 
@@ -157,10 +167,14 @@
             {% endif %}
             {% endfor %}
 
-            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment">
+            <button type="submit" class="payment-submit waves-effect waves-light" id="submit-payment" data-loading-label="Connexion à Djomy…">
               <i class="material-icons left">payments</i>
-              {% trans "Financer maintenant" %}
+              <span data-submit-button-label>{% trans "Financer maintenant" %}</span>
             </button>
+            <p class="form-submit-status" id="payment-submit-status" role="status" aria-live="polite" aria-atomic="true" hidden>
+              <i class="material-icons form-submit-spinner" aria-hidden="true">autorenew</i>
+              <span>{% trans "Redirection sécurisée vers Djomy en cours. Veuillez patienter…" %}</span>
+            </p>
           </div>
         </aside>
       </div>
@@ -199,12 +213,29 @@
     // du navigateur incluse) et on se contente de verrouiller le bouton.
     var paymentForm = document.querySelector('form.payment-form');
     var submitBtn = document.getElementById('submit-payment');
+    var submitStatus = document.getElementById('payment-submit-status');
     if (paymentForm && submitBtn) {
-      paymentForm.addEventListener('submit', function () {
-        if (submitBtn.dataset.submitting === '1') return;
+      paymentForm.addEventListener('submit', function (event) {
+        if (submitBtn.dataset.submitting === '1') {
+          event.preventDefault();
+          return;
+        }
         submitBtn.dataset.submitting = '1';
+        submitBtn.disabled = true;
         submitBtn.classList.add('disabled');
-        submitBtn.innerHTML = '<i class="material-icons left">autorenew</i> Redirection...';
+        submitBtn.setAttribute('aria-disabled', 'true');
+        paymentForm.setAttribute('aria-busy', 'true');
+
+        var label = submitBtn.querySelector('[data-submit-button-label]');
+        if (label) {
+          label.textContent = submitBtn.dataset.loadingLabel || 'Redirection…';
+        }
+        var icon = submitBtn.querySelector('.material-icons');
+        if (icon) {
+          icon.textContent = 'autorenew';
+          icon.classList.add('form-submit-spinner');
+        }
+        if (submitStatus) submitStatus.hidden = false;
       });
     }
   });

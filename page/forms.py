@@ -443,7 +443,7 @@ class DonationForm(_AnonymizablePaymentForm):
     donor_address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Adresse du donateur")
     donor_city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class':  'validate'}), label="Ville du donateur")
     amount = forms.DecimalField(max_digits=18, decimal_places=0, min_value=10000, widget=forms.NumberInput(attrs={'class': 'validate', 'required': 'required', 'min': '10000', 'step': '1000'}), error_messages={'required': 'Veuillez renseigner votre montant.', 'min_value': 'Le montant doit au moins atteindre 10000 GNF'}, label="Montant (En GNF) à donner")
-    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 10,'class':'materialize-textarea'}), label="Description", required=False)
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'class': 'materialize-textarea'}), label="Description", required=False)
     is_anonymous = forms.BooleanField(required=False, label="Faire un don anonyme (nous ne demandons que l'email et le téléphone)")
 
     class Meta:

@@ -1,7 +1,8 @@
 # Dépendances directes du projet (les transitives sont résolues par pip).
-Django==6.0.6
+Django==6.0.8
 
-django-allauth[socialaccount]==65.18.0
+django-allauth[socialaccount]==65.19.7
+oauthlib==4.0.0
 django-crispy-forms==2.6
 django-formtools==2.6.1
 django-jazzmin==3.0.5

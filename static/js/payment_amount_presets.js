@@ -59,19 +59,15 @@
     let presets = [];
     if (mode === "funding") {
       const remaining = parseNumeric(container.dataset.remaining);
-      presets = buildFundingPresets(remaining, minAmount, step);
-      if (!presets.length) {
+      if (remaining <= 0) {
+        presets = buildDonationPresets(minAmount, step);
+      } else {
+        presets = buildFundingPresets(remaining, minAmount, step);
+      }
+      if (!presets.length && remaining > 0) {
         const fallbackAmount = Math.floor(remaining);
-        if (fallbackAmount > 0) {
-          presets = [fallbackAmount];
-          amountInput.setAttribute("min", "1");
-        } else {
-          container.insertAdjacentHTML(
-            "beforeend",
-            "<p class='grey-text text-darken-1'>Cette collecte est déjà financée.</p>"
-          );
-          return;
-        }
+        presets = [fallbackAmount];
+        amountInput.setAttribute("min", "1");
       }
     } else {
       presets = buildDonationPresets(minAmount, step);

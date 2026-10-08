@@ -8,7 +8,17 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(djomy_payment_success)
-def handle_djomy_payment_success(sender, reference, transaction_id, amount, **kwargs):
+def handle_djomy_payment_success(
+    sender,
+    reference,
+    transaction_id,
+    amount,
+    received_amount,
+    fees,
+    payment_method="",
+    currency="GNF",
+    **kwargs,
+):
     """
     Écouteur du signal de succès de paiement Djomy (émis par le webhook de
     django_djomy). La confirmation est déléguée à
@@ -33,18 +43,37 @@ def handle_djomy_payment_success(sender, reference, transaction_id, amount, **kw
         return
 
     try:
-        received_amount = Decimal(str(amount))
+        paid_amount = Decimal(str(amount))
+        received_amount = Decimal(str(received_amount))
+        fees = Decimal(str(fees))
     except (InvalidOperation, TypeError, ValueError):
-        received_amount = None
-    if received_amount != payment.amount:
+        return
+    if (
+        paid_amount != payment.amount
+        or received_amount < 0
+        or fees < 0
+        or received_amount + fees != paid_amount
+        or str(currency).strip().upper() != "GNF"
+    ):
         logger.warning(
-            "Confirmation Djomy ignorée: montant manquant ou différent pour la référence %s.",
+            "Confirmation Djomy ignorée: comptabilité invalide pour la référence %s.",
             reference,
         )
         return
 
-    if transaction_id and not payment.transaction_id:
-        payment.transaction_id = transaction_id
-        payment.save(update_fields=["transaction_id", "updated_at"])
+    payment.received_amount = received_amount
+    payment.fees = fees
+    payment.provider_payment_method = str(payment_method or "")[:32]
+    payment.provider_currency = str(currency).strip().upper()
+    if transaction_id:
+        payment.provider_transaction_id = transaction_id
+    payment.save(update_fields=[
+        "received_amount",
+        "fees",
+        "provider_payment_method",
+        "provider_currency",
+        "provider_transaction_id",
+        "updated_at",
+    ])
 
     _apply_payment_success(payment)

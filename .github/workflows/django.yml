@@ -45,7 +45,6 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -63,4 +62,4 @@ jobs:
         run: pip-audit -r requirements.txt
 
       - name: Static security scan
-        run: bandit -r accounts page ensemble224 -x migrations,__pycache__,.venv
+        run: bandit -r accounts page ensemble224 -x migrations,__pycache__,.venv --severity-level medium --confidence-level medium

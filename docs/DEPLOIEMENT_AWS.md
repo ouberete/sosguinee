@@ -266,7 +266,7 @@ https://ensemble224.org/djomy/webhook/
 
 ## 8. Validation post-déploiement
 
-1. `curl -H "Host: ensemble224.org" http://<LB>/healthz/` → `{"status": "ok"}`.
+1. `curl -H "Host: ensemble224.org" http://<LB>/healthz/` vérifie la liveness; `/readyz/` vérifie PostgreSQL et Redis avant le trafic.
 2. Uploader une **image d'alerte** → elle doit s'afficher (servie depuis le
    bucket public, URL `https://ensemble224-media.s3.eu-west-3.amazonaws.com/...`).
 3. Uploader une **pièce d'identité** → visible **seulement** par le

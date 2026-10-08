@@ -29,7 +29,7 @@ from page.forms import DonationForm, FundingRequestForm, LossAlertForm, MessageC
     CommentForm
 from page.services.loss_alert_service import LossAlertService
 from page.services.funding_request_service import FundingRequestService
-from django.core.paginator import Paginator
+from django.core.paginator import InvalidPage, Paginator
 from page.models import UserDetails
 from ensemble224.utils.email_service import EmailService
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -188,7 +188,7 @@ def _finalize_funding_request_status(funding_request):
         FundingRequestStatus,
         fallback_name="Terminé",
         fallback_description="Statut de fin de collecte.",
-        keywords=("termine", "clos", "cloture"),
+        keywords=("termine",),
     )
     if not done_status or funding_request.funding_request_status_id == done_status.id:
         return False
@@ -207,6 +207,8 @@ def _send_payment_success_email(payment):
                 'name': str(payment.donor_first_name or '').capitalize() + ' ' + str(payment.donor_last_name or '').upper(),
                 'beneficiary_name': payment.funding_request.beneficiary_name if payment.funding_request else '',
                 'amount': payment.amount,
+                'received_amount': payment.received_amount if payment.received_amount is not None else payment.amount,
+                'fees': payment.fees if payment.fees is not None else 0,
                 'title': payment.funding_request.title if payment.funding_request else '',
             }
             template_email = 'page/template_email/funding_payment_email.html'
@@ -246,7 +248,10 @@ def _apply_payment_success(payment):
             funding_request = FundingRequest.objects.select_for_update().get(
                 pk=locked.funding_request_id
             )
-            new_total = (funding_request.amount_received or 0) + locked.amount
+            net_amount = locked.received_amount
+            if net_amount is None:
+                net_amount = locked.amount
+            new_total = (funding_request.amount_received or 0) + net_amount
             funding_request.amount_received = new_total
             funding_request.save(update_fields=["amount_received", "updated_at"])
             _finalize_funding_request_status(funding_request)
@@ -273,6 +278,60 @@ def _provider_amount_matches(payment, raw_amount):
         return False
 
 
+def _extract_provider_payment_accounting(payload, payment):
+    paid_amount = _extract_first_non_empty(
+        payload, ("paidAmount", "paid_amount", "amount")
+    )
+    received_amount = _extract_first_non_empty(
+        payload, ("receivedAmount", "received_amount", "netAmount", "net_amount")
+    )
+    fees = _extract_first_non_empty(payload, ("fees", "feeAmount", "fee_amount"))
+    currency = _extract_first_non_empty(payload, ("currency", "paymentCurrency"))
+
+    try:
+        received_amount = Decimal(str(received_amount))
+        fees = Decimal(str(fees))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+    if (
+        not _provider_amount_matches(payment, paid_amount)
+        or not received_amount.is_finite()
+        or not fees.is_finite()
+        or received_amount < 0
+        or fees < 0
+        or received_amount + fees != payment.amount
+        or str(currency or "").strip().upper() != "GNF"
+    ):
+        return None
+
+    return {
+        "received_amount": received_amount,
+        "fees": fees,
+        "provider_transaction_id": _extract_first_non_empty(
+            payload, ("transactionId", "transaction_id")
+        ),
+        "provider_payment_method": _extract_first_non_empty(
+            payload, ("paymentMethod", "payment_method")
+        ),
+        "provider_currency": str(currency).strip().upper(),
+    }
+
+
+def _persist_provider_payment_accounting(payment, payload):
+    accounting = _extract_provider_payment_accounting(payload, payment)
+    if accounting is None:
+        return False
+
+    for field, value in accounting.items():
+        if value is not None:
+            setattr(payment, field, value)
+    update_fields = [field for field, value in accounting.items() if value is not None]
+    update_fields.append("updated_at")
+    payment.save(update_fields=update_fields)
+    return True
+
+
 def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
     """
     Interroge l'API Djomy pour connaître le statut réel d'un paiement.
@@ -287,7 +346,12 @@ def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
         return None
 
     candidates = []
-    for value in (provider_tx_id, payment.reference, payment.transaction_id):
+    for value in (
+        provider_tx_id,
+        payment.provider_transaction_id,
+        payment.reference,
+        payment.transaction_id,
+    ):
         value = (str(value) if value else "").strip()
         if value and value not in candidates:
             candidates.append(value)
@@ -303,13 +367,9 @@ def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
         normalized = _normalize_payment_status(raw_status)
         if normalized in {"réussi", "échoué", "en_attente"}:
             if normalized == "réussi":
-                provider_amount = _extract_first_non_empty(
-                    data,
-                    ("amount", "paid_amount", "paidAmount", "paymentAmount"),
-                )
-                if not _provider_amount_matches(payment, provider_amount):
+                if not _persist_provider_payment_accounting(payment, data):
                     logger.warning(
-                        "Statut Djomy positif ignoré: montant manquant ou différent pour le paiement %s.",
+                        "Statut Djomy positif ignoré: comptabilité fournisseur incohérente pour le paiement %s.",
                         payment.pk,
                     )
                     continue
@@ -517,6 +577,12 @@ def _resolve_webhook_payment(payload):
     if payment is None and tx_str:
         payment = Donation.objects.filter(transaction_id=tx_str).first()
         model = Donation if payment else model
+    if payment is None and tx_str:
+        payment = FundPayment.objects.filter(provider_transaction_id=tx_str).first()
+        model = FundPayment if payment else model
+    if payment is None and tx_str:
+        payment = Donation.objects.filter(provider_transaction_id=tx_str).first()
+        model = Donation if payment else model
 
     return model, payment, reference_str, tx_str
 #Add new user
@@ -626,12 +692,12 @@ def close_funding_request(request, public_id):
             return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette demande."}, status=403)
         return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette demande.")
 
-    # Trouver le statut "Clos" ou "Terminé"
+    # Une clôture manuelle reste distincte de l'atteinte de l'objectif.
     closed_status = _resolve_or_create_status(
         FundingRequestStatus,
         fallback_name="Clos",
         fallback_description="Statut de clôture de demande de financement.",
-        keywords=("clos", "cloture", "termine"),
+        keywords=("clos", "cloture"),
     )
     if closed_status:
         previous_status = fr.funding_request_status_name
@@ -951,6 +1017,12 @@ def donation(request):
                     return_url=callback_url,
                     cancel_url=cancel_url
                 )
+                provider_tx_id = _extract_first_non_empty(
+                    response_data or {}, ("transactionId", "transaction_id")
+                )
+                if provider_tx_id:
+                    payment.provider_transaction_id = str(provider_tx_id)
+                    payment.save(update_fields=["provider_transaction_id", "updated_at"])
                 payment_url = _extract_djomy_redirect_url(response_data)
                 _log_payment_event(
                     "donation_gateway_initialized",
@@ -1038,7 +1110,9 @@ class FundingRequestListView(View):
         end_date = request.GET.get('end_date')
         beneficiary_name = request.GET.get('beneficiary_name')
         
-        funding_list = FundingRequest.objects.all()  # Récupère tous les éléments
+        funding_list = FundingRequest.objects.select_related(
+            "funding_request_status", "funding_request_type"
+        ).order_by("-created_at")
         
          # Applique les filtres dynamiques
         if status:
@@ -1063,8 +1137,14 @@ class FundingRequestListView(View):
         paginator = Paginator(funding_list, items_per_page)
         try:
             page_obj = paginator.page(page_number)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+        except InvalidPage:
+            return JsonResponse({'error': "Numéro de page invalide."}, status=400)
+        except Exception:
+            logger.exception("Erreur de pagination de l'API des demandes de financement.")
+            return JsonResponse(
+                {'error': "Impossible de charger les demandes de financement."},
+                status=500,
+            )
 
         # Prépare les données pour le format JSON
         data = {
@@ -1079,11 +1159,13 @@ class FundingRequestListView(View):
                     'id': element.id,
                     'public_id': str(element.public_id),
                     'progress': element.progress,  # Utilise la propriété progress
+                    'progress_percentage': element.progress_percentage,
+                    'excess_amount': element.excess_amount,
                     'days_remaining': element.days_remaining,  # Utilise la propriété days_remaining
                     'amount': element.funding_amount,
                     'amount_received': element.amount_received,
                     'remaining_amount': element.remaining_amount,
-                    'can_fund': element.funding_request_status_name == "En cours",
+                    'can_fund': element.can_receive_contributions,
                     'details_url': "/funding-request-details/"+str(element.public_id)+"/",
                     'payment_url': "/funding/"+str(element.public_id)+"/djomy/",
                     'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
@@ -1114,7 +1196,14 @@ class LossAlertListView(View):
         name = request.GET.get('name')
 
         # Récupère tous les éléments
-        alert_list = LossAlert.objects.all()
+        alert_list = LossAlert.objects.select_related(
+            "loss_alert_status",
+            "loss_alert_type",
+            "region",
+            "prefecture",
+            "commune",
+            "quarter",
+        ).order_by("-created_at")
 
         # Applique les filtres dynamiques
         if status:
@@ -1135,8 +1224,14 @@ class LossAlertListView(View):
         paginator = Paginator(alert_list, items_per_page)
         try:
             page_obj = paginator.page(page_number)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+        except InvalidPage:
+            return JsonResponse({'error': "Numéro de page invalide."}, status=400)
+        except Exception:
+            logger.exception("Erreur de pagination de l'API des alertes.")
+            return JsonResponse(
+                {'error': "Impossible de charger les alertes."},
+                status=500,
+            )
 
         # Prépare les données pour le format JSON
         data = {
@@ -1187,6 +1282,9 @@ def djomy_funding(request, pk=None, public_id=None):
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
         return redirect('djomy_funding', pk)
+    if not funding_request.can_receive_contributions:
+        messages.info(request, "Cette collecte n'accepte plus de contributions.")
+        return redirect('funding_request_details_public', public_id=funding_request.public_id)
     if request.method == 'POST':
         return start_djomy_funding_payment(request, funding_public_id=funding_request.public_id)
     form = FundingPaymentForm(initial=_prefill_donor_initial_data(request))
@@ -1205,6 +1303,9 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
     if not funding_request:
         messages.error(request, "Demande de financement non trouvée.")
         return redirect('funding_request_list')
+    if not funding_request.can_receive_contributions:
+        messages.info(request, "Cette collecte n'accepte plus de contributions.")
+        return redirect('funding_request_details_public', public_id=funding_request.public_id)
     initial = _prefill_donor_initial_data(request)
     form = FundingPaymentForm(request.POST or None, initial=initial)
     if request.method == 'POST':
@@ -1285,6 +1386,12 @@ def start_djomy_funding_payment(request, funding_id=None, funding_public_id=None
                         return_url=callback_url,
                         cancel_url=cancel_url
                     )
+                    provider_tx_id = _extract_first_non_empty(
+                        response_data or {}, ("transactionId", "transaction_id")
+                    )
+                    if provider_tx_id:
+                        payment.provider_transaction_id = str(provider_tx_id)
+                        payment.save(update_fields=["provider_transaction_id", "updated_at"])
                     payment_url = _extract_djomy_redirect_url(response_data)
                     _log_payment_event(
                         "funding_gateway_initialized",
@@ -1432,19 +1539,15 @@ def djomy_webhook(request):
         status_raw = _extract_first_non_empty(payload, ("event", "event_type", "eventType", "type", "name"))
     normalized_status = _normalize_payment_status(status_raw)
     if normalized_status == "réussi":
-        provider_amount = _extract_first_non_empty(
-            payload,
-            ("amount", "paid_amount", "paidAmount", "paymentAmount"),
-        )
-        if not _provider_amount_matches(payment, provider_amount):
+        if not _persist_provider_payment_accounting(payment, payload):
             _log_payment_event(
                 "payment_webhook_rejected",
                 payment_id=payment.id,
                 reference=reference or payment.reference,
-                reason="amount_missing_or_mismatched",
+                reason="invalid_provider_accounting",
                 provider="djomy",
             )
-            return JsonResponse({"ok": False, "error": "Montant du paiement invalide."}, status=400)
+            return JsonResponse({"ok": False, "error": "Données comptables du paiement invalides."}, status=400)
     _log_payment_event(
         "payment_webhook_received",
         payment_type="funding" if model is FundPayment else "donation",

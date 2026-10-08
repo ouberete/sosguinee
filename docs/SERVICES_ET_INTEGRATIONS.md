@@ -59,6 +59,16 @@
 - **Confirmation idempotente** : `_apply_payment_success` est le **seul** point qui
   passe un paiement à « réussi ». Le signal `django_djomy` y délègue aussi
   (`page/signals.py`).
+- **Comptabilisation** : `funding_amount` et `FundingRequest.amount_received`
+  représentent le net attendu/reçu par la collecte. `FundPayment.amount` reste
+  le brut payé; `received_amount` et `fees` sont enregistrés depuis la réponse
+  Djomy. Une confirmation n'est acceptée que si le brut local correspond à
+  `paidAmount`, si `receivedAmount + fees == paidAmount`, et si la devise est
+  `GNF`. L'identifiant Djomy est conservé séparément de l'UUID local.
+- **Historique** : la migration `0046` laisse les détails net/frais des anciens
+  paiements à `NULL`; les montants agrégés déjà enregistrés ne sont pas recalculés
+  sans données de règlement vérifiées. Réconcilier ces paiements avant de prendre
+  une décision financière basée sur leur net.
 - **URLs** : `ensemble224/urls.py:38` (`/djomy/webhook/`, hors i18n) ; admin de suivi
   dans `django_djomy/urls.py`.
 

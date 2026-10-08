@@ -19,7 +19,7 @@ def backfill_locations(apps, schema_editor):
     def coerce_table(table_name):
         # 1) Collect distinct legacy text values currently sitting in quarter_id
         try:
-            cursor.execute(f"SELECT DISTINCT quarter_id FROM {table_name} WHERE quarter_id IS NOT NULL")
+            cursor.execute(f"SELECT DISTINCT quarter_id FROM {table_name} WHERE quarter_id IS NOT NULL")  # nosec B608 -- table_name is a hardcoded literal
             rows = cursor.fetchall()
         except Exception:
             rows = []
@@ -43,7 +43,7 @@ def backfill_locations(apps, schema_editor):
         for name, qid in name_to_id.items():
             try:
                 cursor.execute(
-                    f"UPDATE {table_name} SET quarter_id = ?, commune_id = ?, prefecture_id = ?, region_id = ? "
+                    f"UPDATE {table_name} SET quarter_id = ?, commune_id = ?, prefecture_id = ?, region_id = ? "  # nosec B608
                     f"WHERE quarter_id = ?",
                     [qid, commune.id, prefecture.id, region.id, name]
                 )
@@ -54,15 +54,15 @@ def backfill_locations(apps, schema_editor):
         # 4) Set default placeholders for rows with NULL location fields
         try:
             cursor.execute(
-                f"UPDATE {table_name} SET region_id = ? WHERE region_id IS NULL",
+                f"UPDATE {table_name} SET region_id = ? WHERE region_id IS NULL",  # nosec B608
                 [region.id]
             )
             cursor.execute(
-                f"UPDATE {table_name} SET prefecture_id = ? WHERE prefecture_id IS NULL",
+                f"UPDATE {table_name} SET prefecture_id = ? WHERE prefecture_id IS NULL",  # nosec B608
                 [prefecture.id]
             )
             cursor.execute(
-                f"UPDATE {table_name} SET commune_id = ? WHERE commune_id IS NULL",
+                f"UPDATE {table_name} SET commune_id = ? WHERE commune_id IS NULL",  # nosec B608
                 [commune.id]
             )
         except Exception:

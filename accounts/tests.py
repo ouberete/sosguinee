@@ -1,15 +1,16 @@
 import shutil
 import tempfile
-from unittest.mock import patch
+from unittest.mock import MagicMock, call, patch
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import UserSubscription
+from ensemble224.utils.custom_email_backend import CustomEmailBackend
 from page.models import UserDetails
 from accounts.forms import ProfileForm, UserDocumentForm, UserInfosForm
 from accounts.tasks import cleanup_expired_subscriptions, send_subscription_reminders
@@ -185,3 +186,31 @@ class SubscriptionTasksTests(TestCase):
         subscription.refresh_from_db()
         self.assertEqual(result, {"cleaned": 1})
         self.assertFalse(subscription.is_active)
+
+
+@override_settings(
+    EMAIL_HOST="smtp.gmail.com",
+    EMAIL_PORT=587,
+    EMAIL_USE_TLS=True,
+    EMAIL_USE_SSL=False,
+    EMAIL_HOST_USER="",
+    EMAIL_HOST_PASSWORD="",
+    EMAIL_CLIENT_DOMAIN="localhost",
+)
+class CustomEmailBackendTests(SimpleTestCase):
+    @patch("ensemble224.utils.custom_email_backend.SMTP")
+    def test_starttls_is_bracketed_by_ehlo_commands(self, smtp_factory):
+        connection = MagicMock()
+        smtp_factory.return_value = connection
+        backend = CustomEmailBackend()
+
+        self.assertTrue(backend.open())
+
+        self.assertEqual(
+            connection.method_calls,
+            [
+                call.ehlo(),
+                call.starttls(context=backend.ssl_context),
+                call.ehlo(),
+            ],
+        )

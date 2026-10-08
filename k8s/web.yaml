@@ -62,7 +62,7 @@ spec:
               memory: 768Mi
           readinessProbe:
             httpGet:
-              path: /healthz/
+              path: /readyz/
               port: 8000
               httpHeaders:
                 # ⚠️ Doit figurer dans ALLOWED_HOSTS

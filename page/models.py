@@ -379,11 +379,26 @@ class FundingRequest(BaseEntity):
     all_objects = AllObjectsManager()
 
     @property
-    def progress(self):
+    def progress_percentage(self):
         if self.funding_amount > 0:
             mr = self.amount_received if self.amount_received else 0
-            return min(int((mr / self.funding_amount) * 100), 100)
+            return int((mr / self.funding_amount) * 100)
         return 0
+
+    @property
+    def progress(self):
+        return min(self.progress_percentage, 100)
+
+    @property
+    def excess_amount(self):
+        return max(self.amount_received - self.funding_amount, 0)
+
+    @property
+    def can_receive_contributions(self):
+        status = self.funding_request_status_name
+        if status == "En cours":
+            return True
+        return status == "Terminé" and self.amount_received >= self.funding_amount
 
     @property
     def days_remaining(self):
@@ -604,6 +619,11 @@ class Donation(BaseEntity):
     donor_address = models.CharField(max_length=255, verbose_name='Adresse Donateur', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='donations', blank=True, null=True, verbose_name='Donateur')
     amount = models.DecimalField(max_digits=18, decimal_places=0, verbose_name='Montant')
+    received_amount = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True, verbose_name='Montant net reçu')
+    fees = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True, verbose_name='Frais de paiement')
+    provider_transaction_id = models.CharField(max_length=255, blank=True, null=True, unique=True, verbose_name='ID transaction prestataire')
+    provider_payment_method = models.CharField(max_length=32, blank=True, default='', verbose_name='Moyen de paiement prestataire')
+    provider_currency = models.CharField(max_length=10, blank=True, default='GNF', verbose_name='Devise prestataire')
     description = models.TextField(blank=True, null=True, verbose_name='Description')
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='paypal', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
@@ -705,6 +725,11 @@ class FundPayment(BaseEntity):
     transaction_id = models.CharField(max_length=255, verbose_name='ID Transaction', blank=True, null=True)
     funding_request = models.ForeignKey(FundingRequest, on_delete=models.CASCADE, related_name='payments', verbose_name='Demande de financement')
     amount = models.DecimalField(max_digits=18, decimal_places=2, verbose_name='Montant')
+    received_amount = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True, verbose_name='Montant net reçu')
+    fees = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True, verbose_name='Frais de paiement')
+    provider_transaction_id = models.CharField(max_length=255, blank=True, null=True, unique=True, verbose_name='ID transaction prestataire')
+    provider_payment_method = models.CharField(max_length=32, blank=True, default='', verbose_name='Moyen de paiement prestataire')
+    provider_currency = models.CharField(max_length=10, blank=True, default='GNF', verbose_name='Devise prestataire')
     payment_method = models.CharField(max_length=20, choices=Donation.PAYMENT_METHODS, default='PayCard', verbose_name='Méthode de paiement')
     status = models.CharField(max_length=20, choices=Donation.STATUS_CHOICES, default='en_attente', verbose_name='Statut')
     is_anonymous = models.BooleanField(default=False, verbose_name='Paiement anonyme')

@@ -106,7 +106,14 @@
         {% endif %}
 
         <div class="col s12 center-align form-submit-row">
-          <button type="submit" class="btn-large green waves-effect waves-light" aria-label="Soumettre la demande">Ajouter la demande</button>
+          <button type="submit" class="btn-large green waves-effect waves-light" aria-label="Soumettre la demande" data-submit-button data-loading-label="Envoi en cours…">
+            <i class="material-icons" aria-hidden="true">send</i>
+            <span data-submit-button-label>Ajouter la demande</span>
+          </button>
+          <p class="form-submit-status" data-submit-status role="status" aria-live="polite" aria-atomic="true" hidden>
+            <i class="material-icons" aria-hidden="true">autorenew</i>
+            <span>Envoi de votre demande en cours. Veuillez patienter…</span>
+          </p>
         </div>
       </form>
     </section>

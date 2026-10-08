@@ -48,10 +48,27 @@ def djomy_webhook(request):
     if event_type == "payment.success":
         ref = data.get('merchantPaymentReference', '')
         transaction_id = data.get('transactionId', '')
-        amount = data.get('amount')
+        amount = data.get('paidAmount', data.get('amount'))
+        received_amount = data.get('receivedAmount')
+        fees = data.get('fees')
+        payment_method = data.get('paymentMethod', '')
+        currency = data.get('currency', '')
         try:
-            received_amount = Decimal(str(amount))
+            paid_amount = Decimal(str(amount))
+            received_amount = Decimal(str(received_amount))
+            fees = Decimal(str(fees))
         except (InvalidOperation, TypeError, ValueError):
+            return HttpResponse("Invalid Amount", status=400)
+        if (
+            not paid_amount.is_finite()
+            or not received_amount.is_finite()
+            or not fees.is_finite()
+            or paid_amount < 0
+            or received_amount < 0
+            or fees < 0
+            or received_amount + fees != paid_amount
+            or str(currency).strip().upper() != "GNF"
+        ):
             return HttpResponse("Invalid Amount", status=400)
 
         # --- Idempotence : si déjà traité, on ignore ---
@@ -64,7 +81,7 @@ def djomy_webhook(request):
         # 1. Mise à jour du modèle local DjomyPayment
         try:
             dj_pay = DjomyPayment.objects.get(merchant_reference=ref)
-            if received_amount != dj_pay.amount:
+            if paid_amount != dj_pay.amount:
                 logger.warning("Djomy webhook ignoré: montant différent pour la référence %s.", ref)
                 return HttpResponse("Invalid Amount", status=400)
             dj_pay.transaction_id = transaction_id
@@ -75,7 +92,7 @@ def djomy_webhook(request):
             DjomyPayment.objects.create(
                 merchant_reference=ref,
                 transaction_id=transaction_id,
-                amount=received_amount,
+                amount=paid_amount,
                 status='SUCCESS',
                 raw_payload=payload,
             )
@@ -86,7 +103,11 @@ def djomy_webhook(request):
             sender=DjomyPayment,
             reference=ref,
             transaction_id=transaction_id,
-            amount=received_amount,
+            amount=paid_amount,
+            received_amount=received_amount,
+            fees=fees,
+            payment_method=payment_method,
+            currency=currency,
         )
         logger.info(f"Signal djomy_payment_success émis pour la référence {ref}.")
 

@@ -2229,24 +2229,12 @@ textarea:focus-visible {
 
 .payment-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fdfbfb 0%, #fff2e0 50%, #fef8f4 100%);
+    background: #f4f7fb;
     padding: 42px 0 64px;
-    position: relative;
-}
-
-.payment-page::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.08), transparent 40%),
-                radial-gradient(circle at bottom left, rgba(25, 118, 210, 0.06), transparent 40%);
-    pointer-events: none;
-    z-index: 0;
 }
 
 .payment-shell {
     position: relative;
-    z-index: 1;
     width: min(1180px, calc(100% - 48px));
     margin: 0 auto;
 }
@@ -2461,6 +2449,13 @@ textarea:focus-visible {
     color: #0f172a;
 }
 
+.funding-over-target-note {
+    margin: 8px 0 0;
+    color: #9a3412;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
 .payment-stats {
     display: grid;
     grid-template-columns: 1fr;
@@ -2661,23 +2656,65 @@ textarea:focus-visible {
 
 .payment-fields .input-field input,
 .payment-fields .input-field textarea {
+    border: none;
     border-bottom: 1px solid #cbd5e1;
+    border-radius: 0;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .payment-fields .input-field input:focus,
 .payment-fields .input-field textarea:focus {
+    border: none !important;
     border-bottom: 1px solid #f97316 !important;
     box-shadow: 0 1px 0 0 #f97316 !important;
+    outline: none !important;
+}
+
+.payment-fields .input-field input:focus-visible,
+.payment-fields .input-field textarea:focus-visible {
+    outline: none !important;
 }
 
 .payment-fields .input-field label.active {
     color: #ea580c !important;
     transform: translateY(-14px) scale(0.8);
+    transform-origin: 0 0;
 }
 
 .payment-fields textarea {
-    min-height: 92px;
+    min-height: 72px;
+    padding-top: 0.55rem;
+    line-height: 1.4;
+    resize: vertical;
+}
+
+.payment-fields .input-field.payment-textarea-field,
+.payment-fields .input-field:has(textarea) {
+    margin-top: 1.6rem;
+    position: relative;
+}
+
+.payment-fields .input-field.payment-textarea-field textarea,
+.payment-fields .input-field:has(textarea) textarea {
+    margin-top: 0.2rem;
+}
+
+.payment-fields .input-field.payment-textarea-field label,
+.payment-fields .input-field:has(textarea) label,
+.payment-fields .input-field label.textarea-label {
+    top: 0.4rem;
+}
+
+.payment-fields .input-field.payment-textarea-field label.active,
+.payment-fields .input-field:has(textarea) label.active,
+.payment-fields .input-field label.textarea-label.active {
+    transform: translateY(-24px) scale(0.85) !important;
+    transform-origin: 0 0;
+    z-index: 2;
+    padding: 0 4px;
+    background: #ffffff;
+    border-radius: 4px;
+    display: inline-block;
 }
 
 .payment-captcha {
@@ -3466,6 +3503,36 @@ body:has(.update-profile-page) .main-wrapper > main {
     margin-top: 18px;
 }
 
+.sos-form-page .form-submit-status,
+.payment-page .form-submit-status,
+.form-submit-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    color: #475569;
+    font-weight: 600;
+}
+
+.form-submit-status[hidden] {
+    display: none;
+}
+
+.form-submit-spinner {
+    animation: form-submit-spin 1s linear infinite;
+}
+
+@keyframes form-submit-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-submit-spinner {
+        animation: none;
+    }
+}
+
 @media (max-width: 600px) {
     .sos-form-grid {
         padding: 22px 14px 28px;
@@ -3483,32 +3550,54 @@ body:has(.update-profile-page) .main-wrapper > main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background: #f8fafc;
+    padding: 48px 16px;
 }
 
 .confirmation-card {
-    max-width: 560px;
+    max-width: 540px;
+    width: 100%;
     margin: 0 auto;
-    padding: 48px 36px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    padding: 44px 32px;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
 }
 
 .confirmation-icon {
-    margin-bottom: 20px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
 }
 
 .confirmation-icon .material-icons {
-    font-size: 72px;
+    font-size: 36px;
+}
+
+.confirmation-icon-success {
+    background: #ecfdf5;
 }
 
 .confirmation-icon-success .material-icons {
-    color: #16a34a;
+    color: #059669;
     animation: confirmBounce 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.confirmation-icon-pending {
+    background: #fffbeb;
+}
+
+.confirmation-icon-pending .material-icons {
+    color: #d97706;
+}
+
+.confirmation-icon-error {
+    background: #fef2f2;
 }
 
 .confirmation-icon-error .material-icons {
@@ -3517,20 +3606,22 @@ body:has(.update-profile-page) .main-wrapper > main {
 
 @keyframes confirmBounce {
     0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.15); }
     100% { transform: scale(1); opacity: 1; }
 }
 
-.confirmation-card h2 {
-    font-size: 1.6rem;
+.confirmation-card h1,
+.confirmation-card h2,
+.confirmation-card h4 {
+    font-size: 1.5rem;
     font-weight: 700;
     color: #0f172a;
     margin: 0 0 12px;
 }
 
 .confirmation-message {
-    color: #64748b;
-    font-size: 1rem;
+    color: #475569;
+    font-size: 1.05rem;
     line-height: 1.6;
     margin-bottom: 28px;
 }
@@ -3544,9 +3635,13 @@ body:has(.update-profile-page) .main-wrapper > main {
 
 .confirmation-actions .btn,
 .confirmation-actions .btn-flat {
-    border-radius: 12px;
+    border-radius: 8px;
     text-transform: none;
     font-weight: 600;
+    letter-spacing: 0;
+    height: 42px;
+    line-height: 42px;
+    padding: 0 24px;
 }
 
 /* ========================================================================= */

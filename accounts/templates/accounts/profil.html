@@ -160,10 +160,13 @@
                                             <span style="width: {{ fr.progress }}%"></span>
                                         </div>
                                         <div class="profile-progress-meta">
-                                            <strong>{{ fr.progress }}%</strong>
+                                            <strong>{{ fr.progress_percentage }}%</strong>
                                             <span>{{ fr.amount_received|format_fr }} / {{ fr.funding_amount|format_fr }} GNF</span>
                                         </div>
                                     </div>
+                                    {% if fr.excess_amount > 0 %}
+                                    <p class="funding-over-target-note">Objectif dépassé de {{ fr.excess_amount|format_fr }} GNF</p>
+                                    {% endif %}
                                     <div class="profile-mini-meta">
                                         <span><i class="material-icons">payments</i>{{ fr.remaining_amount|format_fr }} GNF restant</span>
                                         <span><i class="material-icons">schedule</i>{% if fr.days_remaining != None %}{{ fr.days_remaining }} j restants{% else %}Échéance passée{% endif %}</span>

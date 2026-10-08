@@ -16,6 +16,7 @@ resources:
   - celery-beat.yaml
   - ingress.yaml
   - hpa.yaml
+  - backup-cronjob.yaml
 
 # Pour changer l'image et le tag en une seule commande:
 #   kustomize edit set image REGISTRY/ensemble224=ghcr.io/mon-org/ensemble224:v1.2.3

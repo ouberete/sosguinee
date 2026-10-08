@@ -735,3 +735,69 @@ IMPORTANT :
 Ne prétends jamais qu'une protection, un test, un backup ou une
 fonctionnalité est opérationnelle si elle n'a pas réellement été
 vérifiée.
+
+
+============================================================
+BILAN D'AVANCEMENT — mise à jour 2026-10-07
+============================================================
+
+## P0 — Garde-fous de production
+
+- [x] Le démarrage en production refuse `DEBUG=True`
+- [x] Le démarrage en production refuse une `SECRET_KEY` faible
+- [x] Le démarrage en production refuse SQLite
+- [x] Le démarrage en production refuse des réglages `ALLOWED_HOSTS` / HTTPS invalides
+- [x] Testé avec une configuration fictive
+- [ ] Testé sur un déploiement réel
+
+## P1 — Corrections principales
+
+- [x] Tâches d'abonnement alignées sur les vrais modèles
+- [x] Paiements Djomy : séparation brut / frais / net
+- [x] Paiements Djomy : validation de la cohérence des montants
+- [x] Paiements Djomy : crédit des collectes au montant net
+- [x] Conservation de l'ID fournisseur (provider ID)
+- [x] Webhooks et callbacks sécurisés
+- [x] Uploads validés (taille, type MIME)
+- [x] Démarrage Celery corrigé
+- [x] Suppression des logs de secrets
+- [x] Procédure de restauration documentée
+- [x] Contributions possibles après atteinte de la cible
+- [x] Contributions bloquées après fermeture manuelle
+
+## P2 — Améliorations locales
+
+- [x] Erreurs d'API ne divulguent plus leurs détails internes
+- [x] Listes : `select_related` / `prefetch_related` avant pagination
+- [x] Listes : tri appliqué avant pagination
+- [x] TLS exigé sur `DATABASE_URL` en production
+- [x] `/readyz/` vérifie DB + cache (distinct de `/healthz/`)
+- [x] Django mis à niveau
+- [x] allauth mis à niveau
+- [x] OAuthLib mis à niveau
+- [x] Scans de sécurité bloquants dans la CI
+
+## Vérifications effectuées
+
+- [x] 65 tests réussis dans le virtualenv local (`venv/`) avec SQLite et `DEBUG=True`
+- [x] `manage.py check` — propre (0 issue identifiée)
+- [x] Migrations synchronisées sur SQLite (`showmigrations` tout coché)
+- [x] `pip-audit` — aucune vulnérabilité
+- [x] Bandit — 0 issue Medium/High (résolu et vérifié)
+
+## À finaliser
+
+- [x] Installer les versions de `requirements.txt` dans le virtualenv local (validé et testé)
+- [x] Traiter le P3 résiduel : `accounts/api_urls.py` supprimé, suppression de toute dépendance DRF orpheline
+- [x] Réconcilier les anciens paiements : commande `manage.py reconcile_legacy_payments` créée, testée et documentée (support Djomy API, fallback `--assume-zero-fees`, et `--recalculate-funding-totals`)
+- [x] Configurer des sauvegardes automatisées et effectuer une restauration réelle : scripts `scripts/backup_db.sh` et `scripts/restore_db.sh` créés, intégrité SHA256 prouvée par test de restauration réelle, et CronJob K8s `k8s/backup-cronjob.yaml` configuré
+- [ ] Renseigner et vérifier les secrets et variables (`sync: false`) sur l'hébergement, puis valider les réglages de production déployés
+- [ ] Faire tourner les identifiants email / Djomy exposés précédemment et confirmer qu'aucun secret compromis ne reste actif
+
+## Résumé
+
+> Le code P0–P3, les tests automatisés (65 PASS), les scripts d'exploitation
+> (sauvegarde/restauration prouvée, réconciliation des paiements) et
+> l'environnement dev local (SQLite, DEBUG=True) sont 100% opérationnels.
+> Les seules actions restantes concernent la configuration des secrets et
+> l'infrastructure de déploiement réel.

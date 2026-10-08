@@ -171,8 +171,8 @@
           </a>
           <div class="ws-card-body">
             <div class="ws-card-status">
-              <span class="ws-card-status-label {% if req.funding_request_status_name == 'Clos' or req.funding_request_status_name == 'Terminé' or req.funding_request_status_name == 'Clôturé' %}status-closed{% elif req.days_remaining != None and req.days_remaining <= 7 %}status-urgent{% endif %}">
-                <i class="material-icons">bolt</i> {{ req.funding_request_status_name|default:"En attente" }}
+              <span class="ws-card-status-label {% if req.funding_request_status_name == 'Clos' or req.funding_request_status_name == 'Clôturé' or req.funding_request_status_name == 'Terminé' and not req.can_receive_contributions %}status-closed{% elif req.days_remaining != None and req.days_remaining <= 7 %}status-urgent{% endif %}">
+                <i class="material-icons">bolt</i> {% if req.funding_request_status_name == 'Terminé' and req.can_receive_contributions %}{% trans "Collecté" %}{% else %}{{ req.funding_request_status_name|default:"En attente" }}{% endif %}
               </span>
               <span class="ws-card-chip">{{ req.funding_request_type_name }}</span>
             </div>
@@ -187,9 +187,14 @@
                 <div class="ws-card-progress-fill {% if req.progress >= 100 %}high{% elif req.progress >= 50 %}mid{% else %}low{% endif %}" style="width: {{ req.progress }}%"></div>
               </div>
               <div class="ws-card-progress-meta">
-                <span>{{ req.progress }}% {% trans "collecté" %}</span>
+                <span>{{ req.progress_percentage }}% {% trans "collecté" %}</span>
                 <span>{% if req.days_remaining != None %}{{ req.days_remaining }} {% trans "jours restants" %}{% else %}{% trans "Date non définie" %}{% endif %}</span>
               </div>
+              {% if req.excess_amount > 0 %}
+              <p class="funding-over-target-note" role="status">
+                {% trans "Objectif dépassé de" %} {{ req.excess_amount|format_fr }} GNF
+              </p>
+              {% endif %}
             </div>
 
             <p class="ws-card-desc">{{ req.description_needs|truncatechars:140 }}</p>
@@ -207,7 +212,7 @@
 
             <div class="ws-card-action">
               <a href="{% url 'funding_request_details_public' req.public_id %}" class="btn-small orange darken-2 waves-effect waves-light" aria-label="Plus d'infos sur {{ req.title }}">{% trans "Voir détails" %}</a>
-              {% if req.funding_request_status_name == 'En cours' %}
+              {% if req.can_receive_contributions %}
               <a href="{% url 'djomy_funding_public' req.public_id %}" class="btn-flat ws-card-secondary-action">{% trans "Financer" %}</a>
               {% endif %}
             </div>

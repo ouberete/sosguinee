@@ -6,42 +6,38 @@
 {% endblock %}
 
 {% block content %}
-<main role="main" class="valign-wrapper" style="min-height: 70vh; background-color: #f9f9f9;">
-  <section class="section container">
-    <div class="row" style="margin-bottom: 0;">
-      <div class="col s12 m10 offset-m1 l8 offset-l2">
-        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 50px 30px; margin-top: 40px;">
-          {% if request %}
-            <div style="background-color: #e8f5e9; width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-              <i class="material-icons green-text text-darken-2" style="font-size: 50px;">check_circle</i>
-            </div>
-            <h4 style="font-weight: 600; color: #2e7d32;">{% trans "Alerte ajoutée avec succès !" %}</h4>
-            <p class="flow-text" style="font-size: 1.2rem; color: #555; margin-top: 20px; margin-bottom: 40px;">
-              {% trans "Un email de confirmation va vous être envoyé." %}
-            </p>
-          {% else %}
-            <div style="background-color: #ffebee; width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-              <i class="material-icons red-text text-darken-2" style="font-size: 50px;">error_outline</i>
-            </div>
-            <h4 style="font-weight: 600; color: #c62828;">{% trans "Ajout d'alerte impossible." %}</h4>
-            <p class="flow-text" style="font-size: 1.2rem; color: #555; margin-top: 20px; margin-bottom: 40px;">
-              {% trans "Une erreur est survenue lors de l'enregistrement de votre alerte. Veuillez réessayer." %}
-            </p>
-          {% endif %}
-          
-          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-            <a href="{% url 'home' %}" class="btn-large waves-effect waves-light blue darken-2" style="border-radius: 30px; padding: 0 35px;">
-              <i class="material-icons left">home</i> {% trans "Retour à l'accueil" %}
-            </a>
-            {% if request %}
-            <a href="{% url 'loss_alert_list' %}" class="btn-large btn-flat waves-effect waves-light" style="border-radius: 30px; padding: 0 35px; border: 2px solid #ddd;">
-              <i class="material-icons left">campaign</i> {% trans "Voir les alertes" %}
-            </a>
-            {% endif %}
-          </div>
+<main role="main" class="confirmation-page">
+  <div class="container">
+    <div class="confirmation-card center-align">
+      {% if request %}
+        <div class="confirmation-icon confirmation-icon-success">
+          <i class="material-icons">check_circle</i>
         </div>
+        <h4>{% trans "Alerte ajoutée avec succès !" %}</h4>
+        <p class="confirmation-message">
+          {% trans "Votre signalement a été enregistré et publié. Un courriel de confirmation vous a été envoyé." %}
+        </p>
+      {% else %}
+        <div class="confirmation-icon confirmation-icon-error">
+          <i class="material-icons">error_outline</i>
+        </div>
+        <h4>{% trans "Ajout d'alerte impossible." %}</h4>
+        <p class="confirmation-message">
+          {% trans "Une erreur est survenue lors de l'enregistrement de votre alerte. Veuillez réessayer." %}
+        </p>
+      {% endif %}
+      
+      <div class="confirmation-actions">
+        <a href="{% url 'home' %}" class="btn blue darken-3 waves-effect waves-light">
+          <i class="material-icons left">home</i> {% trans "Retour à l'accueil" %}
+        </a>
+        {% if request %}
+        <a href="{% url 'loss_alert_list' %}" class="btn-flat waves-effect waves-light">
+          <i class="material-icons left">campaign</i> {% trans "Voir les alertes" %}
+        </a>
+        {% endif %}
       </div>
     </div>
-  </section>
+  </div>
 </main>
 {% endblock %}

@@ -22,12 +22,26 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from django.core.cache import cache
+from django.db import connection
 from accounts.views.documents import protected_user_document
 from page import views as page_views
 
 
 def healthz(request):
     """Sonde de vivacité pour Kubernetes/monitoring: pas d'accès base."""
+    return JsonResponse({"status": "ok"})
+
+
+def readyz(request):
+    """Sonde de disponibilité: vérifie la base et le cache partagés."""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        cache.get("__readiness_probe__")
+    except Exception:
+        return JsonResponse({"status": "unavailable"}, status=503)
     return JsonResponse({"status": "ok"})
 
 
@@ -75,6 +89,7 @@ urlpatterns = [
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
     # Sonde de santé (probes Kubernetes, load balancer)
     path("healthz/", healthz, name="healthz"),
+    path("readyz/", readyz, name="readyz"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
     # Documents personnels (pièces d'identité...): accès contrôlé par Django.

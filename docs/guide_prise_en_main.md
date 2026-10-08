@@ -270,7 +270,8 @@ Retour arrière : `kubectl -n ensemble224 rollout undo deploy/ensemble224-web`.
 | État des pods | `kubectl -n ensemble224 get pods -w` |
 | Redémarrer le web | `kubectl -n ensemble224 rollout restart deploy/ensemble224-web` |
 | Sauvegarde DB | `kubectl -n ensemble224 exec statefulset/postgres -- pg_dump -U ensemble224 ensemble224 > backup.sql` |
-| Santé | `curl -H "Host: <domaine>" http://<ip>/healthz/` → `{"status": "ok"}` |
+| Liveness | `curl -H "Host: <domaine>" http://<ip>/healthz/` → confirme que Django répond |
+| Readiness | `curl -H "Host: <domaine>" http://<ip>/readyz/` → vérifie PostgreSQL et Redis |
 
 ### 6.8 Sauvegarde et restauration PostgreSQL
 

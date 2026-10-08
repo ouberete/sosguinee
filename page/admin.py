@@ -158,11 +158,11 @@ class FundingRequestAdmin(admin.ModelAdmin):
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
-    list_display = ('public_id', 'donor_name', 'amount', 'created_at', 'status', 'is_anonymous')
+    list_display = ('public_id', 'donor_name', 'amount', 'received_amount', 'fees', 'created_at', 'status', 'is_anonymous')
     list_filter = ('status', 'is_anonymous', 'created_at')
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'donor_email')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'transaction_id', 'public_id')
+    readonly_fields = ('created_at', 'transaction_id', 'public_id', 'provider_transaction_id', 'received_amount', 'fees', 'provider_payment_method', 'provider_currency')
     actions = [export_as_csv]
 
     def donor_name(self, obj):
@@ -171,11 +171,11 @@ class DonationAdmin(admin.ModelAdmin):
 
 @admin.register(FundPayment)
 class FundPaymentAdmin(admin.ModelAdmin):
-    list_display = ('public_id', 'funding_request_link', 'donor_name', 'amount', 'status', 'created_at', 'is_anonymous')
+    list_display = ('public_id', 'funding_request_link', 'donor_name', 'amount', 'received_amount', 'fees', 'status', 'created_at', 'is_anonymous')
     list_filter = ('status', 'is_anonymous', 'created_at')
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'funding_request__title')
     ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'transaction_id', 'public_id')
+    readonly_fields = ('created_at', 'transaction_id', 'public_id', 'provider_transaction_id', 'received_amount', 'fees', 'provider_payment_method', 'provider_currency')
     actions = [export_as_csv]
 
     def funding_request_link(self, obj):

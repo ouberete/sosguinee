@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const comSel = form.querySelector("#id_commune");
     const quaSel = form.querySelector("#id_quarter");
     const submitBtn = form.querySelector("button[type='submit']");
+    const submitStatus = form.querySelector("[data-submit-status]");
 
     const refreshSelect = (select) => {
       if (!select || typeof M === "undefined") return;
@@ -114,9 +115,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (submitBtn) {
-      form.addEventListener("submit", function () {
+      form.addEventListener("submit", function (event) {
+        if (submitBtn.dataset.submitting === "1") {
+          event.preventDefault();
+          return;
+        }
+        submitBtn.dataset.submitting = "1";
         submitBtn.disabled = true;
         submitBtn.classList.add("disabled");
+        submitBtn.setAttribute("aria-disabled", "true");
+        form.setAttribute("aria-busy", "true");
+
+        const buttonLabel = submitBtn.querySelector("[data-submit-button-label]");
+        if (buttonLabel) {
+          buttonLabel.textContent = submitBtn.dataset.loadingLabel || "Envoi en cours…";
+        }
+        const buttonIcon = submitBtn.querySelector(".material-icons");
+        if (buttonIcon) {
+          buttonIcon.textContent = "autorenew";
+          buttonIcon.classList.add("form-submit-spinner");
+        }
+        if (submitStatus) submitStatus.hidden = false;
       });
     }
   });

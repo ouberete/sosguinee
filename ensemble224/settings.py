@@ -29,7 +29,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 ENVIRONMENT = config("ENVIRONMENT", default="development")
-DEBUG = config("DEBUG", default=(ENVIRONMENT != "production"), cast=bool)
+
+
+def _parse_debug(val):
+    if isinstance(val, bool):
+        return val
+    if isinstance(val, str):
+        v = val.strip().lower()
+        if v in ("true", "1", "t", "yes", "y", "on"):
+            return True
+        if v in ("false", "0", "f", "no", "n", "off"):
+            return False
+    return ENVIRONMENT.lower() != "production"
+
+
+DEBUG = config("DEBUG", default=(ENVIRONMENT.lower() != "production"), cast=_parse_debug)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY", default="")
@@ -167,7 +181,11 @@ else:
     }
 
 # Mise à jour avec DATABASE_URL (Render/Heroku/Fly.io)
-db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=False)
+DATABASE_SSL_REQUIRE = config("DATABASE_SSL_REQUIRE", default=not DEBUG, cast=bool)
+db_from_env = dj_database_url.config(
+    conn_max_age=600,
+    ssl_require=DATABASE_SSL_REQUIRE,
+)
 if db_from_env:
     DATABASES['default'].update(db_from_env)
 
@@ -397,8 +415,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
-    # Les sondes load balancer interrogent /healthz/ en HTTP interne
-    SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
+    # Les sondes internes interrogent ces endpoints en HTTP.
+    SECURE_REDIRECT_EXEMPT = [r"^healthz/$", r"^readyz/$"]
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

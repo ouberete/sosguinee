@@ -34,7 +34,7 @@
       <div class="col s12 m6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-            <span class="yellow category">{{ funding_request.funding_request_status_name }}</span>
+            <span class="yellow category">{% if funding_request.funding_request_status_name == "Terminé" and funding_request.can_receive_contributions %}Collecté{% else %}{{ funding_request.funding_request_status_name }}{% endif %}</span>
             <img src="{{ funding_request.principal_image|existing_image_url:'img/hero_1.jpg' }}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
           </div>
@@ -88,11 +88,21 @@
             <div class="detail-item">
               <i class="material-icons">savings</i>
               <div class="detail-content">
-                <span class="detail-label">Montant payé</span>
+                <span class="detail-label">{% if funding_request.amount_received >= funding_request.funding_amount %}Montant collecté{% else %}Montant comptabilisé{% endif %}</span>
                 <span class="detail-value">{{ funding_request.amount_received|format_fr }} GNF</span>
               </div>
             </div>
+            {% if funding_request.excess_amount > 0 %}
+            <div class="detail-item funding-over-target-note" role="status">
+              <i class="material-icons">trending_up</i>
+              <div class="detail-content">
+                <span class="detail-label">Objectif dépassé</span>
+                <span class="detail-value">{{ funding_request.excess_amount|format_fr }} GNF</span>
+              </div>
+            </div>
+            {% endif %}
 
+            {% if funding_request.remaining_amount > 0 %}
             <div class="detail-item">
               <i class="material-icons">account_balance_wallet</i>
               <div class="detail-content">
@@ -100,6 +110,15 @@
                 <span class="detail-value">{{ funding_request.remaining_amount|format_fr }} GNF</span>
               </div>
             </div>
+            {% else %}
+            <div class="detail-item">
+              <i class="material-icons">check_circle</i>
+              <div class="detail-content">
+                <span class="detail-label">Collecte</span>
+                <span class="detail-value">Objectif atteint</span>
+              </div>
+            </div>
+            {% endif %}
 
             {% if funding_request.start_date %}
             <div class="detail-item">
@@ -155,7 +174,7 @@
           <div class="detail-progress-wrapper">
             <div class="detail-progress-header">
               <span>Progression de la collecte</span>
-              <span>{{ funding_request.progress }}%</span>
+              <span>{{ funding_request.progress_percentage }}%</span>
             </div>
             <div class="detail-progress-track">
               <div class="detail-progress-fill" style="width: {{ funding_request.progress }}%;"></div>
@@ -178,7 +197,7 @@
                 <i class="material-icons left">call</i> Contacter
               </a>
               {% endif %}
-              {% if funding_request.funding_request_status and funding_request.funding_request_status.name == "En cours" and funding_request.remaining_amount > 0 %}
+              {% if funding_request.can_receive_contributions %}
               <a href="{% url 'djomy_funding_public' funding_request.public_id %}" class="btn waves-effect waves-light green darken-2" aria-label="Financer la demande">
                 <i class="material-icons left">payments</i> Financer
               </a>

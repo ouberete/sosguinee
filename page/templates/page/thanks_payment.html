@@ -3,31 +3,23 @@
 {% block title %}Merci - Ensemble 224{% endblock %}
 
 {% block content %}
-<main role="main" class="valign-wrapper" style="min-height: 70vh; background-color: #f9f9f9;">
-  <section class="section container">
-    <div class="row">
-      <div class="col s12 m8 offset-m2 l6 offset-l3">
-        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 20px;">
-          <div style="background-color: #e8f5e9; width: 80px; height: 80px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-            <i class="material-icons green-text text-darken-2" style="font-size: 48px;">check_circle</i>
-          </div>
-          <h4 style="font-weight: 600; color: #2e7d32;">Merci pour votre {{ action }} !</h4>
-          <p class="flow-text" style="font-size: 1.1rem; color: #555; margin-top: 20px;">
-            Votre contribution de <strong>{{ amount|format_fr }} GNF</strong> a été reçue avec succès.
-          </p>
-          <div class="divider" style="margin: 20px 0;"></div>
-          <p style="color: #777;">
-            Un courriel de confirmation vous a été envoyé.<br>
-            Votre contribution est grandement appréciée.
-          </p>
-          <div style="margin-top: 30px;">
-            <a href="{% url 'home' %}" class="btn-large waves-effect waves-light blue darken-2" style="border-radius: 25px; padding: 0 30px;">
-              <i class="material-icons left">home</i> Retour à l'accueil
-            </a>
-          </div>
-        </div>
+<main role="main" class="confirmation-page">
+  <div class="container">
+    <div class="confirmation-card center-align">
+      <div class="confirmation-icon confirmation-icon-success">
+        <i class="material-icons">check_circle</i>
+      </div>
+      <h4>Merci pour votre {{ action }} !</h4>
+      <p class="confirmation-message">
+        Votre contribution de <strong>{{ amount|format_fr }} GNF</strong> a été reçue avec succès.<br>
+        Un courriel de confirmation vous a été envoyé. Votre soutien est précieux pour Ensemble 224.
+      </p>
+      <div class="confirmation-actions">
+        <a href="{% url 'home' %}" class="btn blue darken-3 waves-effect waves-light">
+          <i class="material-icons left">home</i> Retour à l'accueil
+        </a>
       </div>
     </div>
-  </section>
+  </div>
 </main>
 {% endblock %}

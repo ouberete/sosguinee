@@ -33,8 +33,10 @@ class CustomEmailBackend(EmailBackend):
                     local_hostname=local_hostname,
                     timeout=self.timeout,
                 )
-                if getattr(self, "use_tls", False):
-                    self.connection.starttls(context=self.ssl_context)
+            self.connection.ehlo()
+            if not getattr(self, "use_ssl", False) and getattr(self, "use_tls", False):
+                self.connection.starttls(context=self.ssl_context)
+                self.connection.ehlo()
 
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
