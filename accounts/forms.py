@@ -68,7 +68,6 @@ class LoginForm(forms.Form):
         label="Identifiant (Email ou nom d'utilisateur)",
         widget=forms.TextInput(attrs={
             'class': 'validate',
-            'placeholder': "Entrez votre email ou nom d'utilisateur"
         })
     )
     password = forms.CharField(
@@ -76,7 +75,6 @@ class LoginForm(forms.Form):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'validate',
-            'placeholder': 'Entrez votre mot de passe',
             'id': 'password-field'      # <- on fixe un id simple
         })
     )
@@ -127,7 +125,6 @@ class RegisterForm(UserCreationForm):
         label="Prénom",
         widget=forms.TextInput(attrs={
             'class': 'validate',
-            'placeholder': 'Prénom'
         }),
         error_messages={'required': "Veuillez renseigner votre prénom."}
     )
@@ -136,7 +133,6 @@ class RegisterForm(UserCreationForm):
         label="Nom",
         widget=forms.TextInput(attrs={
             'class': 'validate',
-            'placeholder': 'Nom'
         }),
         error_messages={'required': "Veuillez renseigner votre nom."}
     )
@@ -145,7 +141,6 @@ class RegisterForm(UserCreationForm):
         label="Email",
         widget=forms.EmailInput(attrs={
             'class': 'validate',
-            'placeholder': 'Votre adresse email'
         }),
         error_messages={
             'required': "Veuillez renseigner votre email.",
@@ -163,7 +158,6 @@ class RegisterForm(UserCreationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'validate',
-            'placeholder': 'Entrez votre mot de passe',
             'id': 'password-field'      # <- on fixe un id simple
         })
     )
@@ -172,7 +166,6 @@ class RegisterForm(UserCreationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'validate',
-            'placeholder': 'Confirmez votre mot de passe',
             'id': 'password-field2'     # <- on fixe un id simple
         }),
         help_text="Entrez le même mot de passe que précédemment, pour vérification."
@@ -182,7 +175,7 @@ class RegisterForm(UserCreationForm):
         fields = ["civility", "first_name", "last_name", "username", "email", "password1", "password2"]
         widgets = {
             'username':   forms.TextInput(attrs={
-                'class': 'validate', 'placeholder': "Nom d'utilisateur"}),
+                'class': 'validate'}),
         }
         error_messages = {
             'username': {
@@ -241,7 +234,6 @@ class ResendActivationForm(forms.Form):
         label="Email ou nom d'utilisateur",
         widget=forms.TextInput(attrs={
             'class': 'validate',
-            'placeholder': "Votre email ou nom d'utilisateur",
         }),
     )
 

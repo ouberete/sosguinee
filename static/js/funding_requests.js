@@ -132,37 +132,46 @@ function renderFundingCard(fundingRequest, index) {
            </button>`
         : '';
 
+    const initials = (fundingRequest.beneficiary_name || 'BE')
+        .split(' ')
+        .map(n => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+
+    const progressValue = fundingRequest.progress_percentage ?? Math.round(fundingRequest.progress || 0);
+
     return `
         <div class="col s12 m6 l4 card-animate" style="${animDelay}">
             <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-${fundingRequest.id}">
-                <a class="ws-card-image" href="${fundingRequest.details_url}" aria-label="Voir ${title}">
-                    <img src="${imgSrc}" alt="${beneficiaryName}" loading="lazy">
-                </a>
+                <div class="ws-card-image-wrap">
+                    <a class="ws-card-image" href="${fundingRequest.details_url}" aria-label="Voir ${title}">
+                        <img src="${imgSrc}" alt="${beneficiaryName}" loading="lazy">
+                    </a>
+                    <span class="ws-card-badge-type">
+                        <i class="material-icons">category</i> ${escapeHtml(typeLabel)}
+                    </span>
+                    <span class="ws-card-badge-status ${statusClass}">
+                        <i class="material-icons">bolt</i> ${escapeHtml(displayStatusLabel)}
+                    </span>
+                </div>
 
                 <div class="ws-card-body">
-                    <div class="ws-card-status">
-                        <span class="ws-card-status-label ${statusClass}">
-                            <i class="material-icons">bolt</i>
-                            ${escapeHtml(displayStatusLabel)}
-                        </span>
-                        <span class="ws-card-chip">${escapeHtml(typeLabel)}</span>
-                    </div>
-
                     <h3 id="fund-title-${fundingRequest.id}" class="ws-card-title">
                         <a href="${fundingRequest.details_url}">${title}</a>
                     </h3>
 
-                    <p class="ws-card-beneficiary">
-                        <i class="material-icons">person</i>
-                        <span>${beneficiaryName}</span>
-                    </p>
+                    <div class="ws-card-amount-block">
+                        <span class="ws-card-amount-big">${collectedAmount}</span>
+                        <span class="ws-card-amount-sub">collectés sur ${targetAmount}</span>
+                    </div>
 
                     <div class="ws-card-progress">
                         <div class="ws-card-progress-track" role="progressbar" aria-valuenow="${fundingRequest.progress}" aria-valuemin="0" aria-valuemax="100">
                             <div class="ws-card-progress-fill ${progressClass}" style="width: ${fundingRequest.progress}%"></div>
                         </div>
                         <div class="ws-card-progress-meta">
-                            <span>${fundingRequest.progress_percentage ?? fundingRequest.progress}% collecte</span>
+                            <span class="ws-card-progress-percent">${progressValue}% atteint</span>
                             <span>${daysText}</span>
                         </div>
                         ${Number(fundingRequest.excess_amount || 0) > 0
@@ -172,31 +181,33 @@ function renderFundingCard(fundingRequest, index) {
 
                     <p class="ws-card-desc">${description}</p>
 
-                    <div class="ws-card-stats">
-                        <div class="ws-card-stat">
-                            <div class="ws-card-stat-value">${targetAmount}</div>
-                            <div class="ws-card-stat-label">Objectif</div>
-                        </div>
-                        <div class="ws-card-stat">
-                            <div class="ws-card-stat-value">${collectedAmount}</div>
-                            <div class="ws-card-stat-label">Collecte</div>
-                        </div>
-                    </div>
-
                     <div class="ws-card-action">
-                        <a id="${fundingRequest.id}-funddetails" href="${fundingRequest.details_url}" class="btn waves-effect waves-light orange darken-2" aria-label="Voir détails ${title}">
-                            Voir détails
-                        </a>
-                        ${canFund ? `<a href="${paymentUrl}" class="btn-flat ws-card-secondary-action">Financer</a>` : ''}
+                        ${canFund
+                            ? `<a href="${paymentUrl}" class="btn ws-card-cta waves-effect waves-light" aria-label="Financer ${title}">
+                                 <i class="material-icons left">payments</i> Financer
+                               </a>`
+                            : `<a id="${fundingRequest.id}-funddetails" href="${fundingRequest.details_url}" class="btn ws-card-cta ws-card-cta--secondary waves-effect" aria-label="Voir détails ${title}">
+                                 Voir détails
+                               </a>`
+                        }
                     </div>
 
-                    <div class="ws-card-socials">
-                        <a href="${buildShareUrl('facebook', fullUrl, shareTitle)}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="${buildShareUrl('twitter', fullUrl, shareTitle)}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="${buildShareUrl('whatsapp', fullUrl, shareTitle)}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <div class="ws-card-footer">
+                        <div class="ws-card-publisher">
+                            <div class="ws-card-publisher-avatar" aria-hidden="true">${escapeHtml(initials)}</div>
+                            <div class="ws-card-publisher-info">
+                                <span class="ws-card-publisher-sub">Bénéficiaire</span>
+                                <span class="ws-card-publisher-name">${beneficiaryName}</span>
+                            </div>
+                        </div>
+
+                        <div class="ws-card-socials">
+                            <a href="${buildShareUrl('whatsapp', fullUrl, shareTitle)}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                            <a href="${buildShareUrl('facebook', fullUrl, shareTitle)}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+                        </div>
                     </div>
 
-                    ${closeBtn ? `<div class="ws-card-owner-action">${closeBtn}</div>` : ''}
+                    ${closeBtn ? `<div class="ws-card-owner-action" style="margin-top: 10px;">${closeBtn}</div>` : ''}
                 </div>
             </article>
         </div>
@@ -279,6 +290,16 @@ $(document).ready(function () {
         const page = $(this).data('page');
         loadFundingRequests(page);
         $('html, body').animate({ scrollTop: $('#fundings-container').offset().top - 80 }, 400);
+    });
+
+    // Empêcher la propagation des clics sur les select-wrapper pour éviter les sauts de scroll
+    $(document).on('click', '.select-wrapper', function (e) {
+        e.stopPropagation();
+    });
+
+    // Filtre réactif au changement d'un select
+    $('#filterForm select').on('change', function () {
+        $('#filterForm').submit();
     });
 
     $('#filterForm').submit(function (event) {

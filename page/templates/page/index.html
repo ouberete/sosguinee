@@ -166,29 +166,35 @@
       {% for req in funding_requests %}
       <div class="col s12 m12 l4">
         <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-{{ req.id }}">
-          <a class="ws-card-image" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
-            <img src="{{ req.principal_image|existing_image_url:'img/hero_1.jpg' }}" alt="{{ req.beneficiary_name }}" loading="lazy">
-          </a>
+          <div class="ws-card-image-wrap">
+            <a class="ws-card-image" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
+              <img src="{{ req.principal_image|existing_image_url:'img/hero_1.jpg' }}" alt="{{ req.beneficiary_name }}" loading="lazy">
+            </a>
+            <span class="ws-card-badge-type">
+              <i class="material-icons">category</i> {{ req.funding_request_type_name }}
+            </span>
+            <span class="ws-card-badge-status {% if req.funding_request_status_name == 'Clos' or req.funding_request_status_name == 'Clôturé' or req.funding_request_status_name == 'Terminé' and not req.can_receive_contributions %}status-closed{% elif req.days_remaining != None and req.days_remaining <= 7 %}status-urgent{% else %}status-open{% endif %}">
+              <i class="material-icons">bolt</i> {% if req.funding_request_status_name == 'Terminé' and req.can_receive_contributions %}{% trans "Collecté" %}{% else %}{{ req.funding_request_status_name|default:"En attente" }}{% endif %}
+            </span>
+          </div>
+
           <div class="ws-card-body">
-            <div class="ws-card-status">
-              <span class="ws-card-status-label {% if req.funding_request_status_name == 'Clos' or req.funding_request_status_name == 'Clôturé' or req.funding_request_status_name == 'Terminé' and not req.can_receive_contributions %}status-closed{% elif req.days_remaining != None and req.days_remaining <= 7 %}status-urgent{% endif %}">
-                <i class="material-icons">bolt</i> {% if req.funding_request_status_name == 'Terminé' and req.can_receive_contributions %}{% trans "Collecté" %}{% else %}{{ req.funding_request_status_name|default:"En attente" }}{% endif %}
-              </span>
-              <span class="ws-card-chip">{{ req.funding_request_type_name }}</span>
-            </div>
             <h3 class="ws-card-title" id="fund-title-{{ req.id }}">
               <a href="{% url 'funding_request_details_public' req.public_id %}">{{ req.title }}</a>
             </h3>
 
-            <p class="ws-card-beneficiary"><i class="material-icons">person</i><span>{{ req.beneficiary_name }}</span></p>
+            <div class="ws-card-amount-block">
+              <span class="ws-card-amount-big">{{ req.amount_received|format_fr }} GNF</span>
+              <span class="ws-card-amount-sub">{% trans "collectés sur" %} {{ req.funding_amount|format_fr }} GNF</span>
+            </div>
 
             <div class="ws-card-progress">
-              <div class="ws-card-progress-track">
+              <div class="ws-card-progress-track" role="progressbar" aria-valuenow="{{ req.progress }}" aria-valuemin="0" aria-valuemax="100">
                 <div class="ws-card-progress-fill {% if req.progress >= 100 %}high{% elif req.progress >= 50 %}mid{% else %}low{% endif %}" style="width: {{ req.progress }}%"></div>
               </div>
               <div class="ws-card-progress-meta">
-                <span>{{ req.progress_percentage }}% {% trans "collecté" %}</span>
-                <span>{% if req.days_remaining != None %}{{ req.days_remaining }} {% trans "jours restants" %}{% else %}{% trans "Date non définie" %}{% endif %}</span>
+                <span class="ws-card-progress-percent">{{ req.progress_percentage }}% {% trans "atteint" %}</span>
+                <span>{% if req.days_remaining != None %}{{ req.days_remaining }} {% trans "jours restants" %}{% else %}{% trans "Sans échéance" %}{% endif %}</span>
               </div>
               {% if req.excess_amount > 0 %}
               <p class="funding-over-target-note" role="status">
@@ -197,33 +203,38 @@
               {% endif %}
             </div>
 
-            <p class="ws-card-desc">{{ req.description_needs|truncatechars:140 }}</p>
-
-            <div class="ws-card-stats">
-              <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.funding_amount|format_fr }} GNF</div>
-                <div class="ws-card-stat-label">{% trans "Objectif" %}</div>
-              </div>
-              <div class="ws-card-stat">
-                <div class="ws-card-stat-value">{{ req.amount_received|format_fr }} GNF</div>
-                <div class="ws-card-stat-label">{% trans "Collecté" %}</div>
-              </div>
-            </div>
+            <p class="ws-card-desc">{{ req.description_needs|truncatechars:120 }}</p>
 
             <div class="ws-card-action">
-              <a href="{% url 'funding_request_details_public' req.public_id %}" class="btn-small orange darken-2 waves-effect waves-light" aria-label="Plus d'infos sur {{ req.title }}">{% trans "Voir détails" %}</a>
               {% if req.can_receive_contributions %}
-              <a href="{% url 'djomy_funding_public' req.public_id %}" class="btn-flat ws-card-secondary-action">{% trans "Financer" %}</a>
+              <a href="{% url 'djomy_funding_public' req.public_id %}" class="btn ws-card-cta waves-effect waves-light" aria-label="{% trans 'Financer' %} {{ req.title }}">
+                <i class="material-icons left">payments</i> {% trans "Financer" %}
+              </a>
+              {% else %}
+              <a href="{% url 'funding_request_details_public' req.public_id %}" class="btn ws-card-cta ws-card-cta--secondary waves-effect" aria-label="{% trans 'Voir détails' %} {{ req.title }}">
+                {% trans "Voir détails" %}
+              </a>
               {% endif %}
             </div>
 
-            <div class="ws-card-socials">
-              {% url 'funding_request_details_public' req.public_id as fr_detail_path %}
-              {% with fr_abs=request.scheme|add:'://'|add:request.get_host|add:fr_detail_path fr_title='Aide '|add:req.beneficiary_name|add:' - '|add:req.title|add:' - Ensemble 224' %}
-              <a href="https://www.facebook.com/sharer/sharer.php?u={{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
-              <a href="https://twitter.com/intent/tweet?url={{ fr_abs|urlencode:'' }}&amp;text={{ fr_title|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon tw" aria-label="Partager sur Twitter"><i class="fab fa-twitter"></i></a>
-              <a href="https://wa.me/?text={{ fr_title|urlencode:'' }}%20{{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
-              {% endwith %}
+            <div class="ws-card-footer">
+              <div class="ws-card-publisher">
+                <div class="ws-card-publisher-avatar" aria-hidden="true">
+                  {{ req.beneficiary_name|slice:":2"|upper }}
+                </div>
+                <div class="ws-card-publisher-info">
+                  <span class="ws-card-publisher-sub">{% trans "Bénéficiaire" %}</span>
+                  <span class="ws-card-publisher-name">{{ req.beneficiary_name }}</span>
+                </div>
+              </div>
+
+              <div class="ws-card-socials">
+                {% url 'funding_request_details_public' req.public_id as fr_detail_path %}
+                {% with fr_abs=request.scheme|add:'://'|add:request.get_host|add:fr_detail_path fr_title='Aide '|add:req.beneficiary_name|add:' - '|add:req.title|add:' - Ensemble 224' %}
+                <a href="https://wa.me/?text={{ fr_title|urlencode:'' }}%20{{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon wa" aria-label="Partager sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ fr_abs|urlencode:'' }}" target="_blank" rel="noopener" class="social-icon fb" aria-label="Partager sur Facebook"><i class="fab fa-facebook-f"></i></a>
+                {% endwith %}
+              </div>
             </div>
           </div>
         </article>

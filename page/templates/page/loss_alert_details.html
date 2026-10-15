@@ -29,7 +29,7 @@
 
   <section class="section container details-content-section" aria-labelledby="detail-alert-heading">
     <div class="row">
-      <div class="col s12 m6 detail-main-image">
+      <div class="col s12 l5 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
             <span class="badge">{{ alert.status_alert_name }}</span>
@@ -44,15 +44,15 @@
           <a href="mailto:?subject=Alerte%20SOS%20Guinée:%20{{ alert.name|urlencode }}&body=Consultez%20cette%20alerte%20sur%20SOS%20Guinée:%20{{ request.build_absolute_uri|urlencode }}" class="social-icon" aria-label="Partager par Email"><i class="material-icons">email</i></a>
         </div>
       </div>
-      <div class="col s12 m6">
+      <div class="col s12 l7 card-main-details">
         <div class="card-panel">
-          <h4 id="detail-alert-heading" style="padding: 20px 20px 0 20px; margin: 0; font-size: 1.5rem; font-weight: 600;">Informations clés</h4>
+          <h4 id="detail-alert-heading" style="padding: 20px 24px 0 24px; margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a;">Informations sur l'Alerte</h4>
           <div class="details-grid">
             {% if alert.loss_alert_type %}
             <div class="detail-item">
               <i class="material-icons">category</i>
               <div class="detail-content">
-                <span class="detail-label">Type d'alerte</span>
+                <span class="detail-label">Catégorie de l'alerte</span>
                 <span class="detail-value">{{ alert.type_alert_name }}</span>
               </div>
             </div>
@@ -61,7 +61,7 @@
             <div class="detail-item highlight-item">
               <i class="material-icons">event</i>
               <div class="detail-content">
-                <span class="detail-label">Date de l'événement</span>
+                <span class="detail-label">Date et heure constatées</span>
                 <span class="detail-value">
                   {{ alert.date_alert|date:"d F Y" }}
                   {% if alert.hour_alert %} à {{ alert.hour_alert }}{% endif %}
@@ -73,7 +73,7 @@
             <div class="detail-item" style="grid-column: 1 / -1;">
               <i class="material-icons">place</i>
               <div class="detail-content">
-                <span class="detail-label">Lieu</span>
+                <span class="detail-label">Lieu de l'événement</span>
                 <span class="detail-value">
                   {% if alert.region %}{{ alert.region }}{% endif %}
                   {% if alert.prefecture %}, {{ alert.prefecture }}{% endif %}
@@ -89,7 +89,7 @@
             <div class="detail-item" style="grid-column: 1 / -1;">
               <i class="material-icons">contact_phone</i>
               <div class="detail-content">
-                <span class="detail-label">Contacts</span>
+                <span class="detail-label">Coordonnées de contact</span>
                 <span class="detail-value">
                   {% if alert.phone %}{{ alert.phone }}{% endif %}
                   {% if alert.phone and alert.email %} • {% endif %}

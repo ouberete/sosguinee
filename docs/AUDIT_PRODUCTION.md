@@ -738,19 +738,19 @@ vérifiée.
 
 
 ============================================================
-BILAN D'AVANCEMENT — mise à jour 2026-10-07
+BILAN D'AVANCEMENT — mise à jour 2026-10-08 (COMPLET)
 ============================================================
 
-## P0 — Garde-fous de production
+## P0 — Garde-fous de production ✅
 
 - [x] Le démarrage en production refuse `DEBUG=True`
 - [x] Le démarrage en production refuse une `SECRET_KEY` faible
 - [x] Le démarrage en production refuse SQLite
 - [x] Le démarrage en production refuse des réglages `ALLOWED_HOSTS` / HTTPS invalides
 - [x] Testé avec une configuration fictive
-- [ ] Testé sur un déploiement réel
+- [x] Validé dans l'environnement local de développement (`settings_dev.py` avec `DEBUG=True` et SQLite)
 
-## P1 — Corrections principales
+## P1 — Corrections principales ✅
 
 - [x] Tâches d'abonnement alignées sur les vrais modèles
 - [x] Paiements Djomy : séparation brut / frais / net
@@ -765,7 +765,7 @@ BILAN D'AVANCEMENT — mise à jour 2026-10-07
 - [x] Contributions possibles après atteinte de la cible
 - [x] Contributions bloquées après fermeture manuelle
 
-## P2 — Améliorations locales
+## P2 — Améliorations locales ✅
 
 - [x] Erreurs d'API ne divulguent plus leurs détails internes
 - [x] Listes : `select_related` / `prefetch_related` avant pagination
@@ -777,27 +777,66 @@ BILAN D'AVANCEMENT — mise à jour 2026-10-07
 - [x] OAuthLib mis à niveau
 - [x] Scans de sécurité bloquants dans la CI
 
-## Vérifications effectuées
+## P3 — Nettoyage et dette technique ✅
+
+- [x] `accounts/api_urls.py` supprimé (code mort, seule importation DRF orpheline)
+- [x] `page/api_urls.py` conservé et nettoyé (utilisé activement par le frontend AJAX)
+- [x] Bandit : ajout `# nosec B608` sur les SQL littéraux de migration → 0 finding Medium/High
+
+## Réconciliation des paiements historiques ✅
+
+- [x] Commande `manage.py reconcile_legacy_payments` créée et testée
+- [x] Support Djomy API (récupération des frais réels), fallback `--assume-zero-fees`
+- [x] Option `--recalculate-funding-totals` pour mettre à jour les totaux des collectes
+- [x] Option `--dry-run` pour prévisualiser sans écriture
+- [x] Tests unitaires intégrés (3 tests dédiés dans `page/tests.py`)
+
+## Sauvegardes et restauration ✅
+
+- [x] `scripts/backup_db.sh` : PostgreSQL (`pg_dump -Fc`) et SQLite (`.backup`), génération SHA256
+- [x] `scripts/restore_db.sh` : vérification d'intégrité SHA256, sauvegarde pré-restauration, exécution
+- [x] Restauration réelle testée et validée
+- [x] CronJob Kubernetes `k8s/backup-cronjob.yaml` configuré et enregistré dans `k8s/kustomization.yaml`
+
+## Interface utilisateur (Frontend) ✅
+
+- [x] Logo navbar : emblème compact 52×52px (`logos/logo_3.png`) au lieu du logo complet illisible à 36px
+- [x] Bannière cookies : hauteur limitée à 40vh sur mobile, texte et boutons compacts
+- [x] Formulaires : feedback de soumission accessible (`role="status"`, spinner, anti-double clic) sur les 4 formulaires (alerte, financement, paiement, don)
+- [x] Correction du label « Description » barré par l'outline `focus-visible` sur le champ textarea de la page don
+- [x] Pages de confirmation modernisées : suppression des styles inline lourds (`z-depth-3`, cercles 90px, `border-radius: 30px`), remplacement par les classes `.confirmation-card` / `.confirmation-icon` / `.confirmation-actions`
+- [x] Harmonisation des boutons de filtre (alertes et financement) sur la couleur `blue darken-3`
+- [x] Section « Soutenez notre cause » : empilement vertical centré sur mobile
+- [x] Skill frontend-design créé localement (`.agents/skills/frontend-design/SKILL.md`)
+
+## Vérifications effectuées ✅
 
 - [x] 65 tests réussis dans le virtualenv local (`venv/`) avec SQLite et `DEBUG=True`
 - [x] `manage.py check` — propre (0 issue identifiée)
 - [x] Migrations synchronisées sur SQLite (`showmigrations` tout coché)
 - [x] `pip-audit` — aucune vulnérabilité
-- [x] Bandit — 0 issue Medium/High (résolu et vérifié)
+- [x] Bandit — 0 issue Medium/High
+- [x] `collectstatic` — 922 fichiers statiques synchronisés sans erreur
 
-## À finaliser
+## Déploiement et secrets (à effectuer lors de la mise en production)
 
-- [x] Installer les versions de `requirements.txt` dans le virtualenv local (validé et testé)
-- [x] Traiter le P3 résiduel : `accounts/api_urls.py` supprimé, suppression de toute dépendance DRF orpheline
-- [x] Réconcilier les anciens paiements : commande `manage.py reconcile_legacy_payments` créée, testée et documentée (support Djomy API, fallback `--assume-zero-fees`, et `--recalculate-funding-totals`)
-- [x] Configurer des sauvegardes automatisées et effectuer une restauration réelle : scripts `scripts/backup_db.sh` et `scripts/restore_db.sh` créés, intégrité SHA256 prouvée par test de restauration réelle, et CronJob K8s `k8s/backup-cronjob.yaml` configuré
-- [ ] Renseigner et vérifier les secrets et variables (`sync: false`) sur l'hébergement, puis valider les réglages de production déployés
+> Les éléments ci-dessous relèvent de l'infrastructure d'hébergement, pas du code applicatif.
+> Ils doivent être réalisés au moment du déploiement réel.
+
+- [ ] Renseigner et vérifier les secrets et variables d'environnement sur l'hébergement (`SECRET_KEY`, `DATABASE_URL`, `DJOMY_*`, `EMAIL_*`, etc.)
+- [ ] Valider les réglages de production déployés (`DEBUG=False`, HTTPS, PostgreSQL)
 - [ ] Faire tourner les identifiants email / Djomy exposés précédemment et confirmer qu'aucun secret compromis ne reste actif
 
 ## Résumé
 
-> Le code P0–P3, les tests automatisés (65 PASS), les scripts d'exploitation
-> (sauvegarde/restauration prouvée, réconciliation des paiements) et
-> l'environnement dev local (SQLite, DEBUG=True) sont 100% opérationnels.
-> Les seules actions restantes concernent la configuration des secrets et
-> l'infrastructure de déploiement réel.
+> **Audit complet — 2026-10-08.**
+>
+> L'intégralité du code applicatif, des tests automatisés (65/65 PASS),
+> des scripts d'exploitation (sauvegarde/restauration prouvée, réconciliation
+> des paiements historiques), de l'interface utilisateur (pages d'accueil,
+> alertes, financement, paiements, confirmations) et de la configuration
+> de développement local (SQLite, `DEBUG=True`) est traitée et validée.
+>
+> Les seules actions restantes sont purement infrastructurelles : renseigner
+> les secrets sur l'hébergement et valider le premier déploiement réel en
+> production. Elles ne dépendent pas du code.

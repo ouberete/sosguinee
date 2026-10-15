@@ -111,25 +111,20 @@
               {% endif %}
 
               <div class="col s12 contact-submit-row">
-                <button type="submit" class="btn-large blue darken-2 waves-effect waves-light" role="button" aria-label="{% trans 'Envoyer le message' %}">
-                  {% trans "Envoyer le message" %}
+                <button type="submit" class="contact-submit-btn waves-effect waves-light" id="contact-submit-btn" aria-label="{% trans 'Envoyer le message' %}" data-loading-label="{% trans 'Envoi en cours…' %}">
+                  <i class="material-icons" style="font-size: 20px;">send</i>
+                  <span data-submit-button-label>{% trans "Envoyer le message" %}</span>
                 </button>
-                <div id="loader" class="contact-loader" style="display:none;">
-                  <span>{% trans "Patientez..." %}</span>
-                  <div class="preloader-wrapper small active">
-                    <div class="spinner-layer spinner-blue-only">
-                      <div class="circle-clipper left"><div class="circle"></div></div>
-                      <div class="gap-patch"><div class="circle"></div></div>
-                      <div class="circle-clipper right"><div class="circle"></div></div>
-                    </div>
-                  </div>
-                </div>
+                <p class="form-submit-status" id="contact-submit-status" role="status" aria-live="polite" hidden>
+                  <i class="material-icons form-submit-spinner" aria-hidden="true">autorenew</i>
+                  <span>{% trans "Envoi de votre message en cours. Veuillez patienter…" %}</span>
+                </p>
               </div>
 
               {% if success %}
-                <div class="col s12">
-                  <div class="card-panel green lighten-5 green-text text-darken-4" role="status" aria-live="polite">
-                    <p class="center-align">{{ success }}</p>
+                <div class="col s12" style="margin-top: 16px;">
+                  <div class="card-panel green lighten-5 green-text text-darken-4" role="status" aria-live="polite" style="border-radius: 12px; border-left: 4px solid #16a34a;">
+                    <p class="center-align" style="margin: 0; font-weight: 500;">{{ success }}</p>
                   </div>
                 </div>
               {% endif %}
@@ -151,10 +146,33 @@
     }
 
     const form = document.getElementById('contact-form');
-    const loader = document.getElementById('loader');
-    if (form && loader) {
-      form.addEventListener('submit', function() {
-        loader.style.display = 'inline-flex';
+    const submitBtn = document.getElementById('contact-submit-btn');
+    const submitStatus = document.getElementById('contact-submit-status');
+
+    if (form && submitBtn) {
+      form.addEventListener('submit', function(event) {
+        if (submitBtn.dataset.submitting === '1') {
+          event.preventDefault();
+          return;
+        }
+        submitBtn.dataset.submitting = '1';
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+        submitBtn.setAttribute('aria-disabled', 'true');
+        form.setAttribute('aria-busy', 'true');
+
+        const label = submitBtn.querySelector('[data-submit-button-label]');
+        if (label) {
+          label.textContent = submitBtn.dataset.loadingLabel || 'Envoi…';
+        }
+        const icon = submitBtn.querySelector('.material-icons');
+        if (icon) {
+          icon.textContent = 'autorenew';
+          icon.classList.add('form-submit-spinner');
+        }
+        if (submitStatus) {
+          submitStatus.hidden = false;
+        }
       });
     }
   });

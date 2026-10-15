@@ -1,42 +1,31 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Création de votre compte{% endblock %}
+{% block title %}{% trans "Compte créé" %} - Ensemble 224{% endblock %}
+{% block extracss %}
+  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
 
 {% block content %}
-  {% comment %} {% include 'page/components/nav.html' %} {% endcomment %}
+<main class="auth-page">
+  <div class="auth-card center-align" role="region" aria-labelledby="created-title">
+    <div class="confirmation-icon confirmation-icon--success" style="margin: 0 auto 20px;">
+      <i class="material-icons">mark_email_read</i>
+    </div>
+    <h1 id="created-title" class="auth-brand-title">{% trans "Compte créé avec succès" %}</h1>
+    <p class="auth-brand-subtitle" style="margin-bottom: 24px; line-height: 1.6;">
+      {% blocktrans %}Un lien d'activation vous a été envoyé par e-mail. Veuillez cliquer sur ce lien pour activer votre compte avant de vous connecter.{% endblocktrans %}
+    </p>
 
-  <main role="main">
-    <section class="section container form-shell" aria-labelledby="account-created-heading">
-      <div class="row">
-        <div class="col s12">
-          <div class="card">
-            <div class="card-content center-align">
-              <i class="material-icons large green-text text-darken-2">check_circle</i>
-              <h5 id="account-created-heading" class="green-text text-darken-2">Compte créé avec succès</h5>
-
-              <p class="grey-text text-darken-2">
-                Un lien d'activation vous a été envoyé par courriel.
-              </p>
-              <p class="grey-text text-darken-2">
-                Veuillez cliquer sur le lien pour activer votre compte.
-              </p>
-
-              <div class="section">
-                <a href="{% url 'home' %}" class="btn blue lighten-1 waves-effect waves-light">
-                  <i class="material-icons left">home</i>Aller à l'accueil
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  {% comment %} {% include 'page/components/footer.html' %} {% endcomment %}
+    <div class="confirmation-actions" style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+      <a href="{% url 'login' %}" class="auth-submit-btn waves-effect waves-light">
+        <i class="material-icons" style="font-size: 20px;">login</i> {% trans "Aller à la page de connexion" %}
+      </a>
+      <a href="{% url 'home' %}" class="btn ws-card-cta ws-card-cta--secondary waves-effect">
+        <i class="material-icons left">home</i> {% trans "Retour à l'accueil" %}
+      </a>
+    </div>
+  </div>
+</main>
 {% endblock %}
 
-{% block extrajs %}
-<script src="{% static 'assets/login/js/login.js' %}"></script>
-{% endblock %}

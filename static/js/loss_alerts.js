@@ -247,6 +247,16 @@ $(document).ready(function () {
         $('html, body').animate({ scrollTop: $('#alerts-container').offset().top - 80 }, 400);
     });
 
+    // Empêcher la propagation des clics sur les select-wrapper pour éviter les sauts de scroll
+    $(document).on('click', '.select-wrapper', function (e) {
+        e.stopPropagation();
+    });
+
+    // Filtre réactif au changement d'un select
+    $('#filterForm select').on('change', function () {
+        $('#filterForm').submit();
+    });
+
     $('#filterForm').submit(function (event) {
         event.preventDefault();
         const itemsPerPage = getItemsPerPage();

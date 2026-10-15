@@ -32,7 +32,7 @@
     {% block extracss %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body data-image-fallback="{% static 'img/mylogo.png' %}"{% if plausible_domain %} data-plausible-domain="{{ plausible_domain }}"{% endif %}>
+<body class="has-mobile-bottom-bar" data-image-fallback="{% static 'img/mylogo.png' %}"{% if plausible_domain %} data-plausible-domain="{{ plausible_domain }}"{% endif %}>
 <div class="site-bg-shape site-bg-shape-1"></div>
 <div class="site-bg-shape site-bg-shape-2"></div>
 
@@ -56,6 +56,8 @@
 
     {% include 'page/components/footer.html' %}
 </div>
+
+{% include 'page/components/mobile_app_bar.html' %}
 
 <div class="cookie-banner" id="cookie-banner" role="region" aria-label="{% trans 'Préférences cookies' %}" hidden>
     <div>
@@ -103,7 +105,13 @@
             constrainWidth: false
         });
         M.Modal.init(document.querySelectorAll('.modal'));
-        M.FormSelect.init(document.querySelectorAll('select'));
+        M.FormSelect.init(document.querySelectorAll('select:not(.browser-default)'), {
+            dropdownOptions: {
+                autoFocus: false,
+                coverTrigger: false,
+                constrainWidth: false
+            }
+        });
         M.Materialbox.init(document.querySelectorAll('.materialboxed'));
         M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 

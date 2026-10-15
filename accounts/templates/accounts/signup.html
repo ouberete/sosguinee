@@ -5,114 +5,117 @@
 
 {% block title %}{% trans "Inscription" %} - Ensemble 224{% endblock %}
 {% block extracss %}
-<meta name="robots" content="noindex">
-<link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
-<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
 {% endblock %}
 
 {% block content %}
-<main class="grey lighten-4 section valign-wrapper" style="min-height: 70vh;">
-  <div class="container form-shell">
-    <div class="row" style="margin-bottom: 0;">
-      <div class="col s12">
-        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 30px; margin-top: 20px;">
-          <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 10px;">{% trans "Créer un compte" %}</h4>
-          <p style="color: #666; margin-bottom: 30px; font-size: 0.9rem;">
-            <span class="red-text">*</span> {% trans "Champs obligatoires" %}
-          </p>
+<main class="auth-page sos-form-page">
+  <div class="auth-card auth-card--wide" role="region" aria-labelledby="signup-title">
+    <a href="{% url 'home' %}" class="auth-brand" aria-label="{% trans 'Retour à l’accueil Ensemble 224' %}">
+      <img src="{% static 'logos/logo_3.png' %}" alt="Ensemble 224" class="auth-brand-logo">
+      <h1 id="signup-title" class="auth-brand-title">{% trans "Créer un compte" %}</h1>
+      <p class="auth-brand-subtitle">{% trans "Rejoignez la communauté citoyenne et solidaire de Guinée" %}</p>
+    </a>
 
-          <form method="post" action="{% url 'register' %}" id="signup-form" novalidate style="text-align: left;">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-              <div class="card-panel red lighten-4 red-text text-darken-4" role="alert">
-                {% for err in form.non_field_errors %}
-                  <p style="margin: 0;">{{ err }}</p>
-                {% endfor %}
-              </div>
+    {% get_providers as providers %}
+    {% if providers %}
+      <div class="auth-social-list">
+        {% providers_media_js %}
+        {% for provider in providers %}
+          <a href="{% provider_login_url provider.id process='signup' %}" class="auth-btn-social waves-effect">
+            {% if provider.id == 'google' %}
+              <svg class="social-icon-img" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>{% trans "S'inscrire avec Google" %}</span>
+            {% elif provider.id == 'facebook' %}
+              <i class="fab fa-facebook" style="color: #1877f2; font-size: 20px;"></i>
+              <span>{% trans "S'inscrire avec Facebook" %}</span>
+            {% elif provider.id == 'apple' %}
+              <i class="fab fa-apple" style="color: #000000; font-size: 20px;"></i>
+              <span>{% trans "S'inscrire avec Apple" %}</span>
+            {% else %}
+              <i class="material-icons" style="font-size: 20px;">account_circle</i>
+              <span>{% blocktrans with name=provider.name %}S'inscrire avec {{ name }}{% endblocktrans %}</span>
             {% endif %}
+          </a>
+        {% endfor %}
+      </div>
 
-            <div class="input-field {% if form.civility.errors %}invalid{% endif %}" style="margin-bottom: 20px;">
-              <label for="id_civility" class="active" style="position: relative; transform: none; display: block; margin-bottom: 8px;">
-                {% trans "Civilité" %}{% if form.civility.field.required %}<span class="red-text"> *</span>{% endif %}
-              </label>
-              <select id="id_civility" name="civility" class="browser-default" style="border: 1px solid #ccc; border-radius: 4px; padding: 0 10px; height: 45px; width: 100%;" required autofocus>
-                <option value="" disabled {% if not form.civility.value %}selected{% endif %}>{% trans "Choisir votre civilité" %}</option>
-                {% for value, label in form.civility.field.choices %}
-                  {% if value %}
-                    <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
-              {% for error in form.civility.errors %}
-                <span class="helper-text red-text">{{ error }}</span>
-              {% endfor %}
-            </div>
+      <div class="auth-divider">
+        <span>{% trans "Ou formulaire classique" %}</span>
+      </div>
+    {% endif %}
 
-            {% for field in form.visible_fields %}
-              {% if field.name != 'civility' %}
-                <div class="input-field {% if field.errors %}invalid{% endif %}" style="margin-bottom: 20px;">
-                  <label for="{{ field.id_for_label }}" class="active" style="position: relative; transform: none; display: block; margin-bottom: 8px;">
-                    {{ field.label }}{% if field.field.required %}<span class="red-text"> *</span>{% endif %}
-                  </label>
-                  {{ field }}
-                  {% for error in field.errors %}
-                    <span class="helper-text red-text">{{ error }}</span>
-                  {% endfor %}
-                </div>
-              {% endif %}
+    <form method="post" action="{% url 'register' %}" id="signup-form" class="auth-form row" novalidate style="margin-bottom: 0;">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="col s12">
+          <div class="card-panel red lighten-5 red-text text-darken-4" role="alert" style="border-radius: 12px; margin-bottom: 20px; padding: 12px 16px;">
+            {% for err in form.non_field_errors %}
+              <p style="margin: 0; font-size: 0.9rem;">{{ err }}</p>
             {% endfor %}
-
-            {% if turnstile_site_key %}
-              <div class="input-field center-align" style="margin-top: 30px;">
-                <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
-              </div>
-            {% endif %}
-
-            <p style="margin: 20px 0;">
-              <label>
-                <input type="checkbox" id="show-password" />
-                <span>{% trans "Afficher le mot de passe" %}</span>
-              </label>
-            </p>
-
-            <div class="center-align" style="margin-top: 30px;">
-              <button type="submit" class="btn-large waves-effect waves-light blue darken-2" id="signup-btn" style="border-radius: 30px; padding: 0 35px; width: 100%;">
-                <i class="material-icons left">person_add</i> {% trans "S'inscrire" %}
-              </button>
-              <button class="btn-large waves-effect waves-light blue darken-2 hide" id="loading-btn" type="button" disabled style="border-radius: 30px; padding: 0 35px; width: 100%;">
-                <i class="material-icons left">hourglass_empty</i>{% trans "Inscription..." %}
-              </button>
-            </div>
-          </form>
-
-          <div class="divider" style="margin:2.5rem 0 1.5rem 0;"></div>
-          
-          <div class="center-align">
-            <p style="color: #555; margin-bottom: 15px;">{% trans "Ou inscrivez-vous avec :" %}</p>
-            {% providers_media_js %}
-            {% get_providers as providers %}
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              {% for provider in providers %}
-                <a href="{% provider_login_url provider.id process='signup' %}"
-                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="border-radius: 25px; display:block;">
-                  <i class="material-icons left">
-                    {% if provider.id == 'google' %}account_circle
-                    {% elif provider.id == 'facebook' %}facebook
-                    {% elif provider.id == 'apple' %}apple
-                    {% else %}person
-                    {% endif %}
-                  </i>
-                  {{ provider.name }}
-                </a>
-              {% endfor %}
-            </div>
-          </div>
-
-          <div style="margin-top: 30px;">
-            <p style="color: #555;">{% trans "Déjà membre ?" %} <a href="{% url 'login' %}" style="font-weight: bold; color: #f57c00;">{% trans "Se connecter" %}</a></p>
           </div>
         </div>
+      {% endif %}
+
+      {% for field in form.visible_fields %}
+        {% if field.name == 'civility' %}
+          <div class="input-field col s12 form-field select-field{% if form.civility.errors %} has-error{% endif %}">
+            <select id="id_civility" name="civility" class="browser-default" required>
+              <option value="" disabled {% if not form.civility.value %}selected{% endif %}>{% trans "Choisir votre civilité" %}</option>
+              {% for value, label in form.civility.field.choices %}
+                {% if value %}
+                  <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <label for="id_civility" class="form-field-label active select-label">
+              {% trans "Civilité" %}<span class="required-mark" aria-hidden="true">*</span>
+            </label>
+            {% for error in form.civility.errors %}
+              <span class="field-error red-text">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {% include 'page/includes/form_field.html' with field=field field_width='s12' %}
+        {% endif %}
+      {% endfor %}
+
+      {% if turnstile_site_key %}
+        <div class="col s12 input-field center-align" style="margin: 20px 0;">
+          <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+        </div>
+      {% endif %}
+
+      <div class="col s12 auth-toggle-pwd">
+        <label>
+          <input type="checkbox" id="show-password" />
+          <span>{% trans "Afficher les mots de passe" %}</span>
+        </label>
+      </div>
+
+      <div class="col s12">
+        <button type="submit" class="auth-submit-btn waves-effect waves-light" id="signup-btn">
+          <i class="material-icons" style="font-size: 20px;">person_add</i>
+          <span id="signup-btn-text">{% trans "Créer mon compte" %}</span>
+        </button>
+        <p class="form-submit-status" id="signup-submit-status" role="status" aria-live="polite" hidden style="margin-top: 10px; text-align: center;">
+          <i class="material-icons form-submit-spinner" aria-hidden="true">autorenew</i>
+          <span>{% trans "Inscription en cours…" %}</span>
+        </p>
+      </div>
+    </form>
+
+    <div class="auth-links">
+      <div class="auth-switch" style="border-top: none; margin-top: 10px; padding-top: 0;">
+        <span>{% trans "Vous possédez déjà un compte ?" %}</span>
+        <a href="{% url 'login' %}">{% trans "Se connecter" %}</a>
       </div>
     </div>
   </div>
@@ -129,8 +132,11 @@
 
     const chk = document.getElementById('show-password');
     const pwdFields = document.querySelectorAll('#signup-form input[type=password]');
+    const signupForm = document.getElementById('signup-form');
     const signupBtn = document.getElementById('signup-btn');
-    const loadingBtn = document.getElementById('loading-btn');
+    const btnText = document.getElementById('signup-btn-text');
+    const statusMsg = document.getElementById('signup-submit-status');
+
     if (chk) {
       chk.addEventListener('change', () => {
         pwdFields.forEach(input => {
@@ -138,10 +144,15 @@
         });
       });
     }
-    document.getElementById('signup-form').addEventListener('submit', () => {
-      signupBtn.classList.add('hide');
-      loadingBtn.classList.remove('hide');
-    });
+
+    if (signupForm && signupBtn) {
+      signupForm.addEventListener('submit', () => {
+        signupBtn.disabled = true;
+        signupBtn.classList.add('disabled');
+        if (btnText) btnText.textContent = '{% trans "Inscription..." %}';
+        if (statusMsg) statusMsg.hidden = false;
+      });
+    }
   });
 </script>
 {% endblock %}

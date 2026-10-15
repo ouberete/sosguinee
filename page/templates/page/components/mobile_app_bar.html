@@ -1,0 +1,72 @@
+{% load i18n %}
+<!-- Mobile Bottom App Bar (style application mobile / Tikerama) -->
+<nav class="mobile-bottom-app-bar hide-on-large-only" aria-label="{% trans 'Navigation mobile rapide' %}">
+  <a href="{% url 'home' %}" class="mobile-app-bar-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+    <i class="material-icons">home</i>
+    <span>{% trans "Accueil" %}</span>
+  </a>
+
+  <a href="{% url 'loss_alert_list' %}" class="mobile-app-bar-item {% if request.resolver_match.url_name == 'loss_alert_list' or request.resolver_match.url_name == 'loss_alert_detail_public' %}active{% endif %}">
+    <i class="material-icons">campaign</i>
+    <span>{% trans "Alertes" %}</span>
+  </a>
+
+  <!-- Bouton central "+" : ouvre le Bottom Sheet d'action rapide -->
+  <a href="#modal-publish-action" class="mobile-app-bar-publish-btn modal-trigger" aria-label="{% trans 'Publier une annonce' %}">
+    <i class="material-icons">add</i>
+  </a>
+
+  <a href="{% url 'funding_request_list' %}" class="mobile-app-bar-item {% if request.resolver_match.url_name == 'funding_request_list' or request.resolver_match.url_name == 'funding_request_details_public' %}active{% endif %}">
+    <i class="material-icons">volunteer_activism</i>
+    <span>{% trans "Financement" %}</span>
+  </a>
+
+  {% if user.is_authenticated %}
+  <a href="{% url 'profile' %}" class="mobile-app-bar-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+    <i class="material-icons">person</i>
+    <span>{% trans "Profil" %}</span>
+  </a>
+  {% else %}
+  <a href="#!" data-target="mobile-menu" class="mobile-app-bar-item sidenav-trigger" aria-label="{% trans 'Menu complet' %}">
+    <i class="material-icons">menu</i>
+    <span>{% trans "Menu" %}</span>
+  </a>
+  {% endif %}
+</nav>
+
+<!-- Modal Bottom Sheet : Choix de publication rapide -->
+<div id="modal-publish-action" class="modal bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="publishSheetTitle">
+  <div class="publish-sheet-handle" aria-hidden="true"></div>
+  <div class="modal-content">
+    <h3 class="publish-sheet-title" id="publishSheetTitle">{% trans "Que souhaitez-vous publier ?" %}</h3>
+    <div class="publish-sheet-list">
+      <a href="{% url 'add_loss_alert' %}" class="publish-sheet-item modal-close waves-effect">
+        <span class="publish-sheet-item-icon alert-icon">
+          <i class="material-icons">campaign</i>
+        </span>
+        <span class="publish-sheet-item-copy">
+          <span class="publish-sheet-item-title">{% trans "Signaler une alerte de perte" %}</span>
+          <span class="publish-sheet-item-desc">{% trans "Personne disparue, pièce d'identité, objet ou document égaré." %}</span>
+        </span>
+        <i class="material-icons grey-text text-darken-1">chevron_right</i>
+      </a>
+
+      <a href="{% url 'add_funding_request' %}" class="publish-sheet-item modal-close waves-effect">
+        <span class="publish-sheet-item-icon fund-icon">
+          <i class="material-icons">volunteer_activism</i>
+        </span>
+        <span class="publish-sheet-item-copy">
+          <span class="publish-sheet-item-title">{% trans "Demander un financement solidaire" %}</span>
+          <span class="publish-sheet-item-desc">{% trans "Urgence médicale, maladie grave, chirurgie ou cause solidaire." %}</span>
+        </span>
+        <i class="material-icons grey-text text-darken-1">chevron_right</i>
+      </a>
+    </div>
+  </div>
+  <div class="modal-footer center-align" style="border: none; padding: 0 16px 16px;">
+    <button type="button" class="modal-close btn-flat grey-text text-darken-2 waves-effect" style="width: 100%; border-radius: 999px;">
+      {% trans "Annuler" %}
+    </button>
+  </div>
+</div>
+

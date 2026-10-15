@@ -5,91 +5,104 @@
 
 {% block title %}{% trans "Connexion" %} - Ensemble 224{% endblock %}
 {% block extracss %}
-  <link rel="stylesheet" href="{% static 'assets/login/css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
   <meta name="robots" content="noindex">
 {% endblock %}
 
 {% block content %}
-<main class="grey lighten-4 section valign-wrapper" style="min-height: 70vh;">
-  <div class="container form-shell">
-    <div class="row" style="margin-bottom: 0;">
-      <div class="col s12">
-        <div class="card-panel center-align z-depth-3" style="border-radius: 12px; padding: 40px 30px; margin-top: 20px;">
-          <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 30px;">{% trans "Se connecter" %}</h4>
+<main class="auth-page sos-form-page">
+  <div class="auth-card" role="region" aria-labelledby="auth-title">
+    <a href="{% url 'home' %}" class="auth-brand" aria-label="{% trans 'Retour à l’accueil Ensemble 224' %}">
+      <img src="{% static 'logos/logo_3.png' %}" alt="Ensemble 224" class="auth-brand-logo">
+      <h1 id="auth-title" class="auth-brand-title">{% trans "Heureux de vous revoir" %}</h1>
+      <p class="auth-brand-subtitle">{% trans "Connectez-vous pour gérer vos alertes et vos actions solidaires" %}</p>
+    </a>
 
-          <form method="post" action="{% url 'login' %}" id="login-form" novalidate style="text-align: left;">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-              <div class="card-panel red lighten-4 red-text text-darken-4">
-                {% for err in form.non_field_errors %}
-                  <p>{{ err }}</p>
-                {% endfor %}
-              </div>
+    {% get_providers as providers %}
+    {% if providers %}
+      <div class="auth-social-list">
+        {% providers_media_js %}
+        {% for provider in providers %}
+          <a href="{% provider_login_url provider.id %}" class="auth-btn-social waves-effect">
+            {% if provider.id == 'google' %}
+              <svg class="social-icon-img" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>{% trans "Continuer avec Google" %}</span>
+            {% elif provider.id == 'facebook' %}
+              <i class="fab fa-facebook" style="color: #1877f2; font-size: 20px;"></i>
+              <span>{% trans "Continuer avec Facebook" %}</span>
+            {% elif provider.id == 'apple' %}
+              <i class="fab fa-apple" style="color: #000000; font-size: 20px;"></i>
+              <span>{% trans "Continuer avec Apple" %}</span>
+            {% else %}
+              <i class="material-icons" style="font-size: 20px;">account_circle</i>
+              <span>{% blocktrans with name=provider.name %}Continuer avec {{ name }}{% endblocktrans %}</span>
             {% endif %}
+          </a>
+        {% endfor %}
+      </div>
 
-            {% for field in form.visible_fields %}
-              <div class="input-field {% if field.errors %}invalid{% endif %}">
-                {{ field.label_tag }}
-                {{ field }}
-                {% for error in field.errors %}
-                  <span class="helper-text red-text">{{ error }}</span>
-                {% endfor %}
-              </div>
+      <div class="auth-divider">
+        <span>{% trans "Ou avec email" %}</span>
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}" id="login-form" class="auth-form row" novalidate style="margin-bottom: 0;">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="col s12">
+          <div class="card-panel red lighten-5 red-text text-darken-4" role="alert" style="border-radius: 12px; margin-bottom: 20px; padding: 12px 16px;">
+            {% for err in form.non_field_errors %}
+              <p style="margin: 0; font-size: 0.9rem;">{{ err }}</p>
             {% endfor %}
-
-            {% if turnstile_site_key %}
-              <div class="input-field center-align">
-                <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
-              </div>
-            {% endif %}
-
-            <p style="margin-bottom: 20px;">
-              <label>
-                <input type="checkbox" id="show-password" />
-                <span>{% trans "Afficher le mot de passe" %}</span>
-              </label>
-            </p>
-
-            <div class="center-align">
-              <button type="submit" class="btn-large waves-effect waves-light blue darken-2" id="login-btn" style="border-radius: 30px; padding: 0 35px; width: 100%;">
-                <i class="material-icons left">login</i> {% trans "Se connecter" %}
-              </button>
-              <button class="btn-large waves-effect waves-light blue darken-2 hide" id="loading-btn" type="button" disabled style="border-radius: 30px; padding: 0 35px; width: 100%;">
-                <i class="material-icons left">hourglass_empty</i>{% trans "Connexion..." %}
-              </button>
-            </div>
-          </form>
-
-          <div class="divider" style="margin:2rem 0;"></div>
-          
-          <div class="center-align">
-            <p style="color: #555; margin-bottom: 15px;">{% trans "Ou connectez-vous avec :" %}</p>
-            {% providers_media_js %}
-            {% get_providers as providers %}
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              {% for provider in providers %}
-                <a href="{% provider_login_url provider.id %}"
-                   class="btn waves-effect waves-light social-btn {{ provider.id }}-btn" style="border-radius: 25px; display:block;">
-                  <i class="material-icons left">
-                    {% if provider.id == 'google' %}account_circle
-                    {% elif provider.id == 'facebook' %}facebook
-                    {% elif provider.id == 'apple' %}apple
-                    {% else %}person
-                    {% endif %}
-                  </i>
-                  {{ provider.name }}
-                </a>
-              {% endfor %}
-            </div>
-          </div>
-
-          <div style="margin-top: 30px;">
-            <p><a href="{% url 'reset-password' %}" style="color: #1976d2;">{% trans "Mot de passe oublié ?" %}</a></p>
-            <p><a href="{% url 'resend_activation' %}" style="color: #1976d2;">{% trans "Renvoyer le lien d'activation" %}</a></p>
-            <p style="margin-top: 15px;">{% trans "Pas encore de compte ?" %} <a href="{% url 'register' %}" style="font-weight: bold; color: #f57c00;">{% trans "S'inscrire" %}</a></p>
           </div>
         </div>
+      {% endif %}
+
+      {% for field in form.visible_fields %}
+        {% include 'page/includes/form_field.html' with field=field field_width='s12' %}
+      {% endfor %}
+
+      {% if turnstile_site_key %}
+        <div class="col s12 input-field center-align" style="margin: 16px 0;">
+          <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}"></div>
+        </div>
+      {% endif %}
+
+      <div class="col s12 auth-toggle-pwd">
+        <label>
+          <input type="checkbox" id="show-password" />
+          <span>{% trans "Afficher le mot de passe" %}</span>
+        </label>
+      </div>
+
+      <div class="col s12">
+        <button type="submit" class="auth-submit-btn waves-effect waves-light" id="login-btn">
+          <i class="material-icons" style="font-size: 20px;">login</i>
+          <span id="login-btn-text">{% trans "Se connecter" %}</span>
+        </button>
+        <p class="form-submit-status" id="login-submit-status" role="status" aria-live="polite" hidden style="margin-top: 10px; text-align: center;">
+          <i class="material-icons form-submit-spinner" aria-hidden="true">autorenew</i>
+          <span>{% trans "Connexion en cours…" %}</span>
+        </p>
+      </div>
+    </form>
+
+    <div class="auth-links">
+      <div>
+        <a href="{% url 'reset-password' %}">{% trans "Mot de passe oublié ?" %}</a>
+      </div>
+      <div>
+        <a href="{% url 'resend_activation' %}">{% trans "Renvoyer le lien d'activation" %}</a>
+      </div>
+      <div class="auth-switch">
+        <span>{% trans "Pas encore de compte ?" %}</span>
+        <a href="{% url 'register' %}">{% trans "S'inscrire gratuitement" %}</a>
       </div>
     </div>
   </div>
@@ -100,17 +113,29 @@
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    if (typeof M !== 'undefined' && typeof M.updateTextFields === 'function') {
+      M.updateTextFields();
+    }
+
     const chk = document.getElementById('show-password');
     const pwd = document.querySelector('#login-form input[type=password]');
+    const loginForm = document.getElementById('login-form');
     const loginBtn = document.getElementById('login-btn');
-    const loadingBtn = document.getElementById('loading-btn');
+    const btnText = document.getElementById('login-btn-text');
+    const statusMsg = document.getElementById('login-submit-status');
+
     if (chk && pwd) {
       chk.addEventListener('change', () => { pwd.type = chk.checked ? 'text' : 'password'; });
     }
-    document.getElementById('login-form').addEventListener('submit', () => {
-      loginBtn.classList.add('hide');
-      loadingBtn.classList.remove('hide');
-    });
+
+    if (loginForm && loginBtn) {
+      loginForm.addEventListener('submit', () => {
+        loginBtn.disabled = true;
+        loginBtn.classList.add('disabled');
+        if (btnText) btnText.textContent = '{% trans "Connexion..." %}';
+        if (statusMsg) statusMsg.hidden = false;
+      });
+    }
   });
 </script>
 {% endblock %}

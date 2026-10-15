@@ -28,7 +28,7 @@
     </section>
     <section class="section container page-width-wide" aria-labelledby="filter-alert-heading"><h2 id="filter-alert-heading"
                                                                                   class="center-align light">{% trans "Filtrer les alertes" %}</h2>
-        <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1">
+        <form id="filterForm" method="get" action="" class="row card-panel grey lighten-5 z-depth-1" onsubmit="return false;">
             <div class="input-field col s12 m6 l4"><select id="type_alert" name="type_alert">
                 <option value="" {% if not request.GET.type_alert %}selected{% endif %}>{% trans "Tous les types d'alerte" %}</option>
                  {% for t in loss_alert_types %}
@@ -76,7 +76,6 @@
 {% block extrajs %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        M.FormSelect.init(document.querySelectorAll('select'));
         M.Datepicker.init(document.querySelectorAll('.datepicker'), {
             format: 'dd-mm-yyyy',
             i18n: {
@@ -91,7 +90,6 @@
             }
         });
         M.Parallax.init(document.querySelectorAll('.parallax'));
-        M.Materialbox.init(document.querySelectorAll('.materialboxed'));
     });
 </script>
 <script src="{% static 'js/loss_alerts.js' %}"></script>
