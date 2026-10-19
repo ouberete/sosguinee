@@ -127,7 +127,7 @@ class PaymentCallbackTests(TestCase):
         self.assertEqual(funding.progress_percentage, 150)
         self.assertEqual(funding.excess_amount, Decimal("500.00"))
 
-    def test_funding_callback_credits_net_amount_after_fees(self):
+    def test_funding_callback_credits_gross_amount_paid_by_donor(self):
         funding = self._funding()
         payment = FundPayment.objects.create(
             funding_request=funding,
@@ -144,7 +144,7 @@ class PaymentCallbackTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         funding.refresh_from_db()
-        self.assertEqual(funding.amount_received, Decimal("135.00"))
+        self.assertEqual(funding.amount_received, Decimal("150.00"))
 
     @patch("page.views._send_payment_success_email")
     @patch(
@@ -178,7 +178,7 @@ class PaymentCallbackTests(TestCase):
         get_status.assert_called_once_with("provider-status-id")
         funding.refresh_from_db()
         payment.refresh_from_db()
-        self.assertEqual(funding.amount_received, Decimal("135.00"))
+        self.assertEqual(funding.amount_received, Decimal("150.00"))
         self.assertEqual(payment.fees, Decimal("15.00"))
 
 
@@ -422,7 +422,7 @@ class PaymentWebhookAmountTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.funding.refresh_from_db()
         self.payment.refresh_from_db()
-        self.assertEqual(self.funding.amount_received, Decimal("1350.00"))
+        self.assertEqual(self.funding.amount_received, Decimal("1500.00"))
         self.assertEqual(self.payment.status, "réussi")
         self.assertEqual(self.payment.received_amount, Decimal("1350.00"))
         self.assertEqual(self.payment.fees, Decimal("150.00"))
@@ -482,7 +482,7 @@ class LegacyPaymentWebhookTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.funding.refresh_from_db()
         self.payment.refresh_from_db()
-        self.assertEqual(self.funding.amount_received, Decimal("1350.00"))
+        self.assertEqual(self.funding.amount_received, Decimal("1500.00"))
         self.assertEqual(self.payment.provider_transaction_id, "legacy-provider-id")
         self.assertEqual(self.payment.fees, Decimal("150.00"))
 
@@ -780,6 +780,82 @@ class ReconcileLegacyPaymentsCommandTests(TestCase):
         self.assertEqual(self.legacy_fund_payment.received_amount, Decimal("48500.00"))
         self.assertEqual(self.legacy_fund_payment.fees, Decimal("1500.00"))
         self.assertEqual(self.legacy_fund_payment.provider_transaction_id, "DJOMY_TX_999")
-        # Funding request total is updated to the actual net received:
-        self.assertEqual(self.funding.amount_received, Decimal("48500.00"))
+        # Funding request total is updated to the gross amount paid by donors:
+        self.assertEqual(self.funding.amount_received, Decimal("50000.00"))
+
+
+class PendingPaymentReconciliationTests(TestCase):
+    def setUp(self):
+        self.funding = FundingRequest.objects.create(
+            beneficiary_name="Aissatou Diallo",
+            title="Urgence chirurgicale",
+            funding_amount=Decimal("1000000.00"),
+            amount_received=Decimal("0.00"),
+            description_needs="Intervention chirurgicale urgente",
+            principal_image="img/Fundings/test.png",
+        )
+        past_time = timezone.now() - timedelta(minutes=20)
+        self.pending_payment = FundPayment.objects.create(
+            funding_request=self.funding,
+            amount=Decimal("100000.00"),
+            status="en_attente",
+            reference="FUND_PENDING_001",
+        )
+        FundPayment.objects.filter(pk=self.pending_payment.pk).update(created_at=past_time)
+        self.pending_payment.refresh_from_db()
+
+        self.pending_donation = Donation.objects.create(
+            amount=Decimal("50000.00"),
+            status="en_attente",
+            reference="DON_PENDING_001",
+        )
+        Donation.objects.filter(pk=self.pending_donation.pk).update(created_at=past_time)
+        self.pending_donation.refresh_from_db()
+
+    def test_reconcile_pending_payments_command_confirms_success(self):
+        djomy_payload = {
+            "status": "success",
+            "paidAmount": 100000,
+            "receivedAmount": 97000,
+            "fees": 3000,
+            "currency": "GNF",
+            "transactionId": "TX_CONFIRMED_123",
+            "paymentMethod": "orange_money",
+        }
+        with patch("django_djomy.services.DjomyService.get_payment_status", return_value=djomy_payload):
+            call_command("reconcile_pending_payments", "--model=fundpayment", "--minutes=5")
+
+        self.pending_payment.refresh_from_db()
+        self.funding.refresh_from_db()
+
+        self.assertEqual(self.pending_payment.status, "réussi")
+        self.assertEqual(self.pending_payment.received_amount, Decimal("97000.00"))
+        self.assertEqual(self.pending_payment.fees, Decimal("3000.00"))
+        self.assertEqual(self.funding.amount_received, Decimal("100000.00"))
+
+    def test_admin_check_djomy_status_action(self):
+        from page.admin import check_djomy_status_action
+        from unittest.mock import Mock
+
+        djomy_payload = {
+            "status": "success",
+            "paidAmount": 50000,
+            "receivedAmount": 48500,
+            "fees": 1500,
+            "currency": "GNF",
+            "transactionId": "DON_TX_777",
+            "paymentMethod": "momo",
+        }
+        request = Mock()
+        modeladmin = Mock()
+
+        with patch("django_djomy.services.DjomyService.get_payment_status", return_value=djomy_payload):
+            check_djomy_status_action(modeladmin, request, Donation.objects.filter(pk=self.pending_donation.pk))
+
+        self.pending_donation.refresh_from_db()
+        self.assertEqual(self.pending_donation.status, "réussi")
+        self.assertEqual(self.pending_donation.received_amount, Decimal("48500.00"))
+        self.assertEqual(self.pending_donation.fees, Decimal("1500.00"))
+        modeladmin.message_user.assert_called_once()
+
 

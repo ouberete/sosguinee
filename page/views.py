@@ -248,10 +248,10 @@ def _apply_payment_success(payment):
             funding_request = FundingRequest.objects.select_for_update().get(
                 pk=locked.funding_request_id
             )
-            net_amount = locked.received_amount
-            if net_amount is None:
-                net_amount = locked.amount
-            new_total = (funding_request.amount_received or 0) + net_amount
+            # Créditer le montant réel payé par le donateur (montant brut).
+            # Les frais Djomy restent conservés sur le paiement pour la traçabilité comptable.
+            credited_amount = locked.amount
+            new_total = (funding_request.amount_received or Decimal("0.00")) + credited_amount
             funding_request.amount_received = new_total
             funding_request.save(update_fields=["amount_received", "updated_at"])
             _finalize_funding_request_status(funding_request)
@@ -375,6 +375,44 @@ def _verify_payment_status_with_djomy(payment, provider_tx_id=None):
                     continue
             return normalized
     return None
+
+
+def reconcile_payment_with_djomy(payment):
+    """
+    Vérifie le statut d'un paiement (Donation ou FundPayment) auprès de l'API Djomy.
+    Si le paiement est confirmé 'réussi' ou 'échoué', applique les mises à jour
+    comptables, le crédit de la cagnotte (pour les financements), et l'envoi d'emails.
+    Retourne un dict: {'status': <nouveau_statut>, 'updated': <bool>, 'message': <str>}
+    """
+    initial_status = payment.status
+    verified_status = _verify_payment_status_with_djomy(payment)
+
+    if verified_status == "réussi":
+        updated = _apply_payment_success(payment)
+        return {
+            "status": "réussi",
+            "updated": updated,
+            "message": "Paiement confirmé et comptabilisé avec succès via Djomy." if updated else "Paiement déjà confirmé.",
+        }
+    elif verified_status == "échoué":
+        updated = _mark_payment_failed(payment)
+        return {
+            "status": "échoué",
+            "updated": updated,
+            "message": "Paiement marqué comme échoué suite à la vérification Djomy.",
+        }
+    elif verified_status == "en_attente":
+        return {
+            "status": "en_attente",
+            "updated": False,
+            "message": "Transaction toujours en attente chez Djomy.",
+        }
+    else:
+        return {
+            "status": initial_status,
+            "updated": False,
+            "message": "Impossible de récupérer le statut auprès de Djomy (introuvable ou API indisponible).",
+        }
 
 
 def _force_https(url):

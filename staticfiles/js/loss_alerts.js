@@ -114,7 +114,7 @@ function GenerateLossAlertList(response) {
     response.loss_alerts.forEach(function (lossAlert, index) {
         const statusLabel = lossAlert.status_alert_name || 'En attente';
         const typeLabel = lossAlert.type_alert_name || 'Alerte';
-        const imgSrc = lossAlert.principal_image_url || '/static/img/articles/img1.avif';
+        const imgSrc = lossAlert.principal_image_url || '/static/img/default_alert.png';
         const title = escapeHtml(lossAlert.name || 'Alerte de perte');
         const description = escapeHtml(truncateText(lossAlert.description || 'Signalement en attente de details complementaires.', 130));
         const fullUrl = `${window.location.origin}${lossAlert.details_url}`;
@@ -141,7 +141,7 @@ function GenerateLossAlertList(response) {
             <div class="col s12 m6 l4 card-animate" style="${animDelay}">
                 <article class="bf-card bf-alert-card" role="article" aria-labelledby="alert-title-${lossAlert.id}">
                     <a class="bf-card-image" href="${lossAlert.details_url}" aria-label="Voir ${title}">
-                        <img src="${imgSrc}" alt="${title}" loading="lazy">
+                        <img src="${imgSrc}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/default_alert.png';">
                         <span class="bf-card-badge ${toneClass}">
                             <i class="material-icons">campaign</i>
                             ${escapeHtml(statusLabel)}

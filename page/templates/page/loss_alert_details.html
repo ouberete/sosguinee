@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load static custom_filters %}
+{% load static i18n custom_filters %}
 
 {% block title %}Détails de l'alerte - Ensemble 224{% endblock %}
 {% block extra_head %}
 <meta name="description" content="Détails de l'alerte: {{ alert.name }} sur Ensemble 224.">
 <meta property="og:title" content="Alerte - {{ alert.name }}">
 <meta property="og:description" content="{{ alert.description|truncatechars:140 }}">
-<meta property="og:image" content="{{ alert.principal_image|existing_image_url:'img/mylogo.png' }}">
+<meta property="og:image" content="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}">
 {% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
@@ -29,12 +29,33 @@
 
   <section class="section container details-content-section" aria-labelledby="detail-alert-heading">
     <div class="row">
-      <div class="col s12 l5 detail-main-image">
+      <div class="col s12 l6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
-            <span class="badge">{{ alert.status_alert_name }}</span>
-            <img src="{{ alert.principal_image|existing_image_url:'img/hero_1.jpg' }}"
-                 alt="Image alerte {{ alert.name }}" loading="lazy" class="materialboxed">
+            {% if alert.loss_alert_type %}
+              <span class="ws-card-badge-type">
+                <i class="material-icons">category</i> {{ alert.type_alert_name }}
+              </span>
+            {% endif %}
+            {% if alert.status_alert_name == "Résolue" or alert.status_alert_name == "Trouvé" or alert.status_alert_name == "Retrouvé" %}
+              <span class="ws-card-badge-status status-open">
+                <i class="material-icons">check_circle</i> {{ alert.status_alert_name }}
+              </span>
+            {% elif alert.status_alert_name == "Clos" or alert.status_alert_name == "Fermé" %}
+              <span class="ws-card-badge-status status-closed">
+                <i class="material-icons">lock</i> {{ alert.status_alert_name }}
+              </span>
+            {% else %}
+              <span class="ws-card-badge-status status-urgent">
+                <i class="material-icons">campaign</i> {{ alert.status_alert_name }}
+              </span>
+            {% endif %}
+            <img src="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}"
+                 alt="Image alerte {{ alert.name }}" data-caption="{{ alert.name }}" loading="lazy" class="custom-previewable"
+                 onerror="this.onerror=null;this.src='{% static 'img/default_alert.png' %}';">
+            <button type="button" class="image-zoom-hint custom-previewable" data-full-image="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}" data-caption="{{ alert.name }}" aria-label="Agrandir l'image">
+              <i class="material-icons">zoom_in</i>
+            </button>
           </div>
         </div>
         <div class="social-share-buttons">
@@ -44,9 +65,9 @@
           <a href="mailto:?subject=Alerte%20SOS%20Guinée:%20{{ alert.name|urlencode }}&body=Consultez%20cette%20alerte%20sur%20SOS%20Guinée:%20{{ request.build_absolute_uri|urlencode }}" class="social-icon" aria-label="Partager par Email"><i class="material-icons">email</i></a>
         </div>
       </div>
-      <div class="col s12 l7 card-main-details">
+      <div class="col s12 l6 card-main-details">
         <div class="card-panel">
-          <h4 id="detail-alert-heading" style="padding: 20px 24px 0 24px; margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a;">Informations sur l'Alerte</h4>
+          <h4 id="detail-alert-heading" class="detail-heading">Informations sur l'Alerte</h4>
           <div class="details-grid">
             {% if alert.loss_alert_type %}
             <div class="detail-item">
@@ -141,20 +162,38 @@
         <div class="row">
           {% for doc in alert.optional_docs.all %}
           <div class="col s12 m6 l4">
-            <div class="card">
-              <div class="card-image">
-                {% if doc.document|is_image_file %}
-                <img src="{{ doc.document.url }}" alt="Document justificatif de l'alerte" class="materialboxed" loading="lazy">
-                {% else %}
-                <div class="document-preview center-align">
-                  <i class="material-icons large grey-text text-darken-2">description</i>
-                  <p>Document PDF</p>
-                </div>
-                {% endif %}
+            <div class="doc-proof-card">
+              {% if doc.document|is_image_file %}
+              <div class="doc-proof-preview custom-previewable" data-full-image="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="image" title="{% trans 'Cliquer pour agrandir' %}">
+                <span class="doc-proof-badge img">IMAGE</span>
+                <img src="{{ doc.document.url }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" loading="lazy">
               </div>
-              <div class="card-action center-align">
-                <a href="{{ doc.document.url }}" target="_blank" rel="noopener noreferrer" class="btn-small blue waves-effect waves-light">
-                  <i class="material-icons left">file_download</i> Télécharger
+              {% elif doc.document|is_pdf_file %}
+              <div class="doc-proof-preview is-pdf custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="pdf" title="{% trans 'Cliquer pour afficher l’aperçu PDF' %}">
+                <span class="doc-proof-badge pdf">PDF</span>
+                <i class="material-icons large">picture_as_pdf</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% elif doc.document|is_word_file %}
+              <div class="doc-proof-preview is-word custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{{ doc.document|file_extension|lower }}" title="{% trans 'Cliquer pour afficher l’aperçu Word' %}">
+                <span class="doc-proof-badge word">{{ doc.document|file_extension }}</span>
+                <i class="material-icons large">description</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% else %}
+              <div class="doc-proof-preview custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{{ doc.document|file_extension|lower }}" title="{% trans 'Cliquer pour ouvrir l’aperçu' %}">
+                <span class="doc-proof-badge">{{ doc.document|file_extension|default:"DOC" }}</span>
+                <i class="material-icons large grey-text text-darken-2">insert_drive_file</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% endif %}
+
+              <div class="doc-proof-actions">
+                <button type="button" class="btn-flat blue-text text-darken-2 waves-effect custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{% if doc.document|is_image_file %}image{% elif doc.document|is_pdf_file %}pdf{% elif doc.document|is_word_file %}docx{% else %}{{ doc.document|file_extension|lower }}{% endif %}">
+                  <i class="material-icons left">visibility</i> {% trans "Aperçu" %}
+                </button>
+                <a href="{{ doc.document.url }}" download class="btn-flat grey-text text-darken-3 waves-effect" title="{% trans 'Télécharger le document' %}">
+                  <i class="material-icons left">file_download</i> {% trans "Télécharger" %}
                 </a>
               </div>
             </div>
@@ -174,7 +213,6 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     M.Parallax.init(document.querySelectorAll('.parallax'));
-    M.Materialbox.init(document.querySelectorAll('.materialboxed'));
   });
 </script>
 <script src="{% static 'js/comments.js' %}"></script>

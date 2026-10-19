@@ -108,7 +108,7 @@ function renderFundingCard(fundingRequest, index) {
     const daysText = (fundingRequest.days_remaining !== null && fundingRequest.days_remaining !== undefined)
         ? `${fundingRequest.days_remaining} jours restants`
         : 'Sans echeance';
-    const imgSrc = fundingRequest.principal_image_url || '/static/img/articles/img1.avif';
+    const imgSrc = fundingRequest.principal_image_url || '/static/img/default_funding.png';
     const title = escapeHtml(fundingRequest.title || 'Demande de financement');
     const beneficiaryName = escapeHtml(fundingRequest.beneficiary_name || 'Beneficiaire');
     const description = escapeHtml(truncateText(fundingRequest.description_needs || 'Aucune description disponible.', 160));
@@ -146,7 +146,7 @@ function renderFundingCard(fundingRequest, index) {
             <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-${fundingRequest.id}">
                 <div class="ws-card-image-wrap">
                     <a class="ws-card-image" href="${fundingRequest.details_url}" aria-label="Voir ${title}">
-                        <img src="${imgSrc}" alt="${beneficiaryName}" loading="lazy">
+                        <img src="${imgSrc}" alt="${beneficiaryName}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/default_funding.png';">
                     </a>
                     <span class="ws-card-badge-type">
                         <i class="material-icons">category</i> ${escapeHtml(typeLabel)}

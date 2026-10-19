@@ -34,7 +34,11 @@
       <!-- Avatar et Dropdown utilisateur -->
       <li>
         <a class="dropdown-trigger" href="#!" data-target="user-dropdown" aria-label="Menu utilisateur">
-          <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar">
+          {% if user.details.photo %}
+            <img src="{{ user.details.photo.url }}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
+          {% else %}
+            <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar">
+          {% endif %}
           <i class="material-icons right">arrow_drop_down</i>
         </a>
       </li>
@@ -88,16 +92,33 @@
   <li><a href="{% url 'about_us' %}">{% trans "À propos" %}</a></li>
   <li><a href="{% url 'contact' %}">{% trans "Contact" %}</a></li>
   {% if user.is_authenticated %}
-  <li><a href="{% url 'profile' %}">{% trans "Profil" %}</a></li>
-  <li><a href="{% url 'change_password' %}">{% trans "Modifier le mot de passe" %}</a></li>
+  <li>
+    <div class="user-view" style="padding: 18px 16px 12px; margin-bottom: 8px; background: linear-gradient(135deg, #1A2C5B 0%, #152244 100%);">
+      <a href="{% url 'profile' %}">
+        {% if user.details.photo %}
+          <img class="circle" src="{{ user.details.photo.url }}" alt="{% trans 'Profil' %}" style="width: 56px; height: 56px; object-fit: cover; border: 2px solid #ffffff;" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
+        {% else %}
+          <img class="circle" src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" style="width: 56px; height: 56px; object-fit: cover; border: 2px solid #ffffff;">
+        {% endif %}
+      </a>
+      <a href="{% url 'profile' %}"><span class="white-text name" style="font-weight: 700; margin-top: 4px; display: block;">{{ user.get_full_name|default:user.username }}</span></a>
+      <a href="{% url 'profile' %}"><span class="white-text email" style="font-size: 0.82rem; opacity: 0.85; display: block;">{{ user.email }}</span></a>
+    </div>
+  </li>
+  <li><a href="{% url 'profile' %}"><i class="material-icons">account_circle</i>{% trans "Mon Profil" %}</a></li>
+  <li><a href="{% url 'change_password' %}"><i class="material-icons">lock_outline</i>{% trans "Modifier le mot de passe" %}</a></li>
   <li>
     <form action="{% url 'logout' %}" method="post" class="logout-form">
       {% csrf_token %}
-      <button type="submit" class="logout-btn">{% trans "Déconnexion" %}</button>
+      <button type="submit" class="logout-btn" style="display: flex; align-items: center; gap: 16px; padding: 0 32px; width: 100%; text-align: left; height: 48px; background: none; border: none; font-size: 14px; font-weight: 500; color: #d32f2f; cursor: pointer;">
+        <i class="material-icons" style="color: #d32f2f; margin: 0;">exit_to_app</i>{% trans "Déconnexion" %}
+      </button>
     </form>
   </li>
+  <li class="divider"></li>
   {% else %}
-  <li><a href="{% url 'login' %}">{% trans "Connexion" %}</a></li>
+  <li><a href="{% url 'login' %}"><i class="material-icons">login</i>{% trans "Connexion" %}</a></li>
+  <li class="divider"></li>
   {% endif %}
 
   <!-- Sélecteur de langue (mobile) -->

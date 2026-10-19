@@ -356,8 +356,7 @@ class UserInfosForm(forms.ModelForm):
     class Meta:
         model = UserDetails
         fields = [
-            'civility', 'first_name', 'last_name', 'birth_date', 'birth_city',
-            'nationality', 'actual_city', 'zip_code', 'address', 'phone',
+            'civility', 'first_name', 'last_name', 'phone', 'birth_date', 'address',
             'region', 'prefecture', 'commune', 'quarter',
         ]
 
@@ -366,48 +365,45 @@ class ProfileForm(PrivateDocumentValidationMixin, forms.ModelForm):
     class Meta:
         model = UserDetails
         fields = [
-            'civility', 'first_name', 'last_name', 'birth_date', 'birth_city',
-            'nationality', 'actual_city', 'zip_code', 'address', 'phone',
-            'photo', 'id_card', 'id_card_country', 'birth_piece',
-            'birth_piece_country', 'region', 'prefecture', 'commune', 'quarter',
+            'civility', 'first_name', 'last_name', 'phone', 'birth_date', 'address',
+            'photo', 'id_card', 'id_card_country',
+            'region', 'prefecture', 'commune', 'quarter',
         ]
 
     def clean(self):
         cleaned = super().clean()
-        for document, country in (('id_card', 'id_card_country'), ('birth_piece', 'birth_piece_country')):
-            if not (cleaned.get(document) or getattr(self.instance, document, None)):
-                cleaned[country] = None
+        if not (cleaned.get('id_card') or getattr(self.instance, 'id_card', None)):
+            cleaned['id_card_country'] = None
         return cleaned
 
-    # def clean(self):
-    #         cleaned_data = super().clean()
-    #         is_actual_country_as_birth_country = cleaned_data.get('is_actual_country_as_birth_country')
-    #         actual_city = cleaned_data.get('actual_city')
-    #         actual_country = cleaned_data.get('actual_country')
-    #
-    #         if not is_actual_country_as_birth_country:
-    #             if not actual_city:
-    #                 self.add_error('actual_city', 'Veuillez renseigner votre ville.')
-    #             if not actual_country:
-    #                 self.add_error('actual_country', 'Veuillez renseigner votre pays.')
 
 class UserDocumentForm(PrivateDocumentValidationMixin, forms.ModelForm):
-    photo = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.jpg,.jpeg,.png,.webp'}))
-    id_card = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png,.webp'}), label="Pièce d'identité")
-    id_card_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays d'acquisition de la pièce d'identité", widget=forms.Select(attrs={'class': 'form-control'}))
-    birth_piece = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png,.webp'}), label="Carte de naissance")
-    birth_piece_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, required=False, label="Pays d'acquisition de la pièce de naissance", widget=forms.Select(attrs={'class': 'form-control'}))
-  
+    photo = forms.ImageField(
+        required=False,
+        label="Photo de profil",
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.jpg,.jpeg,.png,.webp'})
+    )
+    id_card = forms.FileField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png,.webp'}),
+        label="Pièce d'identité (CNI ou Passeport)"
+    )
+    id_card_country = forms.ChoiceField(
+        choices=UserDetails.COUNTRY_CHOICES,
+        required=False,
+        label="Pays d'émission de la pièce d'identité",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = UserDetails
-        fields = ['photo', 'id_card', 'id_card_country', 'birth_piece', 'birth_piece_country']
+        fields = ['photo', 'id_card', 'id_card_country']
 
     def clean(self):
         cleaned = super().clean()
-        for document, country in (('id_card', 'id_card_country'), ('birth_piece', 'birth_piece_country')):
-            has_document = cleaned.get(document) or getattr(self.instance, document, None)
-            if not has_document:
-                cleaned[country] = None
+        has_document = cleaned.get('id_card') or getattr(self.instance, 'id_card', None)
+        if not has_document:
+            cleaned['id_card_country'] = None
         return cleaned
     
 class UserLinkForm(forms.ModelForm):

@@ -1,93 +1,244 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Politique de confidentialité RGPD - Ensemble 224{% endblock %}
+{% load static i18n %}
+
+{% block title %}{% trans "Politique de confidentialité" %} - Ensemble 224{% endblock %}
+
 {% block extra_head %}
-<meta name="description" content="Politique de confidentialité et informations RGPD de Ensemble 224: données collectées, finalités, durée de conservation, droits et contact.">
-<meta name="keywords" content="Ensemble 224, alerte de perte, trouvaille, demande de financement, SOS, Guinée, dons, aide, support, FAQ">
+{% trans "Politique de confidentialité et protection des données personnelles de Ensemble 224 (Loi L/2016/037/AN et RGPD) : données collectées, sécurité, droits et contact." as meta_desc %}
+{% trans "Politique de confidentialité - Ensemble 224" as og_title %}
+<meta name="description" content="{{ meta_desc }}">
+<meta name="keywords" content="Ensemble 224, confidentialité, protection des données, Guinée, RGPD, sécurité, alertes, dons, financements">
 <meta name="author" content="Ensemble 224">
 <meta name="robots" content="index, follow">
 
-<!-- Métadonnées Open Graph pour Facebook et LinkedIn -->
-<meta property="og:title" content="Politique de confidentialité RGPD - Ensemble 224">
-<meta property="og:description" content="Données collectées, finalités, sécurité, durée de conservation et droits des utilisateurs.">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_desc }}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.ensemble224.org/policy-privacy/">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 <meta property="og:image" content="{% static 'img/og-image.jpg' %}">
 {% endblock extra_head %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
 {% block content %}
 <main role="main">
-
-    <section class="section" aria-labelledby="policy_privacy" >
-<div class="container">
-    <div class="card-panel ">
-        <h2 class="mb-4">Politique de confidentialité RGPD</h2>
-        <p>Chez <strong>Ensemble 224</strong>, nous attachons une grande importance à la protection de votre vie privée et à la sécurité de vos données personnelles. Cette politique de confidentialité vous informe sur la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre plateforme.</p>
-
-        <div class="section my-3">
-            <h5>1. Collecte des informations</h5>
-            <p>Nous collectons différents types d’informations lors de votre utilisation de Ensemble 224, notamment :</p>
-            <ul>
-                <li><strong>Informations personnelles :</strong> nom, prénom, adresse e-mail, numéro de téléphone, etc. Ces données peuvent être accessibles aux personnes cherchant à apporter des solutions pour les alertes et les financements.</li>
-                <li><strong>Informations de compte :</strong> identifiants de connexion, historique de vos actions sur la plateforme.</li>
-            </ul>
-        </div>
-
-        <div class="section my-3">
-            <h5>2. Utilisation des informations</h5>
-            <p>Vos données sont utilisées pour :</p>
-            <ul>
-                <li><strong>Fournir nos services :</strong> traitement et suivi des alertes, gestion des demandes de financement.</li>
-                <li><strong>Communications :</strong> envoi de notifications importantes relatives à votre compte et nos services.</li>
-                <li><strong>Amélioration continue :</strong> analyse de l’utilisation pour optimiser l’expérience utilisateur.</li>
-            </ul>
-        </div>
-
-        <div class="section my-3">
-            <h5>3. Partage des informations</h5>
-            <p>Nous ne partageons vos informations personnelles avec des tiers que dans les cas suivants :</p>
-            <ul>
-                <li><strong>Avec votre consentement explicite.</strong></li>
-                <li><strong>Conformément à la loi :</strong> obligations légales ou judiciaires.</li>
-                <li><strong>Avec les autorités compétentes :</strong> notamment pour l’arbitrage concernant les dons et les biens/proches retrouvés.</li>
-            </ul>
-        </div>
-
-        <div class="section my-3">
-            <h5>4. Sécurité des informations</h5>
-            <p>Nous mettons en œuvre des mesures techniques et organisationnelles rigoureuses pour assurer la sécurité et la confidentialité de vos données contre tout accès non autorisé, perte ou altération.</p>
-        </div>
-
-        <div class="section my-3">
-            <h5>5. Durée de conservation</h5>
-            <p>Les données sont conservées pendant la durée nécessaire au traitement des alertes, demandes, dons, obligations comptables et obligations légales applicables. Les comptes inactifs et les contenus clôturés peuvent être supprimés ou anonymisés lorsque leur conservation n'est plus nécessaire.</p>
-        </div>
-
-        <div class="section my-3">
-            <h5>6. Cookies</h5>
-            <p>Le site utilise des cookies nécessaires à la session, à la sécurité et aux préférences de navigation. Les cookies de mesure d'audience ne sont déposés qu'après consentement lorsqu'un outil d'analytics est activé.</p>
-        </div>
-
-        <div class="section my-3">
-            <h5>7. Vos droits</h5>
-            <p>Conformément à la réglementation en vigueur (notamment le RGPD), vous disposez des droits suivants :</p>
-            <ul>
-                <li><strong>Droit d’accès :</strong> vous pouvez obtenir une copie des données personnelles que nous détenons.</li>
-                <li><strong>Droit de rectification :</strong> modification des informations inexactes ou incomplètes.</li>
-                <li><strong>Droit à l’effacement :</strong> demande de suppression de vos données, sous réserve des obligations légales.</li>
-                <li><strong>Droit de limitation et d’opposition :</strong> vous pouvez demander la limitation du traitement ou vous opposer à certaines utilisations.</li>
-                <li><strong>Droit à la portabilité :</strong> possibilité de recevoir vos données dans un format structuré.</li>
-            </ul>
-            <p>Pour exercer vos droits, veuillez nous contacter via les coordonnées ci-dessous.</p>
-        </div>
-
-        <div class="section my-3">
-            <h5>8. Modifications de la politique de confidentialité</h5>
-            <p>Nous nous réservons le droit de modifier cette politique à tout moment. Les changements seront publiés sur cette page, et vous serez informé par e-mail si les modifications sont significatives.</p>
-        </div>
-
-        {% include "page/components/address_contact.html" %}
+  <!-- En-tête sobre -->
+  <section class="legal-hero-section">
+    <div class="container center-align">
+      <span class="legal-badge">
+        <i class="material-icons tiny">shield</i> {% trans "Protection des données & Vie privée" %}
+      </span>
+      <h1 class="legal-hero-title">{% trans "Politique de confidentialité" %}</h1>
+      <p class="legal-hero-subtitle">
+        {% blocktrans %}Conforme à la législation guinéenne (Loi L/2016/037/AN) et aux standards internationaux de protection des données (RGPD).{% endblocktrans %}
+      </p>
     </div>
-</div>
-    </section>
+  </section>
+
+  <!-- Contenu principal -->
+  <section class="section legal-content-section" aria-labelledby="privacy-heading">
+    <div class="container legal-container">
+      <div class="card-panel legal-card">
+        <div class="legal-intro">
+          <p class="flow-text">
+            {% blocktrans %}Chez <strong>Ensemble 224</strong>, nous attachons une importance primordiale à la protection de votre vie privée, à la confidentialité et à la sécurité de vos informations personnelles. Cette politique détaille les engagements de notre plateforme citoyenne quant à la collecte, au traitement et à la préservation de vos données lorsque vous signalez une alerte, soutenez une cause ou sollicitez un financement.{% endblocktrans %}
+          </p>
+        </div>
+
+        <div class="divider my-4"></div>
+
+        <!-- 1. Cadre légal -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">1</span> {% trans "Cadre juridique et Responsable du traitement" %}
+          </h2>
+          <p>
+            {% blocktrans %}La plateforme <strong>Ensemble 224</strong> est éditée et exploitée en République de Guinée. Les traitements de données à caractère personnel mis en œuvre sur la plateforme respectent scrupuleusement :{% endblocktrans %}
+          </p>
+          <ul class="browser-default legal-list">
+            <li>
+              <strong>{% trans "Le droit guinéen :" %}</strong> {% blocktrans %}La Loi L/2016/037/AN relative à la cybersécurité et à la protection des données à caractère personnel en République de Guinée.{% endblocktrans %}
+            </li>
+            <li>
+              <strong>{% trans "Les standards internationaux (RGPD) :" %}</strong> {% blocktrans %}Le Règlement Général sur la Protection des Données (UE 2016/679) pour les utilisateurs, donateurs et membres de la diaspora établis dans l'Union Européenne.{% endblocktrans %}
+            </li>
+          </ul>
+        </article>
+
+        <!-- 2. Données collectées -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">2</span> {% trans "Données personnelles collectées" %}
+          </h2>
+          <p>{% trans "Nous collectons uniquement les données strictement nécessaires au bon fonctionnement de nos services de solidarité :" %}</p>
+          <ul class="browser-default legal-list">
+            <li>
+              <strong>{% trans "Données d'identification et de contact :" %}</strong> {% trans "Nom, prénom, adresse e-mail, numéro de téléphone (opérateurs Orange, MTN, etc.)." %}
+            </li>
+            <li>
+              <strong>{% trans "Données des alertes et demandes :" %}</strong> {% trans "Description de la perte ou du besoin solidaire, lieu, date, photographies et informations nécessaires à la mobilisation." %}
+            </li>
+            <li>
+              <strong>{% trans "Pièces justificatives d'identité et de situation :" %}</strong> {% blocktrans %}Pour toute demande de financement ou signalement critique, une pièce d'identité officielle (CNI, passeport, carte d'électeur) et des justificatifs (médicaux, attestations) peuvent être demandés afin de vérifier l'authenticité de la demande et prévenir les fraudes.{% endblocktrans %}
+            </li>
+            <li>
+              <strong>{% trans "Données techniques et de connexion :" %}</strong> {% trans "Adresse IP, journaux de connexion et caractéristiques techniques du navigateur pour assurer la sécurité du service." %}
+            </li>
+          </ul>
+        </article>
+
+        <!-- 3. Finalités -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">3</span> {% trans "Finalités et objectifs des traitements" %}
+          </h2>
+          <p>{% trans "Vos données sont traitées pour des finalités précises, explicites et légitimes :" %}</p>
+          <ul class="browser-default legal-list">
+            <li>{% trans "Publication, mise à jour et suivi des alertes de perte de biens ou de personnes." %}</li>
+            <li>{% trans "Gestion, vérification et modération rigoureuse des demandes de financement solidaire." %}</li>
+            <li>{% trans "Mise en relation sécurisée entre les utilisateurs concernés." %}</li>
+            <li>{% trans "Prévention de la fraude, vérification de l'identité des bénéficiaires et protection de la communauté." %}</li>
+            <li>{% trans "Notification par email ou SMS concernant l'état d'avancement des démarches." %}</li>
+          </ul>
+        </article>
+
+        <!-- 4. Paiements et dons -->
+        <article class="legal-article highlight-box">
+          <h2 class="legal-article-title">
+            <span class="legal-num">4</span> {% trans "Paiements sécurisés et absence de conservation des données bancaires" %}
+          </h2>
+          <p>
+            {% blocktrans %}La sécurité de vos contributions est au cœur de nos priorités. Ensemble 224 utilise l'infrastructure de paiement certifiée <strong>Djomy Africa</strong> (opérant avec Orange Money Guinée, MTN Mobile Money et cartes bancaires).{% endblocktrans %}
+          </p>
+          <div class="legal-callout">
+            <i class="material-icons amber-text text-darken-3">lock</i>
+            <p>
+              <strong>{% trans "Règle absolue :" %}</strong> {% blocktrans %}Ensemble 224 <strong>ne collecte, ne transite et ne stocke JAMAIS</strong> vos codes secrets PIN Mobile Money, vos mots de passe bancaires ou vos numéros complets de carte. Toutes les opérations de saisie de code sont réalisées directement et de manière chiffrée sur les serveurs sécurisés de votre opérateur ou de Djomy.{% endblocktrans %}
+            </p>
+          </div>
+        </article>
+
+        <!-- 5. Partage des informations -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">5</span> {% trans "Partage et destinataires des données" %}
+          </h2>
+          <p>{% trans "Ensemble 224 ne vend, ne loue et ne cède aucune donnée personnelle à des fins commerciales ou publicitaires. Vos informations ne sont transmises que dans les cas limitatifs suivants :" %}</p>
+          <ul class="browser-default legal-list">
+            <li>
+              <strong>{% trans "Partage public consenti :" %}</strong> {% blocktrans %}Les informations intégrées volontairement dans une alerte publique (nom du proche recherché, objet, zone géographique, photo) sont visibles des visiteurs pour faciliter les retrouvailles.{% endblocktrans %}
+            </li>
+            <li>
+              <strong>{% trans "Autorités compétentes et cadre légal :" %}</strong> {% blocktrans %}En cas de litige, de signalement frauduleux ou dans le cadre de l'arbitrage légal requis pour la restitution de personnes ou de biens de valeur, les éléments nécessaires peuvent être communiqués aux autorités publiques ou judiciaires compétentes conformément aux lois en vigueur.{% endblocktrans %}
+            </li>
+            <li>
+              <strong>{% trans "Prestataires techniques de confiance :" %}</strong> {% trans "Hébergeur sécurisé et passerelle de paiement (Djomy), agissant sous contrat strict de confidentialité." %}
+            </li>
+          </ul>
+        </article>
+
+        <!-- 6. Sécurité -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">6</span> {% trans "Sécurité et confidentialité" %}
+          </h2>
+          <p>
+            {% blocktrans %}Nous appliquons des mesures de sécurité techniques et organisationnelles renforcées : chiffrement des communications via le protocole HTTPS/TLS, contrôle d'accès strict aux fichiers de vérification d'identité (réservés à la modération autorisée), et sauvegardes régulières pour prévenir toute altération ou perte de données.{% endblocktrans %}
+          </p>
+        </article>
+
+        <!-- 7. Durée de conservation -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">7</span> {% trans "Durée de conservation des données" %}
+          </h2>
+          <p>
+            {% blocktrans %}Les données sont conservées le temps nécessaire à la réalisation des finalités prévues :{% endblocktrans %}
+          </p>
+          <ul class="browser-default legal-list">
+            <li>{% trans "Les alertes résolues ou clôturées sont archivées ou anonymisées." %}</li>
+            <li>{% trans "Les pièces d'identité fournies pour vérification sont conservées de manière sécurisée pendant la durée de validation de la demande, puis archivées conformément aux obligations légales de traçabilité antifraude." %}</li>
+            <li>{% trans "Les comptes inactifs peuvent être supprimés après un délai raisonnable sans activité constatée." %}</li>
+          </ul>
+        </article>
+
+        <!-- 8. Cookies -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">8</span> {% trans "Gestion des cookies et traceurs" %}
+          </h2>
+          <p>
+            {% blocktrans %}La plateforme utilise exclusivement des cookies fonctionnels nécessaires à l'authentification des utilisateurs, à la sécurité CSRF et à la fluidité de navigation. Si un outil de mesure d'audience anonyme est activé, il ne collecte aucune donnée nominative et respecte le choix de consentement exprimé via la bannière dédiée.{% endblocktrans %}
+          </p>
+        </article>
+
+        <!-- 9. Vos droits -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">9</span> {% trans "Vos droits et leur exercice" %}
+          </h2>
+          <p>
+            {% blocktrans %}Conformément à la loi guinéenne 2016/037/AN et au RGPD, vous disposez à tout moment des droits suivants sur vos données :{% endblocktrans %}
+          </p>
+          <div class="row legal-rights-grid">
+            <div class="col s12 m6">
+              <div class="legal-right-item">
+                <i class="material-icons green-text">check_circle</i>
+                <div>
+                  <strong>{% trans "Droit d'accès & copie" %}</strong>
+                  <p>{% trans "Consulter les données que nous détenons à votre sujet." %}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="legal-right-item">
+                <i class="material-icons green-text">edit</i>
+                <div>
+                  <strong>{% trans "Droit de rectification" %}</strong>
+                  <p>{% trans "Corriger ou compléter des informations obsolètes ou inexactes." %}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="legal-right-item">
+                <i class="material-icons green-text">delete</i>
+                <div>
+                  <strong>{% trans "Droit à l'effacement" %}</strong>
+                  <p>{% trans "Demander la suppression de vos données personnelles." %}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col s12 m6">
+              <div class="legal-right-item">
+                <i class="material-icons green-text">block</i>
+                <div>
+                  <strong>{% trans "Droit d'opposition" %}</strong>
+                  <p>{% trans "Vous opposer à certains traitements non essentiels." %}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p>
+            {% blocktrans %}Pour faire valoir l'un de ces droits, adressez-nous simplement votre demande par email à <a href="mailto:contact@ensemble224.org">contact@ensemble224.org</a> en joignant un justificatif d'identité.{% endblocktrans %}
+          </p>
+        </article>
+
+        <!-- 10. Modifications -->
+        <article class="legal-article">
+          <h2 class="legal-article-title">
+            <span class="legal-num">10</span> {% trans "Mise à jour de la politique" %}
+          </h2>
+          <p>
+            {% blocktrans %}Cette politique de confidentialité peut être actualisée pour refléter les évolutions légales ou techniques de la plateforme. La version applicable est celle accessible en ligne à la date de votre consultation.{% endblocktrans %}
+          </p>
+        </article>
+
+        <!-- Bloc Contact unifié -->
+        {% include "page/components/address_contact.html" %}
+      </div>
+    </div>
+  </section>
 </main>
 {% endblock %}

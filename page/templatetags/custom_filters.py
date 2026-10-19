@@ -7,13 +7,28 @@ register = template.Library()
 
 
 @register.filter
-def existing_image_url(image_field, default_path):
+def existing_image_url(image_field, default_path='img/default_placeholder.png'):
     """Return a stored image URL only when the referenced file still exists."""
+    if not default_path:
+        default_path = 'img/default_placeholder.png'
     if image_field and getattr(image_field, 'name', None):
-        storage = image_field.storage
-        if storage.exists(image_field.name):
-            return image_field.url
+        storage = getattr(image_field, 'storage', None)
+        if storage:
+            try:
+                if storage.exists(image_field.name):
+                    return image_field.url
+            except Exception:
+                try:
+                    return image_field.url
+                except Exception:
+                    pass
+        else:
+            try:
+                return image_field.url
+            except Exception:
+                pass
     return static(default_path)
+
 
 @register.filter
 def startswith(value, arg):
@@ -82,3 +97,52 @@ def is_image_file(value):
     filename = getattr(value, "name", str(value))
     extension = os.path.splitext(filename)[1].lower()
     return extension in {".jpg", ".jpeg", ".png", ".webp", ".avif"}
+
+
+@register.filter
+def is_pdf_file(value):
+    """
+    Détermine si un fichier est un document PDF selon son extension.
+    """
+    if not value:
+        return False
+
+    filename = getattr(value, "name", str(value))
+    extension = os.path.splitext(filename)[1].lower()
+    return extension == ".pdf"
+
+
+@register.filter
+def is_word_file(value):
+    """
+    Détermine si un fichier est un document Word (.doc, .docx) selon son extension.
+    """
+    if not value:
+        return False
+
+    filename = getattr(value, "name", str(value))
+    extension = os.path.splitext(filename)[1].lower()
+    return extension in {".doc", ".docx"}
+
+
+@register.filter
+def file_extension(value):
+    """
+    Renvoie l'extension d'un fichier en majuscule sans le point (ex: PDF, DOCX, PNG).
+    """
+    if not value:
+        return ""
+    filename = getattr(value, "name", str(value))
+    ext = os.path.splitext(filename)[1].lower()
+    return ext[1:].upper() if ext.startswith(".") else ext.upper()
+
+
+@register.filter
+def file_basename(value):
+    """
+    Renvoie le nom du fichier sans le chemin relatif.
+    """
+    if not value:
+        return ""
+    filename = getattr(value, "name", str(value))
+    return os.path.basename(filename)

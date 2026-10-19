@@ -8,7 +8,7 @@
 <meta name="description" content="Détails de la demande pour {{ funding_request.beneficiary_name }}.">
 <meta property="og:title" content="Demande - {{ funding_request.beneficiary_name }}">
 <meta property="og:description" content="{{ funding_request.description_needs|truncatechars:100 }}">
-<meta property="og:image" content="{{ funding_request.principal_image|existing_image_url:'img/mylogo.png' }}">
+<meta property="og:image" content="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}">
 {% endblock %}
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
@@ -31,7 +31,7 @@
 
   <section class="section container details-content-section" aria-labelledby="detail-fund-heading">
     <div class="row">
-      <div class="col s12 l5 detail-main-image">
+      <div class="col s12 l6 detail-main-image">
         <div class="card hoverable">
           <div class="card-image">
             {% if funding_request.funding_request_type %}
@@ -60,8 +60,12 @@
                 <i class="material-icons">bolt</i> {{ funding_request.funding_request_status_name }}
               </span>
             {% endif %}
-            <img src="{{ funding_request.principal_image|existing_image_url:'img/hero_1.jpg' }}"
-                 alt="Image demande {{ funding_request.beneficiary_name }}" loading="lazy" class="materialboxed">
+            <img src="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}"
+                 alt="Image demande {{ funding_request.beneficiary_name }}" data-caption="{{ funding_request.title|default:funding_request.beneficiary_name }}" loading="lazy" class="custom-previewable"
+                 onerror="this.onerror=null;this.src='{% static 'img/default_funding.png' %}';">
+            <button type="button" class="image-zoom-hint custom-previewable" data-full-image="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}" data-caption="{{ funding_request.title|default:funding_request.beneficiary_name }}" aria-label="Agrandir l'image">
+              <i class="material-icons">zoom_in</i>
+            </button>
           </div>
         </div>
         <div class="social-share-buttons">
@@ -70,9 +74,9 @@
           <a href="mailto:?subject=Demande%20de%20financement%20SOS%20Guinée:%20{{ funding_request.title|default:funding_request.beneficiary_name|urlencode }}&body=Consultez%20cette%20demande%20de%20financement%20sur%20SOS%20Guinée:%20{{ request.build_absolute_uri|urlencode }}" aria-label="Partager par Email"><i class="material-icons">email</i></a>
         </div>
       </div>
-      <div class="col s12 l7 card-main-details">
+      <div class="col s12 l6 card-main-details">
         <div class="card-panel">
-          <h4 id="detail-fund-heading" style="padding: 20px 24px 0 24px; margin: 0; font-size: 1.5rem; font-weight: 700; color: #0f172a;">Informations sur la Demande</h4>
+          <h4 id="detail-fund-heading" class="detail-heading">Informations sur la Demande</h4>
           <div class="details-grid">
             {% if funding_request.title %}
             <div class="detail-item" style="grid-column: 1 / -1;">
@@ -259,20 +263,38 @@
         <div class="row">
           {% for doc in funding_request.optional_docs.all %}
           <div class="col s12 m6 l4">
-            <div class="card">
-              <div class="card-image">
-                {% if doc.document|is_image_file %}
-                <img src="{{ doc.document.url }}" alt="Document justificatif de la demande de financement" class="materialboxed" loading="lazy">
-                {% else %}
-                <div class="document-preview center-align">
-                  <i class="material-icons large grey-text text-darken-2">description</i>
-                  <p>Document PDF</p>
-                </div>
-                {% endif %}
+            <div class="doc-proof-card">
+              {% if doc.document|is_image_file %}
+              <div class="doc-proof-preview custom-previewable" data-full-image="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="image" title="{% trans 'Cliquer pour agrandir' %}">
+                <span class="doc-proof-badge img">IMAGE</span>
+                <img src="{{ doc.document.url }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" loading="lazy">
               </div>
-              <div class="card-action center-align">
-                <a href="{{ doc.document.url }}" target="_blank" rel="noopener noreferrer" class="btn-small blue waves-effect waves-light">
-                  <i class="material-icons left">file_download</i> Télécharger
+              {% elif doc.document|is_pdf_file %}
+              <div class="doc-proof-preview is-pdf custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="pdf" title="{% trans 'Cliquer pour afficher l’aperçu PDF' %}">
+                <span class="doc-proof-badge pdf">PDF</span>
+                <i class="material-icons large">picture_as_pdf</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% elif doc.document|is_word_file %}
+              <div class="doc-proof-preview is-word custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{{ doc.document|file_extension|lower }}" title="{% trans 'Cliquer pour afficher l’aperçu Word' %}">
+                <span class="doc-proof-badge word">{{ doc.document|file_extension }}</span>
+                <i class="material-icons large">description</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% else %}
+              <div class="doc-proof-preview custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{{ doc.document|file_extension|lower }}" title="{% trans 'Cliquer pour ouvrir l’aperçu' %}">
+                <span class="doc-proof-badge">{{ doc.document|file_extension|default:"DOC" }}</span>
+                <i class="material-icons large grey-text text-darken-2">insert_drive_file</i>
+                <span class="doc-proof-filename">{{ doc.document|file_basename }}</span>
+              </div>
+              {% endif %}
+
+              <div class="doc-proof-actions">
+                <button type="button" class="btn-flat blue-text text-darken-2 waves-effect custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="{% if doc.document|is_image_file %}image{% elif doc.document|is_pdf_file %}pdf{% elif doc.document|is_word_file %}docx{% else %}{{ doc.document|file_extension|lower }}{% endif %}">
+                  <i class="material-icons left">visibility</i> {% trans "Aperçu" %}
+                </button>
+                <a href="{{ doc.document.url }}" download class="btn-flat grey-text text-darken-3 waves-effect" title="{% trans 'Télécharger le document' %}">
+                  <i class="material-icons left">file_download</i> {% trans "Télécharger" %}
                 </a>
               </div>
             </div>
@@ -292,7 +314,6 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     M.Parallax.init(document.querySelectorAll('.parallax'));
-    M.Materialbox.init(document.querySelectorAll('.materialboxed'));
   });
 
   document.addEventListener('DOMContentLoaded', function () {

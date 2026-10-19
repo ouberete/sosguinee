@@ -77,8 +77,7 @@ class ProtectedUserDocumentTests(TestCase):
 
 class ProfileFormTests(TestCase):
     ESSENTIAL_FIELDS = {
-        "civility", "first_name", "last_name", "birth_date", "birth_city",
-        "nationality", "actual_city", "zip_code", "address", "phone",
+        "civility", "first_name", "last_name", "phone", "birth_date", "address",
         "region", "prefecture", "commune", "quarter",
     }
 
@@ -91,20 +90,20 @@ class ProfileFormTests(TestCase):
         self.assertNotIn("profession", ProfileForm.base_fields)
         self.assertNotIn("user_category", ProfileForm.base_fields)
         self.assertNotIn("bio", ProfileForm.base_fields)
+        self.assertNotIn("zip_code", ProfileForm.base_fields)
+        self.assertNotIn("birth_piece", ProfileForm.base_fields)
 
     def test_document_country_is_cleared_without_document(self):
         form = UserDocumentForm(
-            data={"id_card_country": "GN", "birth_piece_country": "FR"}
+            data={"id_card_country": "GN"}
         )
         self.assertTrue(form.is_valid())
         self.assertIsNone(form.cleaned_data["id_card_country"])
-        self.assertIsNone(form.cleaned_data["birth_piece_country"])
 
     def test_documents_and_countries_are_optional(self):
         form = UserDocumentForm(data={})
         self.assertTrue(form.is_valid())
         self.assertFalse(form.fields["id_card_country"].required)
-        self.assertFalse(form.fields["birth_piece_country"].required)
 
     def test_valid_pdf_document_is_accepted(self):
         form = UserDocumentForm(

@@ -1,0 +1,52 @@
+{% load i18n static %}
+<!-- Modal Popup Aperçu Documents & Images Customisé -->
+<div id="sg-image-preview-modal" class="sg-preview-modal" role="dialog" aria-modal="true" aria-hidden="true" style="display: none;">
+  <div class="sg-preview-backdrop"></div>
+  <div class="sg-preview-wrapper">
+    <div class="sg-preview-header">
+      <div class="sg-preview-title-box">
+        <span id="sg-preview-modal-type-badge" class="sg-preview-badge">IMG</span>
+        <span id="sg-preview-modal-caption" class="sg-preview-caption-text">{% trans "Aperçu du document" %}</span>
+      </div>
+      <div class="sg-preview-actions">
+        <a id="sg-preview-external-btn" href="#" target="_blank" rel="noopener noreferrer" class="sg-preview-action-btn" title="{% trans 'Ouvrir dans un nouvel onglet' %}" aria-label="{% trans 'Ouvrir dans un nouvel onglet' %}">
+          <i class="material-icons">open_in_new</i>
+        </a>
+        <a id="sg-preview-download-btn" href="#" download class="sg-preview-action-btn" title="{% trans 'Télécharger le document' %}" aria-label="{% trans 'Télécharger le document' %}">
+          <i class="material-icons">file_download</i>
+        </a>
+        <button type="button" class="sg-preview-close-btn" aria-label="{% trans 'Fermer l’aperçu' %}">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+    </div>
+
+    <div class="sg-preview-stage">
+      <!-- 1. Visualiseur d'Image -->
+      <img id="sg-preview-modal-img" src="" alt="{% trans 'Aperçu agrandi' %}" class="sg-preview-img" style="display: none;">
+
+      <!-- 2. Visualiseur PDF / Iframe -->
+      <iframe id="sg-preview-modal-iframe" class="sg-preview-iframe" src="" title="{% trans 'Aperçu du document PDF' %}" style="display: none;"></iframe>
+
+      <!-- 3. Visualiseur Word Docx (rendu direct via docx-preview) -->
+      <div id="sg-preview-modal-docx" class="sg-preview-docx-container" style="display: none;"></div>
+
+      <!-- 4. Carte d'état / chargement ou fallback Word -->
+      <div id="sg-preview-modal-fallback" class="sg-preview-fallback-card" style="display: none;">
+        <div class="sg-preview-fallback-icon">
+          <i class="material-icons large" id="sg-fallback-icon">description</i>
+        </div>
+        <h4 id="sg-fallback-title" class="sg-fallback-title">Document Word</h4>
+        <p id="sg-fallback-desc" class="sg-fallback-desc">{% trans "Ce document peut être consulté en ligne ou téléchargé." %}</p>
+        <div class="sg-fallback-buttons">
+          <a id="sg-fallback-download-btn" href="#" download class="btn waves-effect waves-light blue darken-3">
+            <i class="material-icons left">file_download</i> {% trans "Télécharger" %}
+          </a>
+          <a id="sg-fallback-office-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-flat waves-effect blue-text text-darken-3">
+            <i class="material-icons left">visibility</i> {% trans "Ouvrir avec Office Viewer" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

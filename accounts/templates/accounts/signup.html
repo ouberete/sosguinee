@@ -64,28 +64,35 @@
         </div>
       {% endif %}
 
-      {% for field in form.visible_fields %}
-        {% if field.name == 'civility' %}
-          <div class="input-field col s12 form-field select-field{% if form.civility.errors %} has-error{% endif %}">
-            <select id="id_civility" name="civility" class="browser-default" required>
-              <option value="" disabled {% if not form.civility.value %}selected{% endif %}>{% trans "Choisir votre civilité" %}</option>
-              {% for value, label in form.civility.field.choices %}
-                {% if value %}
-                  <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
-            <label for="id_civility" class="form-field-label active select-label">
-              {% trans "Civilité" %}<span class="required-mark" aria-hidden="true">*</span>
-            </label>
-            {% for error in form.civility.errors %}
-              <span class="field-error red-text">{{ error }}</span>
-            {% endfor %}
-          </div>
-        {% else %}
-          {% include 'page/includes/form_field.html' with field=field field_width='s12' %}
-        {% endif %}
-      {% endfor %}
+      <!-- Civilité -->
+      <div class="input-field col s12 form-field select-field{% if form.civility.errors %} has-error{% endif %}">
+        <select id="id_civility" name="civility" class="browser-default" required>
+          <option value="" disabled {% if not form.civility.value %}selected{% endif %}>{% trans "Choisir votre civilité" %}</option>
+          {% for value, label in form.civility.field.choices %}
+            {% if value %}
+              <option value="{{ value }}" {% if form.civility.value == value %}selected{% endif %}>{{ label }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+        <label for="id_civility" class="form-field-label active select-label">
+          {% trans "Civilité" %}<span class="required-mark" aria-hidden="true">*</span>
+        </label>
+        {% for error in form.civility.errors %}
+          <span class="field-error red-text">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <!-- Prénom & Nom côte à côte sur écran large -->
+      {% include 'page/includes/form_field.html' with field=form.first_name field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.last_name field_width='m6' %}
+
+      <!-- Nom d'utilisateur & Email côte à côte sur écran large -->
+      {% include 'page/includes/form_field.html' with field=form.username field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.email field_width='m6' %}
+
+      <!-- Mots de passe côte à côte sur écran large -->
+      {% include 'page/includes/form_field.html' with field=form.password1 field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.password2 field_width='m6' %}
 
       {% if turnstile_site_key %}
         <div class="col s12 input-field center-align" style="margin: 20px 0;">

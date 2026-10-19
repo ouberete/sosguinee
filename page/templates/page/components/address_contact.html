@@ -1,9 +1,10 @@
-<div class="section card-action">
-    <h5>Contactez-nous</h5>
-    <p>Pour toute assistance supplémentaire, vous pouvez nous contacter :</p>
-    <ul>
-        <li><strong>Email</strong> : support@ensemble224.org</li>
-        <li><strong>Téléphone</strong> : +224 655 368 588</li>
-        <li><strong>Adresse</strong> : Lambanyi Carrefour Dadis, Lambanyi,Conakry, Rep. Guinée</li>
+{% load i18n %}
+<div class="section card-action address-contact-block">
+    <h5 class="blue-text text-darken-3">{% trans "Besoin d'aide ou d'assistance ?" %}</h5>
+    <p class="grey-text text-darken-2">{% trans "Notre équipe est à votre écoute pour vous orienter et répondre à vos questions :" %}</p>
+    <ul class="browser-default">
+        <li><strong>{% trans "Email" %}</strong> : <a href="mailto:contact@ensemble224.org">contact@ensemble224.org</a></li>
+        <li><strong>{% trans "Téléphone" %}</strong> : <a href="tel:+224655368588">+224 655 368 588</a></li>
+        <li><strong>{% trans "Adresse" %}</strong> : {% trans "Lambanyi, immeuble SHERBROOKE, Conakry, Guinée" %}</li>
     </ul>
 </div>

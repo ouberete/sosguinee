@@ -1,4 +1,4 @@
-﻿{% load custom_filters %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,7 +10,7 @@
 <body>
     <p>Bonjour Madame/Monsieur {{ name }},</p>
     <p>Vous avez payé {{ amount|format_fr }} GNF pour contribuer à <strong>{{ beneficiary_name }}</strong> dans le cadre de <strong>{{ title }}</strong>.</p>
-    <p>Après {{ fees|format_fr }} GNF de frais Djomy, {{ received_amount|format_fr }} GNF ont été reçus par la collecte.</p>
-    <p>Merci pour votre contribution.</p>
+    <p>Votre contribution de {{ amount|format_fr }} GNF a bien été créditée à la collecte.</p>
+    <p>Merci pour votre générosité et votre soutien.</p>
 </body>
 </html>

@@ -144,16 +144,16 @@ class Command(BaseCommand):
                         funding_request=fr,
                         status="réussi",
                     )
-                    total_net = sum(
-                        (p.received_amount if p.received_amount is not None else p.amount)
-                        for p in payments
+                    total_amount = sum(
+                        (p.amount for p in payments),
+                        Decimal("0.00"),
                     )
                     old_amount = fr.amount_received or Decimal("0.00")
                     self.stdout.write(
-                        f"  Collecte #{fr.pk} ({fr.title}): ancien total={old_amount} GNF -> nouveau net={total_net} GNF"
+                        f"  Collecte #{fr.pk} ({fr.title}): ancien total={old_amount} GNF -> nouveau total={total_amount} GNF"
                     )
                     if not dry_run:
-                        fr.amount_received = total_net
+                        fr.amount_received = total_amount
                         fr.save(update_fields=["amount_received", "updated_at"])
                         _finalize_funding_request_status(fr)
                 except Exception as exc:

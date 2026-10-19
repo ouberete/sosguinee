@@ -10,72 +10,117 @@
     <section class="section container profile-shell">
         <div class="row">
             <div class="col s12">
-                <h6 class="center-align">Mon Profil</h6>
-                <div class="card">
+                <div class="card profile-header-card">
                     <div class="card-content">
-                        <div class="row">
-                            <div class="col s12 m4 center-align">
-                                {% if profile.photo %}
-                                <img src="{{ profile.photo.url }}" alt="Photo de profil" class="circle responsive-img z-depth-2" style="width: 150px; height: 150px; object-fit: cover;">
-                                {% else %}
-                                <div class="circle z-depth-2 valign-wrapper center-align blue darken-2 white-text" style="width: 150px; height: 150px; margin: 0 auto; display: flex; justify-content: center; align-items: center; font-size: 3rem;">
-                                    {{ user.first_name|make_list|first|default:""|upper }}{{ user.last_name|make_list|first|default:""|upper }}
-                                    {% if not user.first_name and not user.last_name %}{{ user.username|make_list|first|upper }}{% endif %}
-                                </div>
-                                {% endif %}
-                                <h5 class="mt-2">{{ user.get_full_name }}</h5>
-                                <p class="grey-text">@{{ user.username }}</p>
-                                <p>
-                                    <span class="chip {{ account_status|chip_class }}">
-                                        Statut du compte: {{ account_status|default:"Inactive" }}
-                                    </span>
-                                </p>
-                            </div>
-                            <div class="col s12 m8">
-                                <ul class="collection with-header">
-                                    <li class="collection-header"><h5>Informations Personnelles</h5></li>
-                                    <li class="collection-item"><strong>Email:</strong> {{ user.email }}</li>
-                                    <li class="collection-item"><strong>Téléphone:</strong> {{ profile.phone|default:"Non renseigné" }}</li>
-                                    <li class="collection-item"><strong>Date de naissance:</strong> {{ profile.birth_date|default:"Non renseignée" }}</li>
-<!--                                    <li class="collection-item"><strong>Pays de naissance:</strong> {{ country }}</li>-->
-                                    <li class="collection-item"><strong>Ville de naissance:</strong> {{ profile.birth_city }}</li>
-                                    <li class="collection-item"><strong>Nationalité:</strong> {{ nationality }}</li>
-                                    <li class="collection-item"><strong>Adresse actuelle:</strong> {{ profile.address }}</li>
-<!--                                    <li class="collection-item"><strong>Pays actuel:</strong> {{ profile.actual_country }}</li>-->
-                                    <li class="collection-item"><strong>Ville actuelle:</strong> {{ profile.actual_city }}</li>
-                                    {% if profile.region %}
-                                    <li class="collection-item"><strong>Région:</strong> {{ profile.region.name }}</li>
-                                    {% endif %}
-                                    {% if profile.prefecture %}
-                                    <li class="collection-item"><strong>Préfecture:</strong> {{ profile.prefecture.name }}</li>
-                                    {% endif %}
-                                    {% if profile.commune %}
-                                    <li class="collection-item"><strong>Commune:</strong> {{ profile.commune.name }}</li>
-                                    {% endif %}
-                                    {% if profile.quarter %}
-                                    <li class="collection-item"><strong>Quartier:</strong> {{ profile.quarter.name }}</li>
-                                    {% endif %}
-                                    <li class="collection-item"><strong>Code Postal:</strong> {{ profile.zip_code }}</li>
-                                </ul>
-                            </div>
-                        </div>
-                        {% if profile.id_card %}
-                        <div class="row">
-                            <div class="col s12">
-                                <h5 class="mt-4">Pièce d'identité</h5>
-                                <div class="card-panel center-align">
-                                    {% if ".pdf" in profile.id_card.url|lower %}
-                                    <embed type="application/pdf" src="{{ profile.id_card.url }}" width="100%" height="400px">
+                        <div class="row valign-wrapper profile-header-row">
+                            <!-- Colonne Avatar & Statut -->
+                            <div class="col s12 m4 center-align profile-avatar-col">
+                                <div class="profile-avatar-wrap">
+                                    {% if profile.photo %}
+                                    <img src="{{ profile.photo.url }}" alt="{{ user.get_full_name|default:user.username }}" class="circle responsive-img profile-avatar-img" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
                                     {% else %}
-                                    <img src="{{ profile.id_card.url }}" alt="Pièce d'identité" style="max-width: 100%; height: auto; border-radius: 8px;">
+                                    <div class="circle profile-avatar-placeholder">
+                                        {{ user.first_name|make_list|first|default:""|upper }}{{ user.last_name|make_list|first|default:""|upper }}
+                                        {% if not user.first_name and not user.last_name %}{{ user.username|make_list|first|upper }}{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <h4 class="profile-name">{{ profile.get_civility_display|default:"" }} {{ user.get_full_name|default:user.username }}</h4>
+                                <p class="profile-handle">@{{ user.username }}</p>
+                                <div class="profile-badges">
+                                    <span class="chip profile-status-chip {{ account_status|chip_class }}">
+                                        {{ account_status|default:"Actif" }}
+                                    </span>
+                                    {% if profile.id_card %}
+                                    <span class="chip profile-verified-chip green lighten-4 green-text text-darken-3">
+                                        <i class="material-icons tiny left">verified</i> {% trans "Identité vérifiée" %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Colonne Informations Essentielles -->
+                            <div class="col s12 m8 profile-info-col">
+                                <div class="profile-info-header">
+                                    <h5>{% trans "Informations personnelles" %}</h5>
+                                    <a href="{% url 'update_profile' %}" class="btn-small blue darken-2 waves-effect waves-light edit-profile-btn">
+                                        <i class="material-icons left">edit</i>{% trans "Modifier mon profil" %}
+                                    </a>
+                                </div>
+
+                                <div class="profile-info-grid">
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">email</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Email" %}</span>
+                                            <span class="info-val">{{ user.email }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">phone</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Téléphone" %}</span>
+                                            <span class="info-val">
+                                                {% if profile.phone %}
+                                                    <a href="tel:{{ profile.phone }}">{{ profile.phone }}</a>
+                                                {% else %}
+                                                    <span class="grey-text">{% trans "Non renseigné" %}</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">place</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Localisation" %}</span>
+                                            <span class="info-val">
+                                                {% if profile.quarter or profile.commune or profile.prefecture or profile.region or profile.address %}
+                                                    {{ profile.quarter.name|default:"" }}{% if profile.quarter and profile.commune %}, {% endif %}
+                                                    {{ profile.commune.name|default:"" }}{% if profile.commune and profile.prefecture %}, {% endif %}
+                                                    {{ profile.prefecture.name|default:"" }}{% if not profile.commune and not profile.quarter and not profile.prefecture %}{{ profile.address|default:"" }}{% endif %}
+                                                {% else %}
+                                                    <span class="grey-text">{% trans "Non renseignée" %}</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {% if profile.birth_date %}
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">cake</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Date de naissance" %}</span>
+                                            <span class="info-val">{{ profile.birth_date|date:"d F Y" }}</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">event</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Membre depuis" %}</span>
+                                            <span class="info-val">{{ user.date_joined|date:"F Y" }}</span>
+                                        </div>
+                                    </div>
+
+                                    {% if profile.id_card %}
+                                    <div class="profile-info-item">
+                                        <i class="material-icons">badge</i>
+                                        <div>
+                                            <span class="info-label">{% trans "Pièce d'identité" %}</span>
+                                            <span class="info-val">
+                                                <a href="{{ profile.id_card.url }}" target="_blank" class="blue-text text-darken-2">
+                                                    {% trans "Consulter mon document" %} <i class="material-icons tiny">open_in_new</i>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-                    </div>
-                    <div class="card-action right-align">
-                        <a href="{% url 'update_profile' %}" class="btn orange"><i class="material-icons left">edit</i>Modifier le profil</a>
                     </div>
                 </div>
             </div>
@@ -92,7 +137,7 @@
                             {% for a in alerts %}
                             <article class="profile-mini-card alert-mini-card">
                                 <a class="profile-mini-media" href="{% url 'loss_alert_detail_public' a.public_id %}" aria-label="Voir {{ a.name }}">
-                                    <img src="{% if a.principal_image %}{{ a.principal_image.url }}{% else %}{% static 'img/articles/img1.avif' %}{% endif %}" alt="{{ a.name }}" loading="lazy">
+                                    <img src="{{ a.principal_image|existing_image_url:'img/default_alert.png' }}" alt="{{ a.name }}" loading="lazy" onerror="this.onerror=null;this.src='{% static 'img/default_alert.png' %}';">
                                     <span class="profile-mini-badge {{ a.status_alert_name|chip_class }}">{{ a.status_alert_name }}</span>
                                 </a>
                                 <div class="profile-mini-body">
@@ -149,7 +194,7 @@
                             {% for fr in funding_requests %}
                             <article class="profile-mini-card funding-mini-card">
                                 <a class="profile-mini-media" href="{% url 'funding_request_details_public' fr.public_id %}" aria-label="Voir {{ fr.title|default:fr.beneficiary_name }}">
-                                    <img src="{% if fr.principal_image %}{{ fr.principal_image.url }}{% else %}{% static 'img/articles/img2.avif' %}{% endif %}" alt="{{ fr.title|default:fr.beneficiary_name }}" loading="lazy">
+                                    <img src="{{ fr.principal_image|existing_image_url:'img/default_funding.png' }}" alt="{{ fr.title|default:fr.beneficiary_name }}" loading="lazy" onerror="this.onerror=null;this.src='{% static 'img/default_funding.png' %}';">
                                     <span class="profile-mini-badge {{ fr.funding_request_status_name|chip_class }}">{{ fr.funding_request_status_name }}</span>
                                 </a>
                                 <div class="profile-mini-body">

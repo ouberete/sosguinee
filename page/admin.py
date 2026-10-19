@@ -93,6 +93,67 @@ def resend_selected_emails(modeladmin, request, queryset):
 
 resend_selected_emails.short_description = "Renvoyer les emails selectionnes"
 
+
+def check_djomy_status_action(modeladmin, request, queryset):
+    """
+    Action admin permettant d'interroger l'API Djomy pour vérifier le statut réel
+    des paiements sélectionnés (Donation ou FundPayment). Si confirmé, le paiement
+    est mis à jour, les frais et le montant net sont enregistrés, et le montant
+    reçu sur la demande de financement est automatiquement crédité.
+    """
+    from page.views import reconcile_payment_with_djomy
+
+    confirmed_count = 0
+    failed_count = 0
+    pending_count = 0
+    unchanged_count = 0
+    unresolved_count = 0
+
+    for payment in queryset:
+        result = reconcile_payment_with_djomy(payment)
+        status = result.get("status")
+        updated = result.get("updated")
+
+        if status == "réussi":
+            if updated:
+                confirmed_count += 1
+            else:
+                unchanged_count += 1
+        elif status == "échoué":
+            if updated:
+                failed_count += 1
+            else:
+                unchanged_count += 1
+        elif status == "en_attente":
+            pending_count += 1
+        else:
+            unresolved_count += 1
+
+    msg_parts = []
+    if confirmed_count > 0:
+        msg_parts.append(f"{confirmed_count} paiement(s) confirmé(s) et crédité(s)")
+    if failed_count > 0:
+        msg_parts.append(f"{failed_count} paiement(s) marqué(s) comme échoué(s)")
+    if pending_count > 0:
+        msg_parts.append(f"{pending_count} toujours en attente chez Djomy")
+    if unchanged_count > 0:
+        msg_parts.append(f"{unchanged_count} déjà à jour")
+    if unresolved_count > 0:
+        msg_parts.append(f"{unresolved_count} non résolu(s) (API indisponible ou transaction non trouvée)")
+
+    if not msg_parts:
+        message = "Aucun paiement sélectionné."
+        level = messages.INFO
+    else:
+        message = "Résultat de la vérification Djomy : " + ", ".join(msg_parts) + "."
+        level = messages.SUCCESS if confirmed_count > 0 else (messages.INFO if (pending_count or unchanged_count) else messages.WARNING)
+
+    modeladmin.message_user(request, message, level)
+
+
+check_djomy_status_action.short_description = "Vérifier le statut auprès de Djomy"
+
+
 @admin.register(LossAlert)
 class LossAlertAdmin(admin.ModelAdmin):
     list_display = ('name', 'public_id', 'type_alert_name', 'status_alert_name', 'region', 'prefecture', 'commune', 'quarter', 'date_alert', 'priority_badge')
@@ -163,7 +224,7 @@ class DonationAdmin(admin.ModelAdmin):
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'donor_email')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id', 'provider_transaction_id', 'received_amount', 'fees', 'provider_payment_method', 'provider_currency')
-    actions = [export_as_csv]
+    actions = [check_djomy_status_action, export_as_csv]
 
     def donor_name(self, obj):
         return obj.donor_display_name
@@ -176,7 +237,7 @@ class FundPaymentAdmin(admin.ModelAdmin):
     search_fields = ('public_id', 'donor_first_name', 'donor_last_name', 'funding_request__title')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'transaction_id', 'public_id', 'provider_transaction_id', 'received_amount', 'fees', 'provider_payment_method', 'provider_currency')
-    actions = [export_as_csv]
+    actions = [check_djomy_status_action, export_as_csv]
 
     def funding_request_link(self, obj):
         url = reverse('admin:page_fundingrequest_change', args=[obj.funding_request.id])

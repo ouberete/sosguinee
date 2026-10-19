@@ -112,7 +112,17 @@
                 constrainWidth: false
             }
         });
-        M.Materialbox.init(document.querySelectorAll('.materialboxed'));
+        M.Materialbox.init(document.querySelectorAll('.materialboxed'), {
+            onOpenStart: function () {
+                document.body.classList.add('materialbox-active');
+            },
+            onCloseStart: function () {
+                document.body.classList.remove('materialbox-active');
+            },
+            onCloseEnd: function () {
+                document.body.classList.remove('materialbox-active');
+            }
+        });
         M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 
         // Bouton flottant "+" : on n'utilise PAS M.FloatingActionButton dont
@@ -158,6 +168,8 @@
         });
     });
 </script>
+{% include 'page/components/image_preview_modal.html' %}
+<script src="{% static 'js/image_preview_modal.js' %}"></script>
 {% block extrajs %}{% endblock %}
 </body>
 </html>

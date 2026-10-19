@@ -1,43 +1,89 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Conditions générales d'utilisation - Ensemble 224{% endblock %}
+{% load static i18n %}
+
+{% block title %}{% trans "Conditions générales d'utilisation" %} - Ensemble 224{% endblock %}
+
 {% block extra_head %}
-<meta name="description" content="Conditions générales d'utilisation de Ensemble 224: accès au service, publication d'alertes, demandes de financement, dons et responsabilités.">
+{% trans "Conditions générales d'utilisation de Ensemble 224 : accès au service, publication d'alertes, demandes de financement, dons, modération et responsabilités." as meta_desc %}
+{% trans "Conditions générales d'utilisation - Ensemble 224" as og_title %}
+<meta name="description" content="{{ meta_desc }}">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Conditions générales d'utilisation - Ensemble 224">
-<meta property="og:description" content="Les règles d'utilisation de la plateforme Ensemble 224.">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_desc }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 <meta property="og:image" content="{% static 'img/og-image.jpg' %}">
 {% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="section" aria-labelledby="terms-title">
-  <div class="container">
-    <div class="card-panel legal-page">
-      <h1 id="terms-title">Conditions générales d'utilisation</h1>
-      <p>Les présentes conditions encadrent l'utilisation de la plateforme <strong>Ensemble 224</strong>, qui permet de publier des alertes, de présenter des demandes de financement solidaire et de faciliter la mise en relation entre utilisateurs.</p>
-
-      <h2>1. Accès au service</h2>
-      <p>L'accès au site est ouvert aux visiteurs. Certaines fonctionnalités, comme la gestion d'un profil, la publication, le suivi ou les commentaires, peuvent nécessiter la création d'un compte.</p>
-
-      <h2>2. Responsabilités des utilisateurs</h2>
-      <p>Chaque utilisateur s'engage à fournir des informations exactes, licites et respectueuses des droits d'autrui. Les contenus frauduleux, diffamatoires, trompeurs, discriminatoires ou portant atteinte à la vie privée sont interdits.</p>
-
-      <h2>3. Alertes et demandes de financement</h2>
-      <p>Les publications doivent correspondre à une situation réelle. Ensemble 224 peut modérer, suspendre ou supprimer un contenu lorsqu'il paraît incomplet, abusif, frauduleux ou contraire à l'objet de la plateforme.</p>
-
-      <h2>4. Dons et paiements</h2>
-      <p>Les paiements sont traités par un prestataire externe sécurisé. Ensemble 224 ne demande jamais de communiquer un mot de passe bancaire par message. Les remboursements, contestations ou erreurs de paiement sont étudiés au cas par cas avec les justificatifs disponibles.</p>
-
-      <h2>5. Données personnelles</h2>
-      <p>Le traitement des données personnelles est décrit dans la <a href="{% url 'policy_privacy' %}">politique de confidentialité RGPD</a>.</p>
-
-      <h2>6. Disponibilité</h2>
-      <p>Nous faisons nos meilleurs efforts pour maintenir le site accessible, mais des interruptions peuvent survenir pour maintenance, incident technique ou contrainte externe.</p>
-
-      <h2>7. Modification des conditions</h2>
-      <p>Ces conditions peuvent être mises à jour. La version publiée sur cette page est celle applicable au moment de la consultation.</p>
-
-      {% include "page/components/address_contact.html" %}
+<main role="main">
+  <!-- En-tête sobre -->
+  <section class="legal-hero-section">
+    <div class="container center-align">
+      <span class="legal-badge">
+        <i class="material-icons tiny">gavel</i> {% trans "Cadre d'utilisation & Règles de la plateforme" %}
+      </span>
+      <h1 class="legal-hero-title">{% trans "Conditions générales d'utilisation" %}</h1>
+      <p class="legal-hero-subtitle">
+        {% trans "Les principes, droits et devoirs encadrant l'utilisation des services de Ensemble 224." %}
+      </p>
     </div>
-  </div>
-</section>
+  </section>
+
+  <!-- Contenu principal -->
+  <section class="section legal-content-section" aria-labelledby="terms-title">
+    <div class="container legal-container">
+      <div class="card-panel legal-card">
+        <div class="legal-intro">
+          <p class="flow-text">
+            {% blocktrans %}Les présentes conditions régissent l'accès et l'utilisation de la plateforme <strong>Ensemble 224</strong>, qui permet de publier des alertes citoyennes de perte de biens ou de personnes, de soumettre des demandes de financement solidaire et de faciliter l'entraide communautaire en République de Guinée et avec la diaspora.{% endblocktrans %}
+          </p>
+        </div>
+
+        <div class="divider my-4"></div>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">1</span> {% trans "Accès au service et création de compte" %}</h2>
+          <p>{% blocktrans %}La consultation des alertes publiques et des demandes de financement est libre et accessible à tout visiteur. Pour publier une alerte, lancer une collecte de fonds, commenter ou suivre l'état de ses publications, la création d'un compte utilisateur est requise. L'utilisateur s'engage à fournir des informations exactes et à préserver la confidentialité de ses identifiants.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">2</span> {% trans "Engagements et responsabilités des utilisateurs" %}</h2>
+          <p>{% blocktrans %}Chaque utilisateur s'engage à utiliser la plateforme de manière loyale, licite et respectueuse. Sont formellement prohibés : les fausses alertes, les usurpations d'identité, les tentatives d'escroquerie, les contenus diffamatoires ou injurieux, et toute tentative d'extorsion de fonds sous couvert d'actions caritatives.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">3</span> {% trans "Modération et contrôle des publications" %}</h2>
+          <p>{% blocktrans %}Ensemble 224 se réserve le droit de modérer, refuser, suspendre ou supprimer toute publication (alerte ou collecte de fonds) ne respectant pas les critères d'authenticité, manquant de justificatifs requis (pièce d'identité, documents médicaux) ou faisant l'objet d'un signalement d'abus.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">4</span> {% trans "Dons, financements et prestataires de paiement" %}</h2>
+          <p>{% blocktrans %}Les dons sont traités via notre prestataire de paiement sécurisé agréé <strong>Djomy Africa</strong> (Mobile Money et cartes bancaires). Ensemble 224 n'a accès à aucun code secret ou mot de passe bancaire. Les dons versés sont destinés au bénéficiaire de la demande validée. Les contestations éventuelles sont examinées avec bienveillance au vu des pièces justificatives fournies.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">5</span> {% trans "Protection des données à caractère personnel" %}</h2>
+          <p>{% blocktrans %}Le traitement de vos données personnelles est soumis aux dispositions de la législation guinéenne (Loi L/2016/037/AN) et aux règles du RGPD, telles que détaillées dans notre <a href="{% url 'policy_privacy' %}" class="blue-text text-darken-2 font-weight-bold">Politique de confidentialité</a>.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">6</span> {% trans "Disponibilité et maintenance du service" %}</h2>
+          <p>{% blocktrans %}Nous mettons tout en œuvre pour assurer la disponibilité continue du service 24h/24 et 7j/7. Des interruptions ponctuelles pour maintenance technique, mise à niveau de sécurité ou cas de force majeure peuvent néanmoins survenir sans engager la responsabilité de la plateforme.{% endblocktrans %}</p>
+        </article>
+
+        <article class="legal-article">
+          <h2 class="legal-article-title"><span class="legal-num">7</span> {% trans "Évolution des conditions" %}</h2>
+          <p>{% blocktrans %}Ensemble 224 peut actualiser les présentes conditions générales à tout moment. Les utilisateurs seront informés de toute modification majeure. La version en vigueur est celle publiée sur cette page à la date de votre visite.{% endblocktrans %}</p>
+        </article>
+
+        {% include "page/components/address_contact.html" %}
+      </div>
+    </div>
+  </section>
+</main>
 {% endblock %}

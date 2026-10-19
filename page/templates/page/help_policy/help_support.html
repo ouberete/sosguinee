@@ -1,95 +1,296 @@
-﻿{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %}
+{% load static i18n %}
 
-{% block title %}Aide & Support{% endblock title %}
+{% block title %}{% trans "Centre d'Aide & Support" %} - Ensemble 224{% endblock title %}
+
 {% block extra_head %}
-<meta name="description"
-    content="Trouvez des réponses aux questions fréquentes sur l'utilisation de la plateforme Ensemble 224. Apprenez comment signaler une alerte, une trouvaille ou effectuer un don.">
-<meta name="keywords"
-    content="Ensemble 224, alerte de perte, trouvaille, demande de financement, dons, aide, support, FAQ">
+{% trans "Trouvez des réponses à vos questions sur l'utilisation de Ensemble 224 : alertes de perte, personnes retrouvées, demandes de financement, dons et paiements sécurisés." as meta_desc %}
+{% trans "Aide & Support - Ensemble 224" as og_title %}
+<meta name="description" content="{{ meta_desc }}">
+<meta name="keywords" content="Ensemble 224, aide, support, FAQ, alerte perte, personne retrouvée, financement solidaire, don Guinée, Djomy, Orange Money, MTN MoMo">
 <meta name="author" content="Ensemble 224">
 <meta name="robots" content="index, follow">
 
-<!-- Métadonnées Open Graph pour Facebook et LinkedIn -->
-<meta property="og:title" content="Aide & Support – Ensemble 224">
-<meta property="og:description" content="Besoin d'aide pour utiliser Ensemble 224 ? Consultez notre guide pas à pas.">
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ meta_desc }}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.ensemble224.org/aide-support">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
 <meta property="og:image" content="{% static 'img/og-image.jpg' %}">
 {% endblock extra_head %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/custom_css.css' %}">
+{% endblock %}
+
 {% block content %}
-
-<div class="container my-5">
-    <div class="card-panel">
-        <h2 class="center-align blue-text text-darken-2">Aide & Support</h2>
-        <p class="flow-text">Retrouvez ci-dessous les réponses aux questions fréquemment posées sur l’utilisation de la
-            plateforme <strong>Ensemble 224</strong>.</p>
-        <div class="divider"></div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">📌 Comment signaler une alerte de perte de bien ou de proche ?</h5>
-            <ol class="browser-default">
-                <li>Cliquez sur <strong>"Signaler une perte"</strong>.</li>
-                <li>Remplissez le formulaire avec les détails requis (description, date et lieu).</li>
-                <li>Soumettez l'alerte.</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">📍 Comment suivre une alerte de perte ?</h5>
-            <ol class="browser-default">
-                <li>Connectez-vous à votre compte.</li>
-                <li>Accédez à la section <strong>"Mes alertes"</strong>.</li>
-                <li>Consultez l’état actuel de chaque alerte.</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">🔎 Comment signaler une trouvaille de bien ou de proche ?</h5>
-            <ol class="browser-default">
-                <li>Cliquez sur <strong>"Signaler une trouvaille"</strong>.</li>
-                <li>Remplissez les informations nécessaires.</li>
-                <li>Soumettez le formulaire.</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">💰 Comment ajouter une demande de financement ?</h5>
-            <ol class="browser-default">
-                <li>Connectez-vous à votre compte.</li>
-                <li>Sélectionnez <strong>"Ajouter une demande de financement"</strong>.</li>
-                <li>Indiquez le montant souhaité et la raison de votre demande.</li>
-                <li>Envoyez votre demande.</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">🤝 Comment financer une demande ?</h5>
-            <ol class="browser-default">
-                <li>Allez sur <strong>"Financer une demande"</strong>.</li>
-                <li>Choisissez la demande à soutenir.</li>
-                <li>Effectuez votre don en suivant les instructions.</li>
-            </ol>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">⚖️ Arbitrage et retrait des dons</h5>
-            <p>Le retrait des dons ou des biens/proches retrouvés nécessite l’intervention d’une autorité compétente
-                (l’État). Pour toute question ou assistance concernant cette procédure, contactez-nous via les
-                coordonnées ci-dessous.</p>
-        </div>
-
-        <div class="section">
-            <h5 class="blue-text text-darken-1">💳 Frais de paiement Djomy</h5>
-            <p>Djomy peut appliquer des frais variables selon le moyen de paiement utilisé. Le montant final affiché par
-                le prestataire peut donc différer légèrement du montant saisi avant la redirection. Nous n’affichons
-                plus de montant net estimé sur l’écran de paiement pour éviter toute confusion.</p>
-        </div>
-
-        <div class="section">
-            {% include "page/components/address_contact.html" %}
-        </div>
+<main role="main">
+  <!-- Bannière d'en-tête Aide & Support -->
+  <section class="help-hero-section">
+    <div class="container center-align">
+      <span class="help-hero-badge">
+        <i class="material-icons tiny">help_outline</i> {% trans "Assistance & Foire aux questions" %}
+      </span>
+      <h1 class="help-hero-title">{% trans "Comment pouvons-nous vous aider ?" %}</h1>
+      <p class="help-hero-subtitle">
+        {% trans "Découvrez comment fonctionne la plateforme, comment publier une alerte, lancer un financement ou soutenir une cause en toute sécurité." %}
+      </p>
     </div>
-</div>
+  </section>
 
+  <div class="container help-page-container">
+    <!-- Cartes d'action rapide -->
+    <section class="help-quick-actions" aria-label="{% trans 'Actions rapides' %}">
+      <div class="row">
+        <!-- Action 1 : Alertes -->
+        <div class="col s12 m4">
+          <div class="help-action-card">
+            <div class="help-action-icon icon-alert">
+              <i class="material-icons">campaign</i>
+            </div>
+            <h5>{% trans "Alertes de perte" %}</h5>
+            <p>{% trans "Signalez la disparition d'un proche ou d'un objet précieux pour mobiliser la communauté." %}</p>
+            <a href="{% url 'add_loss_alert' %}" class="btn-flat help-action-btn">
+              {% trans "Signaler une alerte" %} <i class="material-icons right">arrow_forward</i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Action 2 : Financements -->
+        <div class="col s12 m4">
+          <div class="help-action-card">
+            <div class="help-action-icon icon-fund">
+              <i class="material-icons">favorite</i>
+            </div>
+            <h5>{% trans "Financement solidaire" %}</h5>
+            <p>{% trans "Initiez une collecte pour une urgence médicale, des soins ou un besoin communautaire vérifié." %}</p>
+            <a href="{% url 'add_funding_request' %}" class="btn-flat help-action-btn">
+              {% trans "Créer une demande" %} <i class="material-icons right">arrow_forward</i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Action 3 : Dons -->
+        <div class="col s12 m4">
+          <div class="help-action-card">
+            <div class="help-action-icon icon-donate">
+              <i class="material-icons">volunteer_activism</i>
+            </div>
+            <h5>{% trans "Soutenir une cause" %}</h5>
+            <p>{% trans "Contribuez par Orange Money, MTN MoMo ou carte bancaire de façon 100% sécurisée." %}</p>
+            <a href="{% url 'funding_request_list' %}" class="btn-flat help-action-btn">
+              {% trans "Voir les collectes" %} <i class="material-icons right">arrow_forward</i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Accordéon par Thématiques -->
+    <section class="help-faq-section" aria-labelledby="faq-main-heading">
+      <div class="center-align faq-heading-wrap">
+        <h2 id="faq-main-heading" class="faq-main-title">{% trans "Questions Fréquemment Posées" %}</h2>
+        <p class="faq-main-subtitle">{% trans "Cliquez sur une question pour afficher sa réponse détaillée." %}</p>
+      </div>
+
+      <!-- Thème 1 : Alertes de perte et retrouvailles -->
+      <div class="faq-category">
+        <h3 class="faq-category-title">
+          <i class="material-icons red-text text-darken-1">error_outline</i> {% trans "1. Alertes de perte & Retrouvailles" %}
+        </h3>
+        <ul class="collapsible popout">
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment signaler une alerte de perte de bien ou de proche ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>{% trans "Pour publier un signalement :" %}</p>
+              <ol class="browser-default">
+                <li>{% blocktrans %}Rendez-vous sur la page <a href="{% url 'add_loss_alert' %}">Signaler une alerte</a>.{% endblocktrans %}</li>
+                <li>{% trans "Renseignez le nom, la description précise, le lieu exact et la date de la disparition." %}</li>
+                <li>{% trans "Ajoutez une photo claire (fortement recommandé pour augmenter les chances de reconnaissance)." %}</li>
+                <li>{% trans "Soumettez le formulaire. Votre alerte sera instantanément visible sur la plateforme et partageable sur les réseaux sociaux." %}</li>
+              </ol>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment signaler un bien ou un proche que j'ai retrouvé ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Si vous avez retrouvé un objet ou recueilli une personne égarée, vous pouvez également publier une alerte en sélectionnant la catégorie appropriée (Trouvaille) via le formulaire de signalement. Décrivez l'objet sans révéler tous les détails confidentiels (ex. : gardez un élément d'identification pour vérifier le propriétaire légitime).{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment suivre et clôturer mon alerte une fois résolue ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Connectez-vous à votre compte, accédez à la page de votre alerte ou à votre profil. Dès que la personne ou le bien est retrouvé, cliquez sur <strong>« Marquer comme résolu / Clôturer »</strong> afin d'informer la communauté et d'éviter que des recherches inutiles ne continuent.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Thème 2 : Demandes de financement solidaire -->
+      <div class="faq-category">
+        <h3 class="faq-category-title">
+          <i class="material-icons green-text text-darken-1">monetization_on</i> {% trans "2. Demandes de financement solidaire" %}
+        </h3>
+        <ul class="collapsible popout">
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment ajouter une demande de financement ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <ol class="browser-default">
+                <li>{% blocktrans %}Connectez-vous à votre compte et cliquez sur <a href="{% url 'add_funding_request' %}">Ajouter une demande de financement</a>.{% endblocktrans %}</li>
+                <li>{% trans "Indiquez le titre, le nom du bénéficiaire, le montant objectif en Francs Guinéens (GNF), la catégorie et la date d'échéance." %}</li>
+                <li>{% trans "Téléversez une image principale ainsi que les justificatifs nécessaires (pièce d'identité et certificat médical ou attestation)." %}</li>
+                <li>{% trans "Validez votre soumission. Notre équipe examine les pièces pour assurer la crédibilité avant validation finale." %}</li>
+              </ol>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Pourquoi une vérification des pièces justificatives est-elle exigée ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Pour protéger la générosité des donateurs et éviter les tentatives d'usurpation d'identité ou d'escroquerie, chaque demande solidaire fait l'objet d'un contrôle antifraude (pièce d'identité valide, dossier médical/communautaire). Cela garantit un taux de confiance maximal pour les donateurs.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Que signifie le statut « Entièrement financé » ou « Collecté » ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Lorsqu'une demande atteint 100% de son objectif financier, elle affiche le statut <strong>« Collecté »</strong> ou <strong>« Entièrement financé »</strong>. Selon la nature de la demande, la collecte peut être clôturée ou prolongée pour couvrir d'éventuels frais annexes imprévus (convalescence, médicaments).{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Thème 3 : Dons, Paiements et Djomy -->
+      <div class="faq-category">
+        <h3 class="faq-category-title">
+          <i class="material-icons orange-text text-darken-2">payment</i> {% trans "3. Dons & Moyens de paiement sécurisés" %}
+        </h3>
+        <ul class="collapsible popout">
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Quels sont les moyens de paiement acceptés ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>{% trans "En partenariat avec la passerelle certifiée <strong>Djomy Africa</strong>, nous acceptons :" %}</p>
+              <ul class="browser-default">
+                <li><strong>{% trans "Orange Money Guinée" %}</strong> ({% trans "via validation par code OTP sur votre téléphone" %})</li>
+                <li><strong>{% trans "MTN Mobile Money Guinée" %}</strong></li>
+                <li><strong>{% trans "Cartes bancaires (Visa, Mastercard)" %}</strong> {% trans "pour les donateurs résidant en Guinée et à l'étranger (diaspora)." %}</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment fonctionnent les frais de transaction Djomy ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Le prestataire agréé Djomy applique les frais d'acheminement standards des opérateurs télécoms (Orange, MTN) ou bancaires selon le moyen choisi. Le montant débité par l'opérateur inclut ces frais techniques réels. <strong>Ensemble 224 ne prélève aucun frais caché</strong> sur votre don.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Mes coordonnées bancaires ou Mobile Money sont-elles protégées ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}<strong>Oui, à 100%.</strong> Ensemble 224 ne reçoit ni ne stocke jamais votre code secret PIN Mobile Money ou vos identifiants bancaires. Toutes les saisies de sécurité sont directement effectuées sur l'interface sécurisée et chiffrée de votre opérateur téléphonique.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Thème 4 : Sécurité, Modération & Arbitrage légal -->
+      <div class="faq-category">
+        <h3 class="faq-category-title">
+          <i class="material-icons purple-text text-darken-1">gavel</i> {% trans "4. Sécurité, Restitution & Arbitrage" %}
+        </h3>
+        <ul class="collapsible popout">
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Pourquoi l'arbitrage légal ou l'intervention des autorités est-il mentionné ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Pour les cas particulièrement sensibles (enfants ou proches vulnérables retrouvés, biens matériels de très forte valeur, ou litige entre personnes), la remise doit s'effectuer en présence ou sous le constat des autorités compétentes (services de sécurité, police/gendarmerie ou autorité administrative). Cela protège à la fois la personne qui a trouvé le bien et le propriétaire légitime.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+          <li>
+            <div class="collapsible-header">
+              <i class="material-icons blue-text text-darken-2">help</i>
+              <span>{% trans "Comment signaler un abus ou une alerte frauduleuse ?" %}</span>
+              <i class="material-icons arrow-indicator right">expand_more</i>
+            </div>
+            <div class="collapsible-body">
+              <p>
+                {% blocktrans %}Si vous constatez une alerte suspecte ou des commentaires inappropriés, contactez immédiatement l'équipe par email à <a href="mailto:contact@ensemble224.org">contact@ensemble224.org</a> ou via notre page de contact. Nous suspendons immédiatement tout contenu faisant l'objet d'un doute sérieux.{% endblocktrans %}
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Bloc d'assistance et contact -->
+    <section class="section help-bottom-card card-panel">
+      {% include "page/components/address_contact.html" %}
+      <div class="center-align mt-3">
+        <a href="{% url 'contact' %}" class="btn blue darken-2 waves-effect waves-light">
+          <i class="material-icons left">email</i> {% trans "Accéder au formulaire de contact" %}
+        </a>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(elems, {
+      accordion: false // Permet d'ouvrir plusieurs questions si souhaité
+    });
+  });
+</script>
 {% endblock %}
