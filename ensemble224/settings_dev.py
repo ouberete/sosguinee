@@ -19,3 +19,16 @@ SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
+# Désactiver tout cache navigateur / WhiteNoise en développement local
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_MAX_AGE = 0
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+

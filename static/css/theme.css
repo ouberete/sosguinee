@@ -98,11 +98,19 @@ nav.page-nav ul li a:hover {
 }
 
 .nav-avatar {
-    height: 32px;
-    width: 32px;
-    object-fit: cover;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
     vertical-align: middle;
-    margin-right: 8px;
+    margin-right: 6px;
+    flex-shrink: 0;
+    display: inline-block;
 }
 
 .lang-switcher {

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Confirmer la clôture" %}{% endblock %}
+{% block content %}
+<main class="section container">
+  <div class="card" style="max-width: 600px; margin: 40px auto; border-radius: 12px;">
+    <div class="card-content">
+      <span class="card-title" style="font-weight: 700; color: #0f172a;">{% trans "Confirmer la clôture" %}</span>
+      <p style="margin: 16px 0; color: #475569; font-size: 1.05rem;">
+        {% if type == 'funding_request' %}
+          {% trans "Voulez-vous vraiment clôturer cette demande de financement ?" %}
+          <br><strong style="color: #0f172a;">{{ object.title|default:object.beneficiary_name }}</strong>
+        {% else %}
+          {% trans "Voulez-vous vraiment clôturer cette alerte ?" %}
+          <br><strong style="color: #0f172a;">{{ object.name }}</strong>
+        {% endif %}
+      </p>
+      <form method="post" style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+        {% csrf_token %}
+        <button type="submit" class="btn grey darken-2 waves-effect waves-light" style="border-radius: 8px;">
+          <i class="material-icons left">check_circle</i> {% trans "Confirmer la clôture" %}
+        </button>
+        {% if type == 'funding_request' %}
+        <a href="{% url 'funding_request_details_public' object.public_id %}" class="btn-flat" style="border-radius: 8px;">{% trans "Annuler" %}</a>
+        {% else %}
+        <a href="{% url 'loss_alert_detail_public' object.public_id %}" class="btn-flat" style="border-radius: 8px;">{% trans "Annuler" %}</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}
+

@@ -155,8 +155,12 @@ class UpdateUserProfileWizard(LoginRequiredMixin, SessionWizardView):
                 # Handle location fields specially (they are model FKs)
                 if key in ('region', 'prefecture', 'commune', 'quarter'):
                     setattr(user_details, f'{key}_id', value.id if value else None)
+                elif key in ('photo', 'id_card', 'birth_piece') and not value:
+                    # Ne pas écraser les fichiers existants si aucun nouveau fichier n'a été soumis
+                    continue
                 else:
                     setattr(user_details, key, value)
 
         user_details.save()
-        return redirect('/profile')
+        return redirect('profile')
+

@@ -107,7 +107,7 @@
             <div class="collapsible-body">
               <p>{% trans "Pour publier un signalement :" %}</p>
               <ol class="browser-default">
-                <li>{% blocktrans %}Rendez-vous sur la page <a href="{% url 'add_loss_alert' %}">Signaler une alerte</a>.{% endblocktrans %}</li>
+                <li>{% url 'add_loss_alert' as add_alert_url %}{% blocktrans %}Rendez-vous sur la page <a href="{{ add_alert_url }}">Signaler une alerte</a>.{% endblocktrans %}</li>
                 <li>{% trans "Renseignez le nom, la description précise, le lieu exact et la date de la disparition." %}</li>
                 <li>{% trans "Ajoutez une photo claire (fortement recommandé pour augmenter les chances de reconnaissance)." %}</li>
                 <li>{% trans "Soumettez le formulaire. Votre alerte sera instantanément visible sur la plateforme et partageable sur les réseaux sociaux." %}</li>
@@ -155,7 +155,7 @@
             </div>
             <div class="collapsible-body">
               <ol class="browser-default">
-                <li>{% blocktrans %}Connectez-vous à votre compte et cliquez sur <a href="{% url 'add_funding_request' %}">Ajouter une demande de financement</a>.{% endblocktrans %}</li>
+                <li>{% url 'add_funding_request' as add_funding_url %}{% blocktrans %}Connectez-vous à votre compte et cliquez sur <a href="{{ add_funding_url }}">Ajouter une demande de financement</a>.{% endblocktrans %}</li>
                 <li>{% trans "Indiquez le titre, le nom du bénéficiaire, le montant objectif en Francs Guinéens (GNF), la catégorie et la date d'échéance." %}</li>
                 <li>{% trans "Téléversez une image principale ainsi que les justificatifs nécessaires (pièce d'identité et certificat médical ou attestation)." %}</li>
                 <li>{% trans "Validez votre soumission. Notre équipe examine les pièces pour assurer la crédibilité avant validation finale." %}</li>

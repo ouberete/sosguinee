@@ -15,20 +15,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.http import HttpResponse, JsonResponse
-from django.urls import include, path, reverse_lazy
-from django.contrib.auth import views as auth_views
-from django.conf.urls.static import static
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.core.cache import cache
 from django.db import connection
+from django.http import HttpResponse, JsonResponse
+from django.urls import include, path, re_path, reverse_lazy
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.static import serve
+
 from accounts.views.documents import protected_user_document
 from page import views as page_views
 
 
+
 def healthz(request):
+
     """Sonde de vivacité pour Kubernetes/monitoring: pas d'accès base."""
     return JsonResponse({"status": "ok"})
 
@@ -82,6 +87,12 @@ def sitemap_xml(request):
     return HttpResponse(content, content_type="application/xml")
 
 
+@xframe_options_sameorigin
+def public_media(request, path):
+    """Serve public attachments with same-origin framing enabled for previews."""
+    return serve(request, path, document_root=settings.MEDIA_ROOT)
+
+
 urlpatterns = [
     # Pour le changement de langue (set_language)
     path("i18n/", include("django.conf.urls.i18n")),
@@ -93,9 +104,11 @@ urlpatterns = [
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
     # Documents personnels (pièces d'identité...): accès contrôlé par Django.
-    # Déclaré AVANT les patterns statiques de DEBUG pour les intercepter;
+    # Déclaré AVANT les patterns statiques pour les intercepter;
     # en production, nginx/l'ingress route ce préfixe vers Django.
     path("media/user_images/<path:path>", protected_user_document, name="protected_user_document"),
+    # Endpoints API hors i18n (évite les redirections 302 pour fetch / ajax)
+    path("api/", include("page.api_urls")),
 ]
 
 
@@ -111,9 +124,15 @@ urlpatterns  += i18n_patterns(
     path('', include('django_djomy.urls')),
 )
 
+# Route média : sert les images publiques (img/Fundings, img/Alerts, etc.)
+# Ne court-circuite pas /media/user_images/ qui est déclaré plus haut dans urlpatterns.
+urlpatterns += [
+    re_path(r"^media/(?P<path>.*)$", public_media),
+]
+
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 
 handler404 = "page.views.custom_404"

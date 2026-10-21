@@ -363,7 +363,7 @@ class FundingRequest(BaseEntity):
     funding_request_status = models.ForeignKey(FundingRequestStatus, on_delete=models.PROTECT, blank=True, null=True)
     funding_request_type = models.ForeignKey(FundingType, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Type Financement')
     description_needs = models.TextField(verbose_name='Description besoins')
-    principal_image = models.ImageField(upload_to='img/Fundings/', verbose_name='Image Principale')
+    principal_image = models.ImageField(upload_to='img/Fundings/', blank=True, null=True, verbose_name='Image Principale')
     optional_docs = models.ManyToManyField(OptionalFundingDoc, blank=True, verbose_name='Autres documents', related_name='funding_request')
     email = models.CharField(max_length=255, null=True, blank=True, verbose_name='Email')
     phone = models.CharField(max_length=255, verbose_name='Telephone', blank=True, null=True)

@@ -21,13 +21,14 @@
                         {% csrf_token %}
                         {{ wizard.management_form }}
 
-                        {% if form.errors %}
-                            {% for error in form.non_field_errors %}
+                        {% if wizard.form.errors %}
+                            {% for error in wizard.form.non_field_errors %}
                             <div class="card-panel red lighten-4 red-text">
                                 <strong>{{ error }}</strong>
                             </div>
                             {% endfor %}
                         {% endif %}
+
 
                         <div class="row update-profile-fields">
                             {% for field in wizard.form.visible_fields %}

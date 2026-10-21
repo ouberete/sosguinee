@@ -11,7 +11,7 @@
 
 <div class="parallax-container valign-wrapper hero-section">
   <div class="parallax">
-    <img src="{% static 'img/hero_1.jpg' %}" alt="Image de fond inspirante pour Ensemble 224">
+    <img src="{% static 'img/hero_1.png' %}" alt="Image de fond inspirante pour Ensemble 224">
   </div>
   <div class="container center-align white-text hero-content">
     <div class="row">
@@ -109,8 +109,8 @@
       {% for alert in loss_alerts %}
       <div class="col s12 m6 l4">
         <article class="bf-card bf-alert-card" role="article" aria-labelledby="alert-title-{{ alert.id }}">
-          <a class="bf-card-image" href="{% url 'loss_alert_detail_public' alert.public_id %}" aria-label="{% trans 'Voir l alerte' %} {{ alert.name }}">
-            <img src="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}" alt="{{ alert.name }}" loading="lazy" onerror="this.onerror=null;this.src='{% static 'img/default_alert.png' %}';">
+          <a class="bf-card-image image-loading-frame" href="{% url 'loss_alert_detail_public' alert.public_id %}" aria-label="{% trans 'Voir l alerte' %} {{ alert.name }}">
+            <img data-image-loading data-image-fallback="{% static 'img/default_alert.png' %}" src="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}" alt="{{ alert.name }}" loading="lazy">
             <span class="bf-card-badge {% if alert.status_alert_name == 'Clos' or alert.status_alert_name == 'Trouvé' or alert.status_alert_name == 'Résolu' or alert.status_alert_name == 'Retrouvé' %}bf-status-closed{% else %}bf-status-open{% endif %}">
               <i class="material-icons">campaign</i> {{ alert.status_alert_name }}
             </span>
@@ -167,8 +167,8 @@
       <div class="col s12 m12 l4">
         <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-{{ req.id }}">
           <div class="ws-card-image-wrap">
-            <a class="ws-card-image" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
-              <img src="{{ req.principal_image|existing_image_url:'img/default_funding.png' }}" alt="{{ req.beneficiary_name }}" loading="lazy" onerror="this.onerror=null;this.src='{% static 'img/default_funding.png' %}';">
+            <a class="ws-card-image image-loading-frame" href="{% url 'funding_request_details_public' req.public_id %}" aria-label="{% trans 'Voir le projet' %} {{ req.title }}">
+              <img data-image-loading data-image-fallback="{% static 'img/default_funding.png' %}" src="{{ req.principal_image|existing_image_url:'img/default_funding.png' }}" alt="{{ req.beneficiary_name }}" loading="lazy">
             </a>
             <span class="ws-card-badge-type">
               <i class="material-icons">category</i> {{ req.funding_request_type_name }}

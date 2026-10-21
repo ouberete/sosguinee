@@ -140,8 +140,8 @@ function GenerateLossAlertList(response) {
         $('#alerts-container').append(`
             <div class="col s12 m6 l4 card-animate" style="${animDelay}">
                 <article class="bf-card bf-alert-card" role="article" aria-labelledby="alert-title-${lossAlert.id}">
-                    <a class="bf-card-image" href="${lossAlert.details_url}" aria-label="Voir ${title}">
-                        <img src="${imgSrc}" alt="${title}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/default_alert.png';">
+                    <a class="bf-card-image image-loading-frame" href="${lossAlert.details_url}" aria-label="Voir ${title}">
+                        <img data-image-loading data-image-fallback="/static/img/default_alert.png" src="${imgSrc}" alt="${title}" loading="lazy">
                         <span class="bf-card-badge ${toneClass}">
                             <i class="material-icons">campaign</i>
                             ${escapeHtml(statusLabel)}

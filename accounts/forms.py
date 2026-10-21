@@ -81,16 +81,28 @@ class LoginForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
-        ident = cleaned.get('username')
-        pwd   = cleaned.get('password')
+        ident = (cleaned.get('username') or '').strip()
+        pwd = cleaned.get('password')
 
         if ident and pwd:
-            try:
-                user_obj = User.objects.get(Q(username__iexact=ident) | Q(email__iexact=ident))
-            except User.DoesNotExist:
+            candidates = list(
+                User.objects.filter(
+                    Q(username__iexact=ident) | Q(email__iexact=ident)
+                ).order_by('-is_active', '-last_login', '-date_joined')
+            )
+
+            if not candidates:
                 raise forms.ValidationError("Identifiant ou Mot de passe incorrect.")
 
-            if not user_obj.check_password(pwd):
+            # Si plusieurs utilisateurs correspondent (ex: même email sur plusieurs comptes),
+            # on vérifie le mot de passe sur chacun pour identifier le bon compte.
+            user_obj = None
+            for candidate in candidates:
+                if candidate.check_password(pwd):
+                    user_obj = candidate
+                    break
+
+            if user_obj is None:
                 raise forms.ValidationError("Identifiant ou Mot de passe incorrect.")
 
             profile = UserDetails.objects.filter(user=user_obj).order_by('-created_at').first()
@@ -114,9 +126,13 @@ class LoginForm(forms.Form):
                     )
 
             user = authenticate(username=user_obj.username, password=pwd)
-            cleaned['user'] = user or user_obj
+            if not user:
+                user = user_obj
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+            cleaned['user'] = user
 
         return cleaned
+
 
 
 class RegisterForm(UserCreationForm):
@@ -353,12 +369,76 @@ class _LegacyUserInfosFormWithLocations(forms.ModelForm):
 # Canonical profile forms used by the wizard.  Keep the model fields themselves
 # for backwards-compatible data, but do not expose secondary profile metadata.
 class UserInfosForm(forms.ModelForm):
+    civility = forms.ChoiceField(
+        choices=UserDetails.CIVILITY_CHOICES,
+        required=False,
+        label="Civilité",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    first_name = forms.CharField(max_length=100, required=False, label="Prénom", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=100, required=False, label="Nom", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=100, required=False, label="Téléphone", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    birth_date = forms.DateField(
+        required=False,
+        label="Date de naissance",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    address = forms.CharField(max_length=100, required=False, label="Adresse", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all().order_by('name'),
+        required=False,
+        label="Région",
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_region'})
+    )
+    prefecture = forms.ModelChoiceField(
+        queryset=Prefecture.objects.none(),
+        required=False,
+        label="Préfecture",
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_prefecture'})
+    )
+    commune = forms.ModelChoiceField(
+        queryset=Commune.objects.none(),
+        required=False,
+        label="Commune",
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_commune'})
+    )
+    quarter = forms.ModelChoiceField(
+        queryset=Quarter.objects.none(),
+        required=False,
+        label="Quartier",
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_quarter'})
+    )
+
     class Meta:
         model = UserDetails
         fields = [
             'civility', 'first_name', 'last_name', 'phone', 'birth_date', 'address',
             'region', 'prefecture', 'commune', 'quarter',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        region_id = self.data.get(self.add_prefix('region'))
+        prefecture_id = self.data.get(self.add_prefix('prefecture'))
+        commune_id = self.data.get(self.add_prefix('commune'))
+
+        if not region_id and self.instance and self.instance.pk:
+            region_id = self.instance.region_id
+        if not prefecture_id and self.instance and self.instance.pk:
+            prefecture_id = self.instance.prefecture_id
+        if not commune_id and self.instance and self.instance.pk:
+            commune_id = self.instance.commune_id
+
+        try:
+            if region_id:
+                self.fields['prefecture'].queryset = Prefecture.objects.filter(region_id=int(region_id)).order_by('name')
+            if prefecture_id:
+                self.fields['commune'].queryset = Commune.objects.filter(prefecture_id=int(prefecture_id)).order_by('name')
+            if commune_id:
+                self.fields['quarter'].queryset = Quarter.objects.filter(commune_id=int(commune_id)).order_by('name')
+        except (ValueError, TypeError):
+            pass
+
 
 
 class ProfileForm(PrivateDocumentValidationMixin, forms.ModelForm):

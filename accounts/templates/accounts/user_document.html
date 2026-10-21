@@ -20,10 +20,19 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ wizard.management_form }}
+
+                        {% if wizard.form.errors %}
+                            {% for error in wizard.form.non_field_errors %}
+                            <div class="card-panel red lighten-4 red-text">
+                                <strong>{{ error }}</strong>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
                         <div class="row update-profile-fields">
                             {% for field in wizard.form.visible_fields %}
                             {% if field.field.widget.input_type != 'file' %}
-                            <div class="input-field col s12 m6{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
+                            <div class="input-field col s12 m12{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
                                 {{ field }}
                                 {{ field.label_tag }}
                                 {% if field.field.required %}
@@ -34,17 +43,35 @@
                                 {% endif %}
                             </div>
                             {% else %}
-                            <div class="file-field input-field col s12 m12{% if field.errors %} has-error{% endif %}{% if field.field.required %} is-required{% endif %}">
-                                <div class="btn">
-                                    <span>{{ field.label }}{% if field.field.required %} *{% endif %}</span>
-                                    {{ field }}
+                            <div class="col s12 m12 file-upload-group" style="margin-bottom: 20px;">
+                                {% if field.name == 'photo' %}
+                                <div class="avatar-edit-preview-row" style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                                    <div class="avatar-preview-box">
+                                        {% if wizard.form.instance.photo %}
+                                            <img id="preview-photo-img" src="{{ wizard.form.instance.photo.url }}" alt="Photo actuelle" class="circle" style="width: 72px; height: 72px; object-fit: cover; border: 2px solid #1A2C5B; box-shadow: 0 2px 6px rgba(0,0,0,0.12);" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
+                                        {% else %}
+                                            <img id="preview-photo-img" src="{% static 'img/avatar/avatar1.png' %}" alt="Photo par défaut" class="circle" style="width: 72px; height: 72px; object-fit: cover; border: 2px solid #ddd;">
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p style="margin: 0; font-weight: 600; color: #1A2C5B;">{{ field.label }}{% if field.field.required %} *{% endif %}</p>
+                                        <span class="grey-text" style="font-size: 0.85rem;">Formats acceptés : JPG, PNG, WEBP (max. 3 Mo)</span>
+                                    </div>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text" placeholder="Aucun document sélectionné">
+                                {% endif %}
+
+                                <div class="file-field input-field" style="margin-top: 0;">
+                                    <div class="btn blue darken-3 waves-effect waves-light">
+                                        <span><i class="material-icons left">cloud_upload</i>{% if field.name == 'photo' %}Choisir une photo{% else %}Choisir un fichier{% endif %}</span>
+                                        {{ field }}
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text" placeholder="{% if field.name == 'photo' %}Sélectionnez une nouvelle photo de profil{% else %}Aucun document sélectionné{% endif %}">
+                                    </div>
+                                    {% for error in field.errors %}
+                                    <span class="field-error red-text">{{ error }}</span>
+                                    {% endfor %}
                                 </div>
-                                {% for error in field.errors %}
-                                <span class="field-error red-text">{{ error }}</span>
-                                {% endfor %}
                             </div>
                             {% endif %}
                             {% endfor %}
@@ -73,6 +100,9 @@
                     </form>
                 </div>
                 <div class="card-action">
+                    <a href="{% url 'profile' %}" class="btn-flat">
+                        <i class="material-icons left">account_circle</i>Mon Profil
+                    </a>
                     <a href="{% url 'home' %}" class="btn-flat">
                         <i class="material-icons left">home</i>Accueil
                     </a>
@@ -82,3 +112,35 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser les select de Materialize
+    var selects = document.querySelectorAll('select');
+    if (selects.length > 0 && typeof M !== 'undefined') {
+        M.FormSelect.init(selects);
+    }
+    if (typeof M !== 'undefined' && M.updateTextFields) {
+        M.updateTextFields();
+    }
+
+    // Prévisualisation instantanée de la photo de profil choisie
+    var photoInput = document.querySelector('input[type="file"][name$="-photo"]');
+    var previewImg = document.getElementById('preview-photo-img');
+    if (photoInput && previewImg) {
+        photoInput.addEventListener('change', function(e) {
+            var file = e.target.files && e.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(evt) {
+                    previewImg.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+

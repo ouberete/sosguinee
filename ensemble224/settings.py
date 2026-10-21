@@ -70,11 +70,14 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
-# Choix explicite selon DEBUG
-if DEBUG:
-    MEDIA_ROOT = BASE_DIR / "media"
-else:
-    MEDIA_ROOT = BASE_DIR / "mediafiles"
+MEDIA_ROOT = BASE_DIR / "media"
+# Assure la compatibilité si un conteneur ou configuration utilise mediafiles
+if not (BASE_DIR / "mediafiles").exists():
+    try:
+        os.symlink(MEDIA_ROOT, BASE_DIR / "mediafiles")
+    except OSError:
+        pass
+
 
 logger = logging.getLogger(__name__)
 logger.debug("MEDIA_ROOT actif : %s", MEDIA_ROOT)
@@ -373,19 +376,41 @@ if USE_S3:
         raise ImproperlyConfigured(
             "USE_S3=True: AWS_STORAGE_BUCKET_NAME et AWS_PRIVATE_STORAGE_BUCKET_NAME sont obligatoires."
         )
-    STORAGES = {
-        "default": {"BACKEND": "ensemble224.utils.storages.PublicMediaStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
-    }
+    if DEBUG:
+        STORAGES = {
+            "default": {"BACKEND": "ensemble224.utils.storages.PublicMediaStorage"},
+            "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+        }
+    else:
+        STORAGES = {
+            "default": {"BACKEND": "ensemble224.utils.storages.PublicMediaStorage"},
+            "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+        }
 else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-        },
-    }
+    if DEBUG:
+        STORAGES = {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+    else:
+        STORAGES = {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            },
+        }
+
+if DEBUG:
+    # Désactiver le cache statique en local pour rechargement immédiat
+    WHITENOISE_AUTOREFRESH = True
+    WHITENOISE_MAX_AGE = 0
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

@@ -17,7 +17,7 @@
 <main role="main">
   <section class="parallax-container valign-wrapper hero-section hero-details-page" aria-label="Bannière détails demande de financement">
     <div class="parallax">
-      <img src="{% static 'img/hero_2.jpg' %}" alt="Image de fond pour les détails de demande de financement">
+      <img src="{% static 'img/hero_1.png' %}" alt="Image de fond pour les détails de demande de financement">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
@@ -33,7 +33,7 @@
     <div class="row">
       <div class="col s12 l6 detail-main-image">
         <div class="card hoverable">
-          <div class="card-image">
+          <div class="card-image image-loading-frame">
             {% if funding_request.funding_request_type %}
               <span class="ws-card-badge-type">
                 <i class="material-icons">category</i> {{ funding_request.funding_request_type }}
@@ -60,10 +60,10 @@
                 <i class="material-icons">bolt</i> {{ funding_request.funding_request_status_name }}
               </span>
             {% endif %}
-            <img src="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}"
+            <img data-image-loading data-image-fallback="{% static 'img/default_funding.png' %}" src="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}"
                  alt="Image demande {{ funding_request.beneficiary_name }}" data-caption="{{ funding_request.title|default:funding_request.beneficiary_name }}" loading="lazy" class="custom-previewable"
-                 onerror="this.onerror=null;this.src='{% static 'img/default_funding.png' %}';">
-            <button type="button" class="image-zoom-hint custom-previewable" data-full-image="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}" data-caption="{{ funding_request.title|default:funding_request.beneficiary_name }}" aria-label="Agrandir l'image">
+                 >
+            <button type="button" class="image-zoom-hin$t custom-previewable" data-full-image="{{ funding_request.principal_image|existing_image_url:'img/default_funding.png' }}" data-caption="{{ funding_request.title|default:funding_request.beneficiary_name }}" aria-label="Agrandir l'image">
               <i class="material-icons">zoom_in</i>
             </button>
           </div>
@@ -259,15 +259,16 @@
     {% if funding_request.optional_docs.exists %}
     <div class="row">
       <div class="col s12">
-        <h4>Autres documents et preuves</h4>
+        <h4>{% trans 'Autres documents et preuves' %}</h4>
         <div class="row">
           {% for doc in funding_request.optional_docs.all %}
           <div class="col s12 m6 l4">
             <div class="doc-proof-card">
               {% if doc.document|is_image_file %}
+              <!-- On garde data-full-image pour que le JS d'origine le reconnaisse, et on garde le cache-busting -->
               <div class="doc-proof-preview custom-previewable" data-full-image="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="image" title="{% trans 'Cliquer pour agrandir' %}">
                 <span class="doc-proof-badge img">IMAGE</span>
-                <img src="{{ doc.document.url }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" loading="lazy">
+                <img src="{{ doc.document.url }}?v={{ doc.updated_at|date:'U' }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" loading="lazy">
               </div>
               {% elif doc.document|is_pdf_file %}
               <div class="doc-proof-preview is-pdf custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="pdf" title="{% trans 'Cliquer pour afficher l’aperçu PDF' %}">
@@ -325,7 +326,6 @@
       closeOnClick: true
     });
   });
-
 </script>
 <script src="{% static 'js/comments.js' %}"></script>
 {% endblock %}

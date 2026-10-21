@@ -761,6 +761,17 @@
     background: #f1f5f9;
 }
 
+.doc-proof-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 6px;
+    display: block;
+    margin: auto;
+}
+
 .doc-proof-preview.is-pdf {
     background: #fef2f2;
 }
@@ -912,7 +923,7 @@
     height: 0;
     padding-bottom: 60%; /* ~3:2 aspect ratio */
     overflow: hidden;
-    background-color: #f0f0f0;
+    background-color: #f8fafc;
 }
 
 .bf-card-image img {
@@ -921,7 +932,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #f8fafc;
     display: block;
     transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -1148,7 +1160,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #f8fafc;
     display: block;
     transition: transform 0.5s ease;
 }
@@ -2695,7 +2708,7 @@ textarea:focus-visible {
 
 .contact-hero-section {
     min-height: 520px;
-    background-image: linear-gradient(rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.48)), url("../img/hero_1.jpg");
+    background-image: linear-gradient(rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.48)), url("../img/hero_1.png");
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -2799,12 +2812,33 @@ textarea:focus-visible {
     box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
 }
 
-.contact-illustration-card img,
+.contact-illustration-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    padding: 18px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.contact-illustration-card img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 260px;
+    object-fit: contain;
+}
+
 .about-story-visual img {
     display: block;
     width: 100%;
-    height: 280px;
-    object-fit: cover;
+    max-width: 100%;
+    height: auto;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: 14px;
 }
 
 .contact-illustration-copy {
@@ -2857,7 +2891,16 @@ textarea:focus-visible {
 .about-story-visual {
     overflow: hidden;
     border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
     box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    height: 100%;
+    min-height: 280px;
+    box-sizing: border-box;
 }
 
 .about-value-card,
@@ -2945,7 +2988,8 @@ textarea:focus-visible {
 
     .contact-illustration-card img,
     .about-story-visual img {
-        height: 220px;
+        height: auto;
+        max-height: 220px;
     }
 }
 
@@ -5498,4 +5542,31 @@ body:has(.update-profile-page) .main-wrapper > main {
     }
 }
 
+
+.image-loading-frame {
+    position: relative;
+}
+
+.image-loading-frame[data-image-state="loading"]::after,
+.image-loading-frame[data-image-state="failed"]::after {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    color: #475569;
+    background: rgba(241, 245, 249, 0.92);
+    font-size: 0.9rem;
+    text-align: center;
+    pointer-events: none;
+}
+
+.image-loading-frame[data-image-state="loading"]::after {
+    content: "Chargement de l’image…";
+}
+
+.image-loading-frame[data-image-state="failed"]::after {
+    content: "Image indisponible";
+}
 

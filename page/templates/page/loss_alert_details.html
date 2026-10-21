@@ -15,7 +15,7 @@
 <main role="main">
   <section class="parallax-container valign-wrapper hero-section hero-details-page" aria-label="Bannière détails alerte">
     <div class="parallax">
-      <img src="{% static 'img/hero_3.jpg' %}" alt="Image de fond pour les détails d'alerte">
+      <img src="{% static 'img/hero_1.png' %}" alt="Image de fond pour les détails d'alerte">
     </div>
     <div class="container center-align white-text hero-content">
       <div class="row">
@@ -31,7 +31,7 @@
     <div class="row">
       <div class="col s12 l6 detail-main-image">
         <div class="card hoverable">
-          <div class="card-image">
+          <div class="card-image image-loading-frame">
             {% if alert.loss_alert_type %}
               <span class="ws-card-badge-type">
                 <i class="material-icons">category</i> {{ alert.type_alert_name }}
@@ -50,9 +50,9 @@
                 <i class="material-icons">campaign</i> {{ alert.status_alert_name }}
               </span>
             {% endif %}
-            <img src="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}"
+            <img data-image-loading data-image-fallback="{% static 'img/default_alert.png' %}" src="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}"
                  alt="Image alerte {{ alert.name }}" data-caption="{{ alert.name }}" loading="lazy" class="custom-previewable"
-                 onerror="this.onerror=null;this.src='{% static 'img/default_alert.png' %}';">
+                 >
             <button type="button" class="image-zoom-hint custom-previewable" data-full-image="{{ alert.principal_image|existing_image_url:'img/default_alert.png' }}" data-caption="{{ alert.name }}" aria-label="Agrandir l'image">
               <i class="material-icons">zoom_in</i>
             </button>
@@ -166,7 +166,7 @@
               {% if doc.document|is_image_file %}
               <div class="doc-proof-preview custom-previewable" data-full-image="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="image" title="{% trans 'Cliquer pour agrandir' %}">
                 <span class="doc-proof-badge img">IMAGE</span>
-                <img src="{{ doc.document.url }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" loading="lazy">
+                <img src="{{ doc.document.url }}" alt="{{ doc.document|file_basename }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" loading="lazy">
               </div>
               {% elif doc.document|is_pdf_file %}
               <div class="doc-proof-preview is-pdf custom-previewable" data-document-url="{{ doc.document.url }}" data-caption="{{ doc.document|file_basename }}" data-document-type="pdf" title="{% trans 'Cliquer pour afficher l’aperçu PDF' %}">

@@ -79,6 +79,51 @@ def _normalize_label(value):
     return re.sub(r"[^a-z0-9]+", " ", text).strip()
 
 
+def _safe_image_url(image_field, instance=None):
+    if image_field and getattr(image_field, 'name', None):
+        name = str(image_field.name).strip()
+        if name:
+            try:
+                if image_field.storage.exists(name):
+                    return image_field.url
+            except Exception:
+                pass
+            try:
+                from django.conf import settings
+                clean_name = name.lstrip('/')
+                for candidate_root in [getattr(settings, 'MEDIA_ROOT', None), settings.BASE_DIR / 'media', settings.BASE_DIR / 'mediafiles']:
+                    if candidate_root and os.path.exists(os.path.join(candidate_root, clean_name)):
+                        return image_field.url
+            except Exception:
+                pass
+            try:
+                if getattr(image_field, 'url', None):
+                    return image_field.url
+            except Exception:
+                pass
+
+    # Repli sur le premier document image des documents complémentaires
+    target_instance = instance or getattr(image_field, 'instance', None)
+    if not target_instance and hasattr(image_field, 'optional_docs'):
+        target_instance = image_field
+
+    if target_instance and hasattr(target_instance, 'optional_docs'):
+        try:
+            for doc in target_instance.optional_docs.all():
+                doc_file = getattr(doc, 'document', None)
+                if doc_file and getattr(doc_file, 'name', None):
+                    filename = str(doc_file.name).lower()
+                    if any(filename.endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.webp', '.avif')):
+                        url = _safe_image_url(doc_file)
+                        if url:
+                            return url
+        except Exception:
+            pass
+
+    return ''
+
+
+
 def _find_status_by_keywords(queryset, keywords):
     normalized_keywords = tuple(_normalize_label(k) for k in keywords if k)
     for status in queryset:
@@ -721,7 +766,6 @@ def delete_funding_request(request, public_id):
 
 
 @login_required
-@require_POST
 def close_funding_request(request, public_id):
     """Clôturer une demande de financement (marquer comme terminée)"""
     fr = FundingRequest.objects.filter(public_id=public_id).first()
@@ -729,6 +773,9 @@ def close_funding_request(request, public_id):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette demande."}, status=403)
         return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette demande.")
+
+    if request.method == 'GET':
+        return render(request, 'page/confirm_close.html', {'object': fr, 'type': 'funding_request'})
 
     # Une clôture manuelle reste distincte de l'atteinte de l'objectif.
     closed_status = _resolve_or_create_status(
@@ -759,7 +806,6 @@ def close_funding_request(request, public_id):
 
 
 @login_required
-@require_POST
 def close_loss_alert(request, public_id):
     """Clôturer une alerte de perte (marquer comme trouvé/résolu)"""
     alert = LossAlert.objects.filter(public_id=public_id).first()
@@ -767,6 +813,9 @@ def close_loss_alert(request, public_id):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': "Vous n'êtes pas autorisé à clôturer cette alerte."}, status=403)
         return HttpResponseForbidden("Vous n'êtes pas autorisé à clôturer cette alerte.")
+
+    if request.method == 'GET':
+        return render(request, 'page/confirm_close.html', {'object': alert, 'type': 'loss_alert'})
 
     # Trouver le statut "Trouvé" ou "Résolu" ou "Retrouvé" ou "Clos"
     found_status = _resolve_or_create_status(
@@ -1193,7 +1242,7 @@ class FundingRequestListView(View):
                     'description_needs': element.description_needs,
                     'funding_request_type_name': element.funding_request_type_name,
                     'funding_request_status': element.funding_request_status_name,  # Utilise la propriété funding_request_status_name
-                    'principal_image_url': element.principal_image.url if element.principal_image else '',
+                    'principal_image_url': _safe_image_url(element.principal_image, instance=element),
                     'id': element.id,
                     'public_id': str(element.public_id),
                     'progress': element.progress,  # Utilise la propriété progress
@@ -1204,10 +1253,10 @@ class FundingRequestListView(View):
                     'amount_received': element.amount_received,
                     'remaining_amount': element.remaining_amount,
                     'can_fund': element.can_receive_contributions,
-                    'details_url': "/funding-request-details/"+str(element.public_id)+"/",
-                    'payment_url': "/funding/"+str(element.public_id)+"/djomy/",
+                    'details_url': reverse('funding_request_details_public', kwargs={'public_id': element.public_id}),
+                    'payment_url': reverse('djomy_funding_public', kwargs={'public_id': element.public_id}),
                     'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
-                    'close_url': "/funding-request/"+str(element.public_id)+"/close/",
+                    'close_url': reverse('close_funding_request', kwargs={'public_id': element.public_id}),
                 }
                 for element in page_obj
             ],
@@ -1278,7 +1327,7 @@ class LossAlertListView(View):
                     'name': element.name,
                     'description': element.description,
                     'status_alert_name': element.status_alert_name,  # Utilise la propriété status_alert_name
-                    'principal_image_url': element.principal_image.url if element.principal_image else '',
+                    'principal_image_url': _safe_image_url(element.principal_image, instance=element),
                     'type_alert_name': element.type_alert_name,  # Utilise la propriété type_alert_name
                     'date_alert': element.date_alert,
                     'hour_alert': element.hour_alert,
@@ -1289,10 +1338,10 @@ class LossAlertListView(View):
                     'address': element.address or '',
                     'id': element.id,
                     'public_id': str(element.public_id),
-                    'details_url': "/loss-alert-details/"+str(element.public_id)+"/",  # URL des détails de l'alerte
+                    'details_url': reverse('loss_alert_detail_public', kwargs={'public_id': element.public_id}),  # URL des détails de l'alerte
                     'phone': element.phone or '',
                     'is_creator': request.user.is_authenticated and element.created_by_id == request.user.id,
-                    'close_url': "/loss-alert/"+str(element.public_id)+"/close/",
+                    'close_url': reverse('close_loss_alert', kwargs={'public_id': element.public_id}),
                 }
                 for element in page_obj
             ],

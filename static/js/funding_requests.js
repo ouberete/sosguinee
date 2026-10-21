@@ -145,8 +145,8 @@ function renderFundingCard(fundingRequest, index) {
         <div class="col s12 m6 l4 card-animate" style="${animDelay}">
             <article class="ws-card ws-funding-card" role="article" aria-labelledby="fund-title-${fundingRequest.id}">
                 <div class="ws-card-image-wrap">
-                    <a class="ws-card-image" href="${fundingRequest.details_url}" aria-label="Voir ${title}">
-                        <img src="${imgSrc}" alt="${beneficiaryName}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/default_funding.png';">
+                    <a class="ws-card-image image-loading-frame" href="${fundingRequest.details_url}" aria-label="Voir ${title}">
+                        <img data-image-loading data-image-fallback="/static/img/default_funding.png" src="${imgSrc}" alt="${beneficiaryName}" loading="lazy">
                     </a>
                     <span class="ws-card-badge-type">
                         <i class="material-icons">category</i> ${escapeHtml(typeLabel)}

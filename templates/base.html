@@ -15,8 +15,10 @@
     <meta property="og:image" content="{% static 'img/mylogo.png' %}">
     <meta name="twitter:card" content="summary_large_image">
 
-    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,29 +75,36 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
 <script>
+    document.addEventListener('load', function (event) {
+        var image = event.target;
+        if (!(image instanceof HTMLImageElement) || !image.matches('[data-image-loading]')) return;
+        var frame = image.parentElement;
+        if (frame) frame.dataset.imageState = 'loaded';
+    }, true);
+
     document.addEventListener('error', function (event) {
         var image = event.target;
-        if (!(image instanceof HTMLImageElement) || image.dataset.fallbackApplied) return;
-        var fallback = document.body.getAttribute('data-image-fallback');
-        if (!fallback || image.currentSrc === fallback) return;
+        if (!(image instanceof HTMLImageElement) || !image.matches('[data-image-loading]')) return;
+        var frame = image.parentElement;
+        if (image.dataset.fallbackApplied || !image.dataset.imageFallback) {
+            if (frame) frame.dataset.imageState = 'failed';
+            return;
+        }
         image.dataset.fallbackApplied = 'true';
-        image.loading = 'eager';
-        image.src = fallback;
+        if (frame) frame.dataset.imageState = 'loading';
+        image.src = image.dataset.imageFallback;
     }, true);
 
     document.addEventListener('DOMContentLoaded', function () {
-        function replaceBrokenImages() {
-            var fallback = document.body.getAttribute('data-image-fallback');
-            if (!fallback) return;
-            document.querySelectorAll('img').forEach(function (image) {
-                if (image.naturalWidth > 0 || image.dataset.fallbackApplied) return;
-                image.dataset.fallbackApplied = 'true';
-                image.loading = 'eager';
-                image.src = fallback;
-            });
-        }
-        replaceBrokenImages();
-        window.setTimeout(replaceBrokenImages, 1500);
+        document.querySelectorAll('img[data-image-loading]').forEach(function (image) {
+            var frame = image.parentElement;
+            if (!frame) return;
+            if (image.complete && image.naturalWidth > 0) {
+                frame.dataset.imageState = 'loaded';
+            } else {
+                frame.dataset.imageState = 'loading';
+            }
+        });
 
         if (!window.M) return;
 

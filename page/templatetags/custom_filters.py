@@ -11,23 +11,54 @@ def existing_image_url(image_field, default_path='img/default_placeholder.png'):
     """Return a stored image URL only when the referenced file still exists."""
     if not default_path:
         default_path = 'img/default_placeholder.png'
+
+    # 1. Vérification du champ image direct
     if image_field and getattr(image_field, 'name', None):
-        storage = getattr(image_field, 'storage', None)
-        if storage:
-            try:
-                if storage.exists(image_field.name):
-                    return image_field.url
-            except Exception:
+        name = str(image_field.name).strip()
+        if name:
+            storage = getattr(image_field, 'storage', None)
+            if storage:
                 try:
-                    return image_field.url
+                    if storage.exists(name):
+                        return image_field.url
                 except Exception:
                     pass
-        else:
+            # Fallback direct disk check in media roots
             try:
-                return image_field.url
+                from django.conf import settings
+                clean_name = name.lstrip('/')
+                for candidate_root in [getattr(settings, 'MEDIA_ROOT', None), settings.BASE_DIR / 'media', settings.BASE_DIR / 'mediafiles']:
+                    if candidate_root and os.path.exists(os.path.join(candidate_root, clean_name)):
+                        return image_field.url
             except Exception:
                 pass
+            # Dernier recours si image_field a une url valide
+            try:
+                if getattr(image_field, 'url', None):
+                    return image_field.url
+            except Exception:
+                pass
+
+    # 2. Si aucune image principale valide, repli sur le premier document image des documents complémentaires
+    target_instance = getattr(image_field, 'instance', None)
+    if not target_instance and hasattr(image_field, 'optional_docs'):
+        target_instance = image_field
+
+    if target_instance and hasattr(target_instance, 'optional_docs'):
+        try:
+            for doc in target_instance.optional_docs.all():
+                doc_file = getattr(doc, 'document', None)
+                if doc_file and getattr(doc_file, 'name', None):
+                    filename = str(doc_file.name).lower()
+                    if any(filename.endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.webp', '.avif')):
+                        url = existing_image_url(doc_file, None)
+                        if url:
+                            return url
+        except Exception:
+            pass
+
     return static(default_path)
+
 
 
 @register.filter

@@ -33,13 +33,13 @@
       {% if user.is_authenticated %}
       <!-- Avatar et Dropdown utilisateur -->
       <li>
-        <a class="dropdown-trigger" href="#!" data-target="user-dropdown" aria-label="Menu utilisateur">
+        <a class="dropdown-trigger" href="#!" data-target="user-dropdown" aria-label="Menu utilisateur" style="display: inline-flex; align-items: center;">
           {% if user.details.photo %}
-            <img src="{{ user.details.photo.url }}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
+            <img src="{{ user.details.photo.url }}" alt="{% trans 'Profil' %}" class="circle nav-avatar" onerror="this.onerror=null;this.src='{% static 'img/avatar/avatar1.png' %}';">
           {% else %}
-            <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle responsive-img nav-avatar">
+            <img src="{% static 'img/avatar/avatar1.png' %}" alt="{% trans 'Profil' %}" class="circle nav-avatar">
           {% endif %}
-          <i class="material-icons right">arrow_drop_down</i>
+          <i class="material-icons right" style="margin-left: 2px;">arrow_drop_down</i>
         </a>
       </li>
       {% else %}
