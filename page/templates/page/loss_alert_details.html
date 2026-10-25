@@ -130,7 +130,7 @@
                 <i class="material-icons left">call</i> Contacter
               </a>
               {% endif %}
-              {% if user == alert.created_by %}
+              {% if user == alert.created_by and alert.status_alert_name != "Résolue" and alert.status_alert_name != "Résolu" and alert.status_alert_name != "Trouvé" and alert.status_alert_name != "Trouvée" and alert.status_alert_name != "Retrouvé" and alert.status_alert_name != "Retrouvée" and alert.status_alert_name != "Clos" and alert.status_alert_name != "Fermé" %}
               <form method="post" action="{% url 'close_loss_alert' alert.public_id %}" style="display:inline;" class="close-form">
                 {% csrf_token %}
                 <button type="submit" class="btn waves-effect waves-light grey darken-1" onclick="return confirm('Voulez-vous vraiment clôturer cette alerte ?')" aria-label="Clôturer l'alerte">

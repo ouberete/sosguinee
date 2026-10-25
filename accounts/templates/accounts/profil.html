@@ -151,7 +151,12 @@
                                 <div class="profile-entity-actions">
                                     <a class="btn-small red darken-2 waves-effect waves-light" href="{% url 'loss_alert_detail_public' a.public_id %}">Voir</a>
                                     <div class="profile-actions-group">
+                                        {% if a.status_alert_name == "En attente" %}
                                         <a class="btn-flat btn-small" href="{% url 'edit_loss_alert' a.public_id %}">Modifier</a>
+                                        {% endif %}
+                                        {% if a.status_alert_name != "Trouvé" and a.status_alert_name != "Retrouvé" and a.status_alert_name != "Résolu" and a.status_alert_name != "Résolue" and a.status_alert_name != "Clos" and a.status_alert_name != "Fermé" %}
+                                        <a class="btn-flat btn-small orange-text text-darken-2" href="{% url 'close_loss_alert' a.public_id %}">Clôturer</a>
+                                        {% endif %}
                                         <a class="btn-flat btn-small red-text" href="{% url 'delete_loss_alert' a.public_id %}" onclick="return confirm('Voulez-vous vraiment supprimer cette alerte ? Cette action est irréversible.');">Supprimer</a>
                                     </div>
                                 </div>
@@ -222,7 +227,12 @@
                                 <div class="profile-entity-actions">
                                     <a class="btn-small orange darken-2 waves-effect waves-light" href="{% url 'funding_request_details_public' fr.public_id %}">Voir</a>
                                     <div class="profile-actions-group">
+                                        {% if fr.funding_request_status_name == "En attente" %}
                                         <a class="btn-flat btn-small" href="{% url 'edit_funding_request' fr.public_id %}">Modifier</a>
+                                        {% endif %}
+                                        {% if fr.funding_request_status_name != "Clos" and fr.funding_request_status_name != "Clôturé" and fr.funding_request_status_name != "Clôturée" and fr.funding_request_status_name != "Terminé" %}
+                                        <a class="btn-flat btn-small orange-text text-darken-2" href="{% url 'close_funding_request' fr.public_id %}">Clôturer</a>
+                                        {% endif %}
                                         <a class="btn-flat btn-small red-text" href="{% url 'delete_funding_request' fr.public_id %}" onclick="return confirm('Voulez-vous vraiment supprimer cette demande de financement ? Cette action est irréversible.');">Supprimer</a>
                                     </div>
                                 </div>

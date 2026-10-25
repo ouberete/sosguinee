@@ -231,7 +231,7 @@
                 <i class="material-icons left">payments</i> Financer
               </a>
               {% endif %}
-              {% if user == funding_request.created_by %}
+              {% if user == funding_request.created_by and funding_request.funding_request_status_name != "Clos" and funding_request.funding_request_status_name != "Clôturé" and funding_request.funding_request_status_name != "Clôturée" %}
               <form method="post" action="{% url 'close_funding_request' funding_request.public_id %}" style="display:inline;" class="close-form">
                 {% csrf_token %}
                 <button type="submit" class="btn waves-effect waves-light grey darken-1" onclick="return confirm('Voulez-vous vraiment clôturer cette demande de financement ?')" aria-label="Clôturer la demande">
