@@ -43,8 +43,8 @@ def backfill_locations(apps, schema_editor):
         for name, qid in name_to_id.items():
             try:
                 cursor.execute(
-                    f"UPDATE {table_name} SET quarter_id = ?, commune_id = ?, prefecture_id = ?, region_id = ? "  # nosec B608
-                    f"WHERE quarter_id = ?",
+                    f"UPDATE {table_name} SET quarter_id = %s, commune_id = %s, prefecture_id = %s, region_id = %s "  # nosec B608
+                    f"WHERE quarter_id = %s",
                     [qid, commune.id, prefecture.id, region.id, name]
                 )
             except Exception:
