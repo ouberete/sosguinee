@@ -54,15 +54,15 @@ def backfill_locations(apps, schema_editor):
         # 4) Set default placeholders for rows with NULL location fields
         try:
             cursor.execute(
-                f"UPDATE {table_name} SET region_id = ? WHERE region_id IS NULL",  # nosec B608
+                f"UPDATE {table_name} SET region_id = %s WHERE region_id IS NULL",  # nosec B608
                 [region.id]
             )
             cursor.execute(
-                f"UPDATE {table_name} SET prefecture_id = ? WHERE prefecture_id IS NULL",  # nosec B608
+                f"UPDATE {table_name} SET prefecture_id = %s WHERE prefecture_id IS NULL",  # nosec B608
                 [prefecture.id]
             )
             cursor.execute(
-                f"UPDATE {table_name} SET commune_id = ? WHERE commune_id IS NULL",  # nosec B608
+                f"UPDATE {table_name} SET commune_id = %s WHERE commune_id IS NULL",  # nosec B608
                 [commune.id]
             )
         except Exception:
