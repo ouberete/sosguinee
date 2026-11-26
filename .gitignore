@@ -26,3 +26,9 @@ staticfiles/
 Thumbs.db
 .DS_Store
 .claude/
+
+docker-compose.prod.yml
+docker-compose.dev.yml
+dockerfile
+entrypoint.sh
+nginx.conf
