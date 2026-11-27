@@ -68,7 +68,8 @@
 
         <article class="legal-article">
           <h2 class="legal-article-title"><span class="legal-num">5</span> {% trans "Protection des données à caractère personnel" %}</h2>
-          <p>{% blocktrans %}Le traitement de vos données personnelles est soumis aux dispositions de la législation guinéenne (Loi L/2016/037/AN) et aux règles du RGPD, telles que détaillées dans notre <a href="{% url 'policy_privacy' %}" class="blue-text text-darken-2 font-weight-bold">Politique de confidentialité</a>.{% endblocktrans %}</p>
+          {% url 'policy_privacy' as policy_url %}
+          <p>{% blocktrans %}Le traitement de vos données personnelles est soumis aux dispositions de la législation guinéenne (Loi L/2016/037/AN) et aux règles du RGPD, telles que détaillées dans notre <a href="{{ policy_url }}" class="blue-text text-darken-2 font-weight-bold">Politique de confidentialité</a>.{% endblocktrans %}</p>
         </article>
 
         <article class="legal-article">
