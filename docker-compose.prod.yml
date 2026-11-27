@@ -1,0 +1,109 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: always
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  web:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    environment:
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
+      - ENVIRONMENT=production
+      - DEBUG=0
+      - SECRET_KEY=${SECRET_KEY}
+      - USE_POSTGRES=True
+      - POSTGRES_HOST=db
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-127.0.0.1,localhost}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      - ASYNC_EMAIL_ENABLED=${ASYNC_EMAIL_ENABLED:-False}
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    volumes:
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/mediafiles
+    depends_on:
+      - web
+    restart: always
+
+  celery_worker:
+    build: .
+    command: celery -A ensemble224 worker -l info -Q default,email
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
+      - ENVIRONMENT=production
+      - DEBUG=0
+      - SECRET_KEY=${SECRET_KEY}
+      - USE_POSTGRES=True
+      - POSTGRES_HOST=db
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      - ASYNC_EMAIL_ENABLED=${ASYNC_EMAIL_ENABLED:-False}
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  celery_beat:
+    build: .
+    command: celery -A ensemble224 beat -l info
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=ensemble224.settings_prod
+      - ENVIRONMENT=production
+      - DEBUG=0
+      - SECRET_KEY=${SECRET_KEY}
+      - USE_POSTGRES=True
+      - POSTGRES_HOST=db
+      - POSTGRES_NAME=${POSTGRES_NAME:-ensemble224}
+      - POSTGRES_DB=${POSTGRES_DB:-ensemble224}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND:-redis://redis:6379/0}
+      - ASYNC_EMAIL_ENABLED=${ASYNC_EMAIL_ENABLED:-False}
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+volumes:
+  pgdata:
+  static_volume:
+  media_volume:
