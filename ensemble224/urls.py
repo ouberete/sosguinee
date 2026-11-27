@@ -17,6 +17,8 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from django.urls import translate_url
+from django.views.i18n import set_language as django_set_language
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
@@ -30,6 +32,20 @@ from django.views.static import serve
 from accounts.views.documents import protected_user_document
 from page import views as page_views
 
+
+
+def set_language(request):
+    """Switch languages while keeping the visitor on the equivalent page."""
+    if request.method == "POST":
+        language = request.POST.get("language")
+        next_url = request.POST.get("next")
+        if language and next_url:
+            translated_url = translate_url(next_url, language)
+            if translated_url:
+                post_data = request.POST.copy()
+                post_data["next"] = translated_url
+                request.POST = post_data
+    return django_set_language(request)
 
 
 def healthz(request):
@@ -95,7 +111,7 @@ def public_media(request, path):
 
 urlpatterns = [
     # Pour le changement de langue (set_language)
-    path("i18n/", include("django.conf.urls.i18n")),
+    path("i18n/setlang/", set_language, name="set_language"),
     # Webhook externe: hors i18n pour garder une URL stable côté PSP.
     path("djomy/webhook/", page_views.djomy_webhook, name="djomy_webhook"),
     # Sonde de santé (probes Kubernetes, load balancer)

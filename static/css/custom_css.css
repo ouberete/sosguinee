@@ -151,7 +151,58 @@
 
 
 
-/* Align password fields side‑by‑side on large screens */
+
+
+
+/* Ensure flex rows align items at the start so error messages don’t affect column height */
+@media only screen and (min-width: 992px) {
+  .auth-form .row {
+    align-items: flex-start;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .auth-form .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+  }
+  .auth-form .input-field.col.l6 {
+    flex: 0 0 48%;
+    max-width: 48%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin-bottom: 1.5rem; /* space for possible error message */
+    position: relative;
+  }
+  .auth-form .input-field.col.l6 .field-error {
+    position: absolute;
+    left: 0;
+    bottom: -1.2rem; /* place below the field without shifting others */
+    width: 100%;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .auth-form .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.65rem; /* match Materialize gutter */
+    margin-right: -0.65rem;
+  }
+  .auth-form .input-field.col.l6 {
+    flex: 0 0 48%;
+    max-width: 48%;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+    margin-bottom: 0;
+  }
+  .auth-form .input-field.col.l6:last-child {
+    margin-right: 0;
+  }
+}
+
 @media only screen and (min-width: 992px) {
   .auth-form .input-field.col.l6 {
     display: inline-block;

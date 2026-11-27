@@ -1,0 +1,2388 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-27 11:59+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+#: accounts/templates/accounts/account_created.html:4
+msgid "Compte créé"
+msgstr ""
+
+#: accounts/templates/accounts/account_created.html:15
+msgid "Compte créé avec succès"
+msgstr ""
+
+#: accounts/templates/accounts/account_created.html:17
+msgid ""
+"Un lien d'activation vous a été envoyé par e-mail. Veuillez cliquer sur ce "
+"lien pour activer votre compte avant de vous connecter."
+msgstr ""
+
+#: accounts/templates/accounts/account_created.html:22
+msgid "Aller à la page de connexion"
+msgstr ""
+
+#: accounts/templates/accounts/account_created.html:25
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:32
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:32
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:32
+#: page/templates/page/confirmation_page/confirmation_payment.html:40
+#: page/templates/page/donation.html:28 templates/404.html:11
+msgid "Retour à l'accueil"
+msgstr ""
+
+#: accounts/templates/accounts/change_password.html:4
+#: accounts/templates/accounts/change_password.html:15
+msgid "Changer le mot de passe"
+msgstr ""
+
+#: accounts/templates/accounts/change_password.html:16
+msgid "Sécurisez votre compte en mettant à jour votre mot de passe"
+msgstr ""
+
+#: accounts/templates/accounts/change_password.html:39
+msgid "Mettre à jour le mot de passe"
+msgstr ""
+
+#: accounts/templates/accounts/change_password.html:47
+msgid "Retour au profil"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:6
+#: page/templates/page/components/nav.html:47
+#: page/templates/page/components/nav.html:120
+msgid "Connexion"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:15
+#: accounts/templates/accounts/resend_activation.html:13
+#: accounts/templates/accounts/reset_password.html:14
+#: accounts/templates/accounts/signup.html:15
+msgid "Retour à l’accueil Ensemble 224"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:17
+msgid "Heureux de vous revoir"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:18
+msgid "Connectez-vous pour gérer vos alertes et vos actions solidaires"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:34
+msgid "Continuer avec Google"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:37
+msgid "Continuer avec Facebook"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:40
+msgid "Continuer avec Apple"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:43
+#, python-format
+msgid "Continuer avec %(name)s"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:50
+msgid "Ou avec email"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:80
+msgid "Afficher le mot de passe"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:87
+#: accounts/templates/accounts/resend_activation.html:47
+#: accounts/templates/accounts/signup.html:125
+msgid "Se connecter"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:91
+msgid "Connexion en cours…"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:98
+msgid "Mot de passe oublié ?"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:101
+#: accounts/templates/accounts/resend_activation.html:39
+msgid "Renvoyer le lien d'activation"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:104
+msgid "Pas encore de compte ?"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:105
+msgid "S'inscrire gratuitement"
+msgstr ""
+
+#: accounts/templates/accounts/login.html:135
+msgid "Connexion..."
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:36
+msgid "Identité vérifiée"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:45
+msgid "Informations personnelles"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:47
+#: accounts/templates/accounts/update_profile.html:149
+msgid "Modifier mon profil"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:55 page/forms.py:402
+#: page/templates/page/about.html:163
+#: page/templates/page/components/address_contact.html:6
+msgid "Email"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:63 django_djomy/models.py:16
+#: page/templates/page/about.html:170
+#: page/templates/page/components/address_contact.html:7
+#: page/templates/page/contact.html:49
+msgid "Téléphone"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:68
+msgid "Non renseigné"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:77
+#: accounts/templates/accounts/update_profile.html:164
+msgid "Localisation"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:84
+msgid "Non renseignée"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:94
+msgid "Date de naissance"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:103
+msgid "Membre depuis"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:112
+msgid "Pièce d'identité"
+msgstr ""
+
+#: accounts/templates/accounts/profil.html:115
+msgid "Consulter mon document"
+msgstr ""
+
+#: accounts/templates/accounts/resend_activation.html:4
+msgid "Renvoyer l'email d'activation"
+msgstr ""
+
+#: accounts/templates/accounts/resend_activation.html:15
+msgid "Activer votre compte"
+msgstr ""
+
+#: accounts/templates/accounts/resend_activation.html:16
+msgid "Indiquez l'email ou le nom d'utilisateur associé à votre compte"
+msgstr ""
+
+#: accounts/templates/accounts/resend_activation.html:46
+msgid "Déjà activé ?"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:5
+msgid "Réinitialiser le mot de passe"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:16
+msgid "Mot de passe oublié"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:17
+msgid "Entrez votre email pour recevoir les instructions de réinitialisation"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:40
+msgid "Envoyer le lien"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:44
+#: page/templates/page/contact.html:116
+msgid "Envoi en cours…"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:51
+msgid "Vous vous souvenez de votre mot de passe ?"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:52
+msgid "Retourner à la connexion"
+msgstr ""
+
+#: accounts/templates/accounts/reset_password.html:73
+msgid "Envoi..."
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:6
+msgid "Inscription"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:17
+msgid "Créer un compte"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:18
+msgid "Rejoignez la communauté citoyenne et solidaire de Guinée"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:34
+msgid "S'inscrire avec Google"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:37
+msgid "S'inscrire avec Facebook"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:40
+msgid "S'inscrire avec Apple"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:43
+#, python-format
+msgid "S'inscrire avec %(name)s"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:50
+msgid "Ou formulaire classique"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:70
+msgid "Choisir votre civilité"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:78
+msgid "Civilité"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:106
+msgid "Afficher les mots de passe"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:113
+msgid "Créer mon compte"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:117
+msgid "Inscription en cours…"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:124
+msgid "Vous possédez déjà un compte ?"
+msgstr ""
+
+#: accounts/templates/accounts/signup.html:159
+msgid "Inscription..."
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:6
+msgid "Modification du profil"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:153
+msgid ""
+"Complétez vos informations étape par étape. Le style de cette page reprend "
+"celui de votre profil pour garder une lecture cohérente."
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:160
+msgid "Infos basiques"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:168
+msgid "Bio et réseaux"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:192
+msgid "Précédent"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:199
+msgid "Suivant"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:203
+msgid "Enregistrer"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:212
+msgid "Voir mon profil"
+msgstr ""
+
+#: accounts/templates/accounts/update_profile.html:215
+#: page/templates/page/components/mobile_app_bar.html:6
+#: page/templates/page/components/nav.html:87 page/templates/page/index.html:5
+msgid "Accueil"
+msgstr ""
+
+#: django_djomy/models.py:12
+msgid "ID Transaction Djomy"
+msgstr ""
+
+#: django_djomy/models.py:13 templates/djomy/detail_statut.html:142
+msgid "Référence Marchand"
+msgstr ""
+
+#: django_djomy/models.py:14 templates/djomy/detail_statut.html:146
+#: templates/djomy/liste_liens.html:168 templates/djomy/liste_liens.html:237
+msgid "Montant"
+msgstr ""
+
+#: django_djomy/models.py:15
+msgid "Devise"
+msgstr ""
+
+#: django_djomy/models.py:17 page/templates/page/loss_alerts.html:43
+#: templates/djomy/detail_statut.html:150 templates/djomy/liste_liens.html:170
+#: templates/djomy/liste_liens.html:238
+msgid "Statut"
+msgstr ""
+
+#: django_djomy/models.py:18
+msgid "URL de Paiement"
+msgstr ""
+
+#: django_djomy/models.py:20
+msgid "Payload Webhook"
+msgstr ""
+
+#: django_djomy/models.py:26
+msgid "Paiement Djomy"
+msgstr ""
+
+#: django_djomy/models.py:27
+msgid "Paiements Djomy"
+msgstr ""
+
+#: ensemble224/settings.py:223
+msgid "Français"
+msgstr ""
+
+#: ensemble224/settings.py:224
+msgid "English"
+msgstr ""
+
+#: page/forms.py:107
+#, python-format
+msgid "Vous pouvez ajouter au maximum %(max_files)s documents."
+msgstr ""
+
+#: page/forms.py:119
+#, python-format
+msgid ""
+"La taille du fichier doit être inférieure à %(max_size)s. Taille actuelle: "
+"%(current_size)s."
+msgstr ""
+
+#: page/forms.py:129
+#, python-format
+msgid ""
+"Type de fichier non autorisé (%(extension)s). Formats autorisés: %(allowed)s."
+msgstr ""
+
+#: page/forms.py:253 page/forms.py:362
+#, python-format
+msgid ""
+"Image principale non autorisée (%(extension)s). Formats autorisés: "
+"%(allowed)s."
+msgstr ""
+
+#: page/forms.py:279 page/forms.py:388
+#, python-format
+msgid ""
+"L'image principale doit être inférieure à %(max_size)s. Taille actuelle: "
+"%(current_size)s."
+msgstr ""
+
+#: page/forms.py:401
+msgid "Veuillez renseigner votre nom."
+msgstr ""
+
+#: page/forms.py:401
+msgid "Nom"
+msgstr ""
+
+#: page/forms.py:402
+msgid "Veuillez renseigner votre email."
+msgstr ""
+
+#: page/forms.py:403
+msgid "Veuillez renseigner votre message."
+msgstr ""
+
+#: page/forms.py:403
+msgid "Message"
+msgstr ""
+
+#: page/templates/page/about.html:4 page/templates/page/about.html:18
+#: page/templates/page/components/footer.html:19
+#: page/templates/page/components/nav.html:27
+#: page/templates/page/components/nav.html:92
+msgid "À propos"
+msgstr ""
+
+#: page/templates/page/about.html:6
+msgid ""
+"En savoir plus sur la mission, les principes d'action et l'engagement de "
+"Ensemble 224."
+msgstr ""
+
+#: page/templates/page/about.html:7 page/templates/page/about.html:20
+#: page/templates/page/about.html:25
+msgid "À propos de Ensemble 224"
+msgstr ""
+
+#: page/templates/page/about.html:8
+msgid ""
+"Découvrez comment Ensemble 224 facilite la solidarité en Guinée à travers "
+"les alertes et les financements."
+msgstr ""
+
+#: page/templates/page/about.html:26
+msgid ""
+"Une plateforme citoyenne pour signaler, mobiliser, vérifier et soutenir, "
+"avec un objectif simple : rendre l'entraide plus visible et plus efficace."
+msgstr ""
+
+#: page/templates/page/about.html:34
+msgid "Vision"
+msgstr ""
+
+#: page/templates/page/about.html:35
+msgid "Pourquoi Ensemble 224 existe"
+msgstr ""
+
+#: page/templates/page/about.html:36
+msgid ""
+"Dans de nombreuses situations, l'information circule mal, l'urgence n'est "
+"pas structurée et la solidarité manque d'outils fiables. Ensemble 224 "
+"cherche à combler ce manque."
+msgstr ""
+
+#: page/templates/page/about.html:42
+msgid "Notre mission"
+msgstr ""
+
+#: page/templates/page/about.html:43
+msgid ""
+"Ensemble 224 aide la communauté à publier et suivre les alertes de perte de "
+"biens ou de proches, à partager les informations utiles et à mobiliser un "
+"financement solidaire pour des besoins médicaux ou communautaires."
+msgstr ""
+
+#: page/templates/page/about.html:44
+msgid ""
+"Notre rôle n'est pas seulement de diffuser une demande : nous voulons rendre "
+"les situations plus lisibles, plus partageables et plus crédibles afin "
+"d'augmenter les chances de réponse."
+msgstr ""
+
+#: page/templates/page/about.html:49 page/templates/page/contact.html:66
+msgid "Ensemble 224"
+msgstr ""
+
+#: page/templates/page/about.html:58
+msgid "Visibilité"
+msgstr ""
+
+#: page/templates/page/about.html:59
+msgid ""
+"Rendre les alertes et les besoins visibles rapidement auprès du bon public."
+msgstr ""
+
+#: page/templates/page/about.html:65
+msgid "Confiance"
+msgstr ""
+
+#: page/templates/page/about.html:66
+msgid ""
+"Favoriser des informations mieux structurées et des parcours plus clairs."
+msgstr ""
+
+#: page/templates/page/about.html:72
+msgid "Solidarité"
+msgstr ""
+
+#: page/templates/page/about.html:73
+msgid ""
+"Faciliter l'engagement des particuliers, des proches et des partenaires."
+msgstr ""
+
+#: page/templates/page/about.html:79
+msgid "Respect"
+msgstr ""
+
+#: page/templates/page/about.html:80
+msgid "Traiter les informations personnelles avec prudence et responsabilité."
+msgstr ""
+
+#: page/templates/page/about.html:88
+msgid "Fonctionnement"
+msgstr ""
+
+#: page/templates/page/about.html:89
+msgid "Comment la plateforme agit"
+msgstr ""
+
+#: page/templates/page/about.html:90
+msgid ""
+"Un parcours simple, pensé pour passer plus vite de l'information à l'action."
+msgstr ""
+
+#: page/templates/page/about.html:97
+msgid "Publier"
+msgstr ""
+
+#: page/templates/page/about.html:98
+msgid ""
+"Une alerte de perte ou une demande de financement est soumise avec les "
+"informations utiles."
+msgstr ""
+
+#: page/templates/page/about.html:104
+msgid "Partager"
+msgstr ""
+
+#: page/templates/page/about.html:105
+msgid ""
+"La communauté peut relayer, consulter et diffuser les informations "
+"importantes."
+msgstr ""
+
+#: page/templates/page/about.html:111
+msgid "Mobiliser"
+msgstr ""
+
+#: page/templates/page/about.html:112
+msgid ""
+"Les personnes concernées ou solidaires peuvent agir, contacter, soutenir ou "
+"financer."
+msgstr ""
+
+#: page/templates/page/about.html:118
+msgid "Suivre"
+msgstr ""
+
+#: page/templates/page/about.html:119
+msgid ""
+"Le statut évolue avec la situation pour garder une information actuelle et "
+"utile."
+msgstr ""
+
+#: page/templates/page/about.html:127
+msgid "Engagement"
+msgstr ""
+
+#: page/templates/page/about.html:128
+msgid "Nos principes d'action"
+msgstr ""
+
+#: page/templates/page/about.html:134
+msgid ""
+"Nous attachons une attention particulière à la confidentialité, à la clarté "
+"des informations publiées et à la responsabilité dans les parcours de "
+"soutien. Certaines situations demandent de la discrétion, d'autres de la "
+"rapidité : la plateforme doit servir les deux."
+msgstr ""
+
+#: page/templates/page/about.html:135
+msgid ""
+"Nous cherchons aussi à rendre les contributions solidaires plus lisibles, "
+"afin que les personnes qui aident comprennent mieux le contexte, les besoins "
+"et l'usage attendu des fonds."
+msgstr ""
+
+#: page/templates/page/about.html:140
+msgid "Ce que nous voulons renforcer"
+msgstr ""
+
+#: page/templates/page/about.html:142
+msgid "la qualité des informations partagées"
+msgstr ""
+
+#: page/templates/page/about.html:143
+msgid "la rapidité de mise en relation"
+msgstr ""
+
+#: page/templates/page/about.html:144
+msgid "la transparence des demandes"
+msgstr ""
+
+#: page/templates/page/about.html:145
+msgid "la confiance dans l'entraide numérique"
+msgstr ""
+
+#: page/templates/page/about.html:154
+#: page/templates/page/components/footer.html:20
+#: page/templates/page/components/nav.html:30
+#: page/templates/page/components/nav.html:93
+#: page/templates/page/contact.html:4
+msgid "Contact"
+msgstr ""
+
+#: page/templates/page/about.html:155
+msgid "Échanger avec nous"
+msgstr ""
+
+#: page/templates/page/about.html:156
+msgid ""
+"Pour une question, un partenariat ou une demande d'information, plusieurs "
+"canaux sont disponibles."
+msgstr ""
+
+#: page/templates/page/about.html:177
+#: page/templates/page/components/address_contact.html:8
+#: page/templates/page/contact.html:58
+msgid "Adresse"
+msgstr ""
+
+#: page/templates/page/about.html:178
+#: page/templates/page/components/address_contact.html:8
+#: page/templates/page/contact.html:59
+msgid "Lambanyi, immeuble SHERBROOKE, Conakry, Guinée"
+msgstr ""
+
+#: page/templates/page/about.html:184 page/templates/page/contact.html:20
+msgid "Nous contacter"
+msgstr ""
+
+#: page/templates/page/about.html:185
+#: page/templates/page/help_policy/help_support.html:53
+msgid "Signaler une alerte"
+msgstr ""
+
+#: page/templates/page/components/address_contact.html:3
+msgid "Besoin d'aide ou d'assistance ?"
+msgstr ""
+
+#: page/templates/page/components/address_contact.html:4
+msgid ""
+"Notre équipe est à votre écoute pour vous orienter et répondre à vos "
+"questions :"
+msgstr ""
+
+#: page/templates/page/components/footer.html:10
+msgid ""
+"Ensemble 224 est une plateforme pour gérer les alertes de perte de biens et "
+"proches, et mobiliser des financements solidaires."
+msgstr ""
+
+#: page/templates/page/components/footer.html:14
+msgid "Liens utiles"
+msgstr ""
+
+#: page/templates/page/components/footer.html:16
+msgid "Aide & Support"
+msgstr ""
+
+#: page/templates/page/components/footer.html:17
+msgid "Politique de Confidentialité"
+msgstr ""
+
+#: page/templates/page/components/footer.html:18
+msgid "CGU"
+msgstr ""
+
+#: page/templates/page/components/footer.html:27
+msgid "Tous droits réservés."
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:9
+msgid "Aperçu du document"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:12
+msgid "Ouvrir dans un nouvel onglet"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:15
+#: page/templates/page/funding_request_details.html:297
+#: page/templates/page/loss_alert_details.html:195
+msgid "Télécharger le document"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:18
+msgid "Fermer l’aperçu"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:26
+msgid "Aperçu agrandi"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:29
+msgid "Aperçu du document PDF"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:40
+msgid "Ce document peut être consulté en ligne ou téléchargé."
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:43
+#: page/templates/page/funding_request_details.html:298
+#: page/templates/page/loss_alert_details.html:196
+msgid "Télécharger"
+msgstr ""
+
+#: page/templates/page/components/image_preview_modal.html:46
+msgid "Ouvrir avec Office Viewer"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:3
+msgid "Navigation mobile rapide"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:11
+#: page/templates/page/components/nav.html:13
+#: page/templates/page/components/nav.html:88
+msgid "Alertes"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:15
+msgid "Publier une annonce"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:21
+msgid "Financement"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:27
+#: page/templates/page/components/nav.html:38
+#: page/templates/page/components/nav.html:40
+#: page/templates/page/components/nav.html:73
+#: page/templates/page/components/nav.html:99
+#: page/templates/page/components/nav.html:101
+msgid "Profil"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:30
+msgid "Menu complet"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:32
+msgid "Menu"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:41
+msgid "Que souhaitez-vous publier ?"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:48
+msgid "Signaler une alerte de perte"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:49
+msgid "Personne disparue, pièce d'identité, objet ou document égaré."
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:59
+msgid "Demander un financement solidaire"
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:60
+msgid "Urgence médicale, maladie grave, chirurgie ou cause solidaire."
+msgstr ""
+
+#: page/templates/page/components/mobile_app_bar.html:68
+#: page/templates/page/confirm_close.html:24
+#: page/templates/page/confirm_close.html:26
+msgid "Annuler"
+msgstr ""
+
+#: page/templates/page/components/nav.html:16
+#: page/templates/page/components/nav.html:89
+msgid "Financements"
+msgstr ""
+
+#: page/templates/page/components/nav.html:22
+msgid "Soumettre"
+msgstr ""
+
+#: page/templates/page/components/nav.html:67
+#: page/templates/page/components/nav.html:90
+msgid "Nouvelle Alerte"
+msgstr ""
+
+#: page/templates/page/components/nav.html:68
+#: page/templates/page/components/nav.html:91
+msgid "Nouveau Financement"
+msgstr ""
+
+#: page/templates/page/components/nav.html:74
+#: page/templates/page/components/nav.html:109
+msgid "Modifier le mot de passe"
+msgstr ""
+
+#: page/templates/page/components/nav.html:79
+#: page/templates/page/components/nav.html:114
+msgid "Déconnexion"
+msgstr ""
+
+#: page/templates/page/components/nav.html:108
+msgid "Mon Profil"
+msgstr ""
+
+#: page/templates/page/confirm_close.html:3
+#: page/templates/page/confirm_close.html:8
+#: page/templates/page/confirm_close.html:21
+msgid "Confirmer la clôture"
+msgstr ""
+
+#: page/templates/page/confirm_close.html:11
+msgid "Voulez-vous vraiment clôturer cette demande de financement ?"
+msgstr ""
+
+#: page/templates/page/confirm_close.html:14
+msgid "Voulez-vous vraiment clôturer cette alerte ?"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:3
+msgid "Confirmation de don"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:16
+msgid "Don enregistré avec succès !"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:18
+msgid ""
+"Un message de confirmation vous a été envoyé par courriel. Merci pour votre "
+"générosité envers Ensemble 224."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:24
+msgid "Ajout de don impossible."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:26
+msgid ""
+"Une erreur est survenue lors de l'enregistrement de votre don. Veuillez "
+"réessayer."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_donation_payment.html:36
+msgid "Faire un autre don"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:3
+msgid "Confirmation ajout demande de financement"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:16
+msgid "Demande de financement ajoutée avec succès !"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:18
+msgid ""
+"Votre demande a bien été enregistrée. Un courriel de confirmation vous a été "
+"envoyé."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:24
+msgid "Ajout de demande impossible."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:26
+msgid ""
+"Une erreur est survenue lors de l'enregistrement de votre demande. Veuillez "
+"réessayer."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_funding_request_added.html:36
+msgid "Voir les demandes"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:3
+msgid "Confirmation ajout alerte"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:16
+msgid "Alerte ajoutée avec succès !"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:18
+msgid ""
+"Votre signalement a été enregistré et publié. Un courriel de confirmation "
+"vous a été envoyé."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:24
+msgid "Ajout d'alerte impossible."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:26
+msgid ""
+"Une erreur est survenue lors de l'enregistrement de votre alerte. Veuillez "
+"réessayer."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_loss_alert_added.html:36
+msgid "Voir les alertes"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:3
+msgid "Confirmation"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:16
+msgid "confirmé avec succès !"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:18
+msgid ""
+"Un message de confirmation vous a été envoyé par courriel. Merci pour votre "
+"engagement."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:24
+msgid "Paiement en cours de vérification"
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:26
+msgid ""
+"Votre paiement est en cours de traitement par l'opérateur. Vous recevrez un "
+"email de confirmation dès qu'il sera validé."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:32
+msgid "Le paiement n'a pas abouti."
+msgstr ""
+
+#: page/templates/page/confirmation_page/confirmation_payment.html:34
+msgid ""
+"La transaction a été refusée ou annulée. Aucun montant n'a été débité. Vous "
+"pouvez réessayer."
+msgstr ""
+
+#: page/templates/page/contact.html:6
+msgid ""
+"Contactez Ensemble 224 pour toute question, suggestion, demande "
+"d'accompagnement ou partenariat."
+msgstr ""
+
+#: page/templates/page/contact.html:15
+msgid "Contactez-nous"
+msgstr ""
+
+#: page/templates/page/contact.html:21
+msgid ""
+"Une question, une suggestion, un besoin d'accompagnement ou une demande de "
+"partenariat ? Notre équipe est à votre écoute."
+msgstr ""
+
+#: page/templates/page/contact.html:29
+msgid "Échange"
+msgstr ""
+
+#: page/templates/page/contact.html:30
+msgid "Parlons de votre besoin"
+msgstr ""
+
+#: page/templates/page/contact.html:31
+msgid ""
+"Nous répondons aux questions liées aux alertes, aux financements solidaires, "
+"aux signalements sensibles et aux collaborations avec la plateforme."
+msgstr ""
+
+#: page/templates/page/contact.html:40
+msgid "Email principal"
+msgstr ""
+
+#: page/templates/page/contact.html:42
+msgid ""
+"Pour les demandes générales, les questions techniques et les retours d'usage."
+msgstr ""
+
+#: page/templates/page/contact.html:51
+msgid "Pour un premier contact rapide ou un besoin d'orientation urgente."
+msgstr ""
+
+#: page/templates/page/contact.html:60
+msgid ""
+"Nous privilégions le contact numérique pour accélérer le traitement des "
+"demandes."
+msgstr ""
+
+#: page/templates/page/contact.html:69
+msgid "Ce que vous pouvez nous écrire"
+msgstr ""
+
+#: page/templates/page/contact.html:71
+msgid "Question sur une alerte ou une demande de financement"
+msgstr ""
+
+#: page/templates/page/contact.html:72
+msgid "Signalement d'une information importante"
+msgstr ""
+
+#: page/templates/page/contact.html:73
+msgid "Proposition de partenariat ou d'appui institutionnel"
+msgstr ""
+
+#: page/templates/page/contact.html:74
+msgid "Retour d'expérience sur l'utilisation du site"
+msgstr ""
+
+#: page/templates/page/contact.html:83
+msgid "Formulaire de contact"
+msgstr ""
+
+#: page/templates/page/contact.html:84
+msgid ""
+"Donnez-nous un maximum de contexte pour que nous puissions vous répondre "
+"clairement et rapidement."
+msgstr ""
+
+#: page/templates/page/contact.html:116 page/templates/page/contact.html:118
+msgid "Envoyer le message"
+msgstr ""
+
+#: page/templates/page/contact.html:122
+msgid "Envoi de votre message en cours. Veuillez patienter…"
+msgstr ""
+
+#: page/templates/page/donation.html:6
+msgid "Faire un Don"
+msgstr ""
+
+#: page/templates/page/donation.html:30
+msgid "Don sécurisé Djomy"
+msgstr ""
+
+#: page/templates/page/donation.html:31
+msgid "Soutenir Ensemble 224"
+msgstr ""
+
+#: page/templates/page/donation.html:32
+msgid ""
+"Renseignez vos informations, choisissez un montant à droite, puis finalisez "
+"votre don de manière sécurisée."
+msgstr ""
+
+#: page/templates/page/donation.html:68
+#: page/templates/page/funding_payment.html:51
+msgid "Vos informations sont préremplies à partir de votre compte."
+msgstr ""
+
+#: page/templates/page/donation.html:103
+msgid "Don traité via Djomy"
+msgstr ""
+
+#: page/templates/page/donation.html:104
+msgid "Confirmation envoyée par email"
+msgstr ""
+
+#: page/templates/page/donation.html:110
+msgid "Don général"
+msgstr ""
+
+#: page/templates/page/donation.html:111
+msgid "Choisir le montant du don"
+msgstr ""
+
+#: page/templates/page/donation.html:112
+msgid ""
+"Votre contribution aide la plateforme à accompagner les alertes, les "
+"collectes solidaires et les familles en difficulté."
+msgstr ""
+
+#: page/templates/page/donation.html:113
+#: page/templates/page/funding_payment.html:105
+msgid ""
+"Djomy peut appliquer des frais variables selon le moyen de paiement. Le "
+"montant final affiché par le prestataire peut donc différer légèrement du "
+"montant saisi."
+msgstr ""
+
+#: page/templates/page/donation.html:133
+msgid "Montants proposés"
+msgstr ""
+
+#: page/templates/page/donation.html:140
+msgid "Diffusion des alertes importantes"
+msgstr ""
+
+#: page/templates/page/donation.html:144
+msgid "Appui aux collectes solidaires"
+msgstr ""
+
+#: page/templates/page/donation.html:148
+msgid "Paiement sécurisé via Djomy"
+msgstr ""
+
+#: page/templates/page/donation.html:154
+msgid "Faire un don sécurisé"
+msgstr ""
+
+#: page/templates/page/donation.html:158
+#: page/templates/page/funding_payment.html:176
+msgid "Redirection sécurisée vers Djomy en cours. Veuillez patienter…"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:6
+msgid "Financer via Djomy"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:18
+msgid "Retour à la demande"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:20
+msgid "Paiement sécurisé Djomy"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:21
+msgid "Participez à cette collecte"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:22
+msgid ""
+"Renseignez vos informations, choisissez un montant à droite, puis finalisez "
+"le paiement via Mobile Money ou carte."
+msgstr ""
+
+#: page/templates/page/funding_payment.html:96
+msgid "Paiement redirigé vers Djomy"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:97
+msgid "Confirmation après transaction"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:103
+msgid "Paiement"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:104
+msgid "Statistiques de paiement"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:111
+msgid "collecté"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:113
+#: page/templates/page/index.html:197
+msgid "jours restants"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:115
+msgid "Échéance dépassée"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:121
+#: page/templates/page/index.html:201
+msgid "Objectif dépassé de"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:127
+msgid "Montant à payer"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:131
+msgid "Montant collecté"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:131
+msgid "Montant comptabilisé"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:136
+msgid "Reste à financer"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:139
+msgid "Collecte"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:140
+msgid "Objectif atteint"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:149
+msgid "Choisir un montant"
+msgstr ""
+
+#: page/templates/page/funding_payment.html:172
+msgid "Financer maintenant"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:262
+msgid "Autres documents et preuves"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:269
+#: page/templates/page/loss_alert_details.html:167
+msgid "Cliquer pour agrandir"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:274
+#: page/templates/page/loss_alert_details.html:172
+msgid "Cliquer pour afficher l’aperçu PDF"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:280
+#: page/templates/page/loss_alert_details.html:178
+msgid "Cliquer pour afficher l’aperçu Word"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:286
+#: page/templates/page/loss_alert_details.html:184
+msgid "Cliquer pour ouvrir l’aperçu"
+msgstr ""
+
+#: page/templates/page/funding_request_details.html:295
+#: page/templates/page/loss_alert_details.html:193
+msgid "Aperçu"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:4
+msgid "Centre d'Aide & Support"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:7
+msgid ""
+"Trouvez des réponses à vos questions sur l'utilisation de Ensemble 224 : "
+"alertes de perte, personnes retrouvées, demandes de financement, dons et "
+"paiements sécurisés."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:8
+msgid "Aide & Support - Ensemble 224"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:31
+msgid "Assistance & Foire aux questions"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:33
+msgid "Comment pouvons-nous vous aider ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:35
+msgid ""
+"Découvrez comment fonctionne la plateforme, comment publier une alerte, "
+"lancer un financement ou soutenir une cause en toute sécurité."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:42
+msgid "Actions rapides"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:50
+#: page/templates/page/loss_alerts.html:6
+#: page/templates/page/loss_alerts.html:9
+msgid "Alertes de perte"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:51
+msgid ""
+"Signalez la disparition d'un proche ou d'un objet précieux pour mobiliser la "
+"communauté."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:64
+msgid "Financement solidaire"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:65
+msgid ""
+"Initiez une collecte pour une urgence médicale, des soins ou un besoin "
+"communautaire vérifié."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:67
+msgid "Créer une demande"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:78
+msgid "Soutenir une cause"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:79
+#, python-format
+msgid ""
+"Contribuez par Orange Money, MTN MoMo ou carte bancaire de façon 100%% "
+"sécurisée."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:81
+msgid "Voir les collectes"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:91
+msgid "Questions Fréquemment Posées"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:92
+msgid "Cliquez sur une question pour afficher sa réponse détaillée."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:98
+msgid "1. Alertes de perte & Retrouvailles"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:104
+msgid "Comment signaler une alerte de perte de bien ou de proche ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:108
+msgid "Pour publier un signalement :"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:110
+#, python-format
+msgid ""
+"Rendez-vous sur la page <a href=\"%(add_alert_url)s\">Signaler une alerte</"
+"a>."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:111
+msgid ""
+"Renseignez le nom, la description précise, le lieu exact et la date de la "
+"disparition."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:112
+msgid ""
+"Ajoutez une photo claire (fortement recommandé pour augmenter les chances de "
+"reconnaissance)."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:113
+msgid ""
+"Soumettez le formulaire. Votre alerte sera instantanément visible sur la "
+"plateforme et partageable sur les réseaux sociaux."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:120
+msgid "Comment signaler un bien ou un proche que j'ai retrouvé ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:125
+msgid ""
+"Si vous avez retrouvé un objet ou recueilli une personne égarée, vous pouvez "
+"également publier une alerte en sélectionnant la catégorie appropriée "
+"(Trouvaille) via le formulaire de signalement. Décrivez l'objet sans révéler "
+"tous les détails confidentiels (ex. : gardez un élément d'identification "
+"pour vérifier le propriétaire légitime)."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:132
+msgid "Comment suivre et clôturer mon alerte une fois résolue ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:137
+msgid ""
+"Connectez-vous à votre compte, accédez à la page de votre alerte ou à votre "
+"profil. Dès que la personne ou le bien est retrouvé, cliquez sur <strong>« "
+"Marquer comme résolu / Clôturer »</strong> afin d'informer la communauté et "
+"d'éviter que des recherches inutiles ne continuent."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:147
+msgid "2. Demandes de financement solidaire"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:153
+msgid "Comment ajouter une demande de financement ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:158
+#, python-format
+msgid ""
+"Connectez-vous à votre compte et cliquez sur <a "
+"href=\"%(add_funding_url)s\">Ajouter une demande de financement</a>."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:159
+msgid ""
+"Indiquez le titre, le nom du bénéficiaire, le montant objectif en Francs "
+"Guinéens (GNF), la catégorie et la date d'échéance."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:160
+msgid ""
+"Téléversez une image principale ainsi que les justificatifs nécessaires "
+"(pièce d'identité et certificat médical ou attestation)."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:161
+msgid ""
+"Validez votre soumission. Notre équipe examine les pièces pour assurer la "
+"crédibilité avant validation finale."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:168
+msgid "Pourquoi une vérification des pièces justificatives est-elle exigée ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:173
+msgid ""
+"Pour protéger la générosité des donateurs et éviter les tentatives "
+"d'usurpation d'identité ou d'escroquerie, chaque demande solidaire fait "
+"l'objet d'un contrôle antifraude (pièce d'identité valide, dossier médical/"
+"communautaire). Cela garantit un taux de confiance maximal pour les "
+"donateurs."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:180
+msgid "Que signifie le statut « Entièrement financé » ou « Collecté » ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:185
+#, python-format
+msgid ""
+"Lorsqu'une demande atteint 100%% de son objectif financier, elle affiche le "
+"statut <strong>« Collecté »</strong> ou <strong>« Entièrement financé »</"
+"strong>. Selon la nature de la demande, la collecte peut être clôturée ou "
+"prolongée pour couvrir d'éventuels frais annexes imprévus (convalescence, "
+"médicaments)."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:195
+msgid "3. Dons & Moyens de paiement sécurisés"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:201
+msgid "Quels sont les moyens de paiement acceptés ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:205
+msgid ""
+"En partenariat avec la passerelle certifiée <strong>Djomy Africa</strong>, "
+"nous acceptons :"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:207
+msgid "Orange Money Guinée"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:207
+msgid "via validation par code OTP sur votre téléphone"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:208
+msgid "MTN Mobile Money Guinée"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:209
+msgid "Cartes bancaires (Visa, Mastercard)"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:209
+msgid "pour les donateurs résidant en Guinée et à l'étranger (diaspora)."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:216
+msgid "Comment fonctionnent les frais de transaction Djomy ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:221
+msgid ""
+"Le prestataire agréé Djomy applique les frais d'acheminement standards des "
+"opérateurs télécoms (Orange, MTN) ou bancaires selon le moyen choisi. Le "
+"montant débité par l'opérateur inclut ces frais techniques réels. "
+"<strong>Ensemble 224 ne prélève aucun frais caché</strong> sur votre don."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:228
+msgid "Mes coordonnées bancaires ou Mobile Money sont-elles protégées ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:233
+#, python-format
+msgid ""
+"<strong>Oui, à 100%%.</strong> Ensemble 224 ne reçoit ni ne stocke jamais "
+"votre code secret PIN Mobile Money ou vos identifiants bancaires. Toutes les "
+"saisies de sécurité sont directement effectuées sur l'interface sécurisée et "
+"chiffrée de votre opérateur téléphonique."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:243
+msgid "4. Sécurité, Restitution & Arbitrage"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:249
+msgid ""
+"Pourquoi l'arbitrage légal ou l'intervention des autorités est-il mentionné ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:254
+msgid ""
+"Pour les cas particulièrement sensibles (enfants ou proches vulnérables "
+"retrouvés, biens matériels de très forte valeur, ou litige entre personnes), "
+"la remise doit s'effectuer en présence ou sous le constat des autorités "
+"compétentes (services de sécurité, police/gendarmerie ou autorité "
+"administrative). Cela protège à la fois la personne qui a trouvé le bien et "
+"le propriétaire légitime."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:261
+msgid "Comment signaler un abus ou une alerte frauduleuse ?"
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:266
+msgid ""
+"Si vous constatez une alerte suspecte ou des commentaires inappropriés, "
+"contactez immédiatement l'équipe par email à <a "
+"href=\"mailto:contact@ensemble224.org\">contact@ensemble224.org</a> ou via "
+"notre page de contact. Nous suspendons immédiatement tout contenu faisant "
+"l'objet d'un doute sérieux."
+msgstr ""
+
+#: page/templates/page/help_policy/help_support.html:279
+msgid "Accéder au formulaire de contact"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:4
+#: page/templates/page/help_policy/policy_privacy.html:33
+msgid "Politique de confidentialité"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:7
+msgid ""
+"Politique de confidentialité et protection des données personnelles de "
+"Ensemble 224 (Loi L/2016/037/AN et RGPD) : données collectées, sécurité, "
+"droits et contact."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:8
+msgid "Politique de confidentialité - Ensemble 224"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:31
+msgid "Protection des données & Vie privée"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:35
+msgid ""
+"Conforme à la législation guinéenne (Loi L/2016/037/AN) et aux standards "
+"internationaux de protection des données (RGPD)."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:46
+msgid ""
+"Chez <strong>Ensemble 224</strong>, nous attachons une importance "
+"primordiale à la protection de votre vie privée, à la confidentialité et à "
+"la sécurité de vos informations personnelles. Cette politique détaille les "
+"engagements de notre plateforme citoyenne quant à la collecte, au traitement "
+"et à la préservation de vos données lorsque vous signalez une alerte, "
+"soutenez une cause ou sollicitez un financement."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:55
+msgid "Cadre juridique et Responsable du traitement"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:58
+msgid ""
+"La plateforme <strong>Ensemble 224</strong> est éditée et exploitée en "
+"République de Guinée. Les traitements de données à caractère personnel mis "
+"en œuvre sur la plateforme respectent scrupuleusement :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:62
+msgid "Le droit guinéen :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:62
+msgid ""
+"La Loi L/2016/037/AN relative à la cybersécurité et à la protection des "
+"données à caractère personnel en République de Guinée."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:65
+msgid "Les standards internationaux (RGPD) :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:65
+msgid ""
+"Le Règlement Général sur la Protection des Données (UE 2016/679) pour les "
+"utilisateurs, donateurs et membres de la diaspora établis dans l'Union "
+"Européenne."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:73
+msgid "Données personnelles collectées"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:75
+msgid ""
+"Nous collectons uniquement les données strictement nécessaires au bon "
+"fonctionnement de nos services de solidarité :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:78
+msgid "Données d'identification et de contact :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:78
+msgid ""
+"Nom, prénom, adresse e-mail, numéro de téléphone (opérateurs Orange, MTN, "
+"etc.)."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:81
+msgid "Données des alertes et demandes :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:81
+msgid ""
+"Description de la perte ou du besoin solidaire, lieu, date, photographies et "
+"informations nécessaires à la mobilisation."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:84
+msgid "Pièces justificatives d'identité et de situation :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:84
+msgid ""
+"Pour toute demande de financement ou signalement critique, une pièce "
+"d'identité officielle (CNI, passeport, carte d'électeur) et des "
+"justificatifs (médicaux, attestations) peuvent être demandés afin de "
+"vérifier l'authenticité de la demande et prévenir les fraudes."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:87
+msgid "Données techniques et de connexion :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:87
+msgid ""
+"Adresse IP, journaux de connexion et caractéristiques techniques du "
+"navigateur pour assurer la sécurité du service."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:95
+msgid "Finalités et objectifs des traitements"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:97
+msgid ""
+"Vos données sont traitées pour des finalités précises, explicites et "
+"légitimes :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:99
+msgid ""
+"Publication, mise à jour et suivi des alertes de perte de biens ou de "
+"personnes."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:100
+msgid ""
+"Gestion, vérification et modération rigoureuse des demandes de financement "
+"solidaire."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:101
+msgid "Mise en relation sécurisée entre les utilisateurs concernés."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:102
+msgid ""
+"Prévention de la fraude, vérification de l'identité des bénéficiaires et "
+"protection de la communauté."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:103
+msgid ""
+"Notification par email ou SMS concernant l'état d'avancement des démarches."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:110
+msgid "Paiements sécurisés et absence de conservation des données bancaires"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:113
+msgid ""
+"La sécurité de vos contributions est au cœur de nos priorités. Ensemble 224 "
+"utilise l'infrastructure de paiement certifiée <strong>Djomy Africa</strong> "
+"(opérant avec Orange Money Guinée, MTN Mobile Money et cartes bancaires)."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:118
+msgid "Règle absolue :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:118
+msgid ""
+"Ensemble 224 <strong>ne collecte, ne transite et ne stocke JAMAIS</strong> "
+"vos codes secrets PIN Mobile Money, vos mots de passe bancaires ou vos "
+"numéros complets de carte. Toutes les opérations de saisie de code sont "
+"réalisées directement et de manière chiffrée sur les serveurs sécurisés de "
+"votre opérateur ou de Djomy."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:126
+msgid "Partage et destinataires des données"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:128
+msgid ""
+"Ensemble 224 ne vend, ne loue et ne cède aucune donnée personnelle à des "
+"fins commerciales ou publicitaires. Vos informations ne sont transmises que "
+"dans les cas limitatifs suivants :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:131
+msgid "Partage public consenti :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:131
+msgid ""
+"Les informations intégrées volontairement dans une alerte publique (nom du "
+"proche recherché, objet, zone géographique, photo) sont visibles des "
+"visiteurs pour faciliter les retrouvailles."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:134
+msgid "Autorités compétentes et cadre légal :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:134
+msgid ""
+"En cas de litige, de signalement frauduleux ou dans le cadre de l'arbitrage "
+"légal requis pour la restitution de personnes ou de biens de valeur, les "
+"éléments nécessaires peuvent être communiqués aux autorités publiques ou "
+"judiciaires compétentes conformément aux lois en vigueur."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:137
+msgid "Prestataires techniques de confiance :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:137
+msgid ""
+"Hébergeur sécurisé et passerelle de paiement (Djomy), agissant sous contrat "
+"strict de confidentialité."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:145
+msgid "Sécurité et confidentialité"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:148
+msgid ""
+"Nous appliquons des mesures de sécurité techniques et organisationnelles "
+"renforcées : chiffrement des communications via le protocole HTTPS/TLS, "
+"contrôle d'accès strict aux fichiers de vérification d'identité (réservés à "
+"la modération autorisée), et sauvegardes régulières pour prévenir toute "
+"altération ou perte de données."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:155
+msgid "Durée de conservation des données"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:158
+msgid ""
+"Les données sont conservées le temps nécessaire à la réalisation des "
+"finalités prévues :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:161
+msgid "Les alertes résolues ou clôturées sont archivées ou anonymisées."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:162
+msgid ""
+"Les pièces d'identité fournies pour vérification sont conservées de manière "
+"sécurisée pendant la durée de validation de la demande, puis archivées "
+"conformément aux obligations légales de traçabilité antifraude."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:163
+msgid ""
+"Les comptes inactifs peuvent être supprimés après un délai raisonnable sans "
+"activité constatée."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:170
+msgid "Gestion des cookies et traceurs"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:173
+msgid ""
+"La plateforme utilise exclusivement des cookies fonctionnels nécessaires à "
+"l'authentification des utilisateurs, à la sécurité CSRF et à la fluidité de "
+"navigation. Si un outil de mesure d'audience anonyme est activé, il ne "
+"collecte aucune donnée nominative et respecte le choix de consentement "
+"exprimé via la bannière dédiée."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:180
+msgid "Vos droits et leur exercice"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:183
+msgid ""
+"Conformément à la loi guinéenne 2016/037/AN et au RGPD, vous disposez à tout "
+"moment des droits suivants sur vos données :"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:190
+msgid "Droit d'accès & copie"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:191
+msgid "Consulter les données que nous détenons à votre sujet."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:199
+msgid "Droit de rectification"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:200
+msgid "Corriger ou compléter des informations obsolètes ou inexactes."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:208
+msgid "Droit à l'effacement"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:209
+msgid "Demander la suppression de vos données personnelles."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:217
+msgid "Droit d'opposition"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:218
+msgid "Vous opposer à certains traitements non essentiels."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:224
+msgid ""
+"Pour faire valoir l'un de ces droits, adressez-nous simplement votre demande "
+"par email à <a "
+"href=\"mailto:contact@ensemble224.org\">contact@ensemble224.org</a> en "
+"joignant un justificatif d'identité."
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:231
+msgid "Mise à jour de la politique"
+msgstr ""
+
+#: page/templates/page/help_policy/policy_privacy.html:234
+msgid ""
+"Cette politique de confidentialité peut être actualisée pour refléter les "
+"évolutions légales ou techniques de la plateforme. La version applicable est "
+"celle accessible en ligne à la date de votre consultation."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:4
+#: page/templates/page/help_policy/terms.html:30
+msgid "Conditions générales d'utilisation"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:7
+msgid ""
+"Conditions générales d'utilisation de Ensemble 224 : accès au service, "
+"publication d'alertes, demandes de financement, dons, modération et "
+"responsabilités."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:8
+msgid "Conditions générales d'utilisation - Ensemble 224"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:28
+msgid "Cadre d'utilisation & Règles de la plateforme"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:32
+msgid ""
+"Les principes, droits et devoirs encadrant l'utilisation des services de "
+"Ensemble 224."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:43
+msgid ""
+"Les présentes conditions régissent l'accès et l'utilisation de la plateforme "
+"<strong>Ensemble 224</strong>, qui permet de publier des alertes citoyennes "
+"de perte de biens ou de personnes, de soumettre des demandes de financement "
+"solidaire et de faciliter l'entraide communautaire en République de Guinée "
+"et avec la diaspora."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:50
+msgid "Accès au service et création de compte"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:51
+msgid ""
+"La consultation des alertes publiques et des demandes de financement est "
+"libre et accessible à tout visiteur. Pour publier une alerte, lancer une "
+"collecte de fonds, commenter ou suivre l'état de ses publications, la "
+"création d'un compte utilisateur est requise. L'utilisateur s'engage à "
+"fournir des informations exactes et à préserver la confidentialité de ses "
+"identifiants."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:55
+msgid "Engagements et responsabilités des utilisateurs"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:56
+msgid ""
+"Chaque utilisateur s'engage à utiliser la plateforme de manière loyale, "
+"licite et respectueuse. Sont formellement prohibés : les fausses alertes, "
+"les usurpations d'identité, les tentatives d'escroquerie, les contenus "
+"diffamatoires ou injurieux, et toute tentative d'extorsion de fonds sous "
+"couvert d'actions caritatives."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:60
+msgid "Modération et contrôle des publications"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:61
+msgid ""
+"Ensemble 224 se réserve le droit de modérer, refuser, suspendre ou supprimer "
+"toute publication (alerte ou collecte de fonds) ne respectant pas les "
+"critères d'authenticité, manquant de justificatifs requis (pièce d'identité, "
+"documents médicaux) ou faisant l'objet d'un signalement d'abus."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:65
+msgid "Dons, financements et prestataires de paiement"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:66
+msgid ""
+"Les dons sont traités via notre prestataire de paiement sécurisé agréé "
+"<strong>Djomy Africa</strong> (Mobile Money et cartes bancaires). Ensemble "
+"224 n'a accès à aucun code secret ou mot de passe bancaire. Les dons versés "
+"sont destinés au bénéficiaire de la demande validée. Les contestations "
+"éventuelles sont examinées avec bienveillance au vu des pièces "
+"justificatives fournies."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:70
+msgid "Protection des données à caractère personnel"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:72
+#, python-format
+msgid ""
+"Le traitement de vos données personnelles est soumis aux dispositions de la "
+"législation guinéenne (Loi L/2016/037/AN) et aux règles du RGPD, telles que "
+"détaillées dans notre <a href=\"%(policy_url)s\" class=\"blue-text text-"
+"darken-2 font-weight-bold\">Politique de confidentialité</a>."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:76
+msgid "Disponibilité et maintenance du service"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:77
+msgid ""
+"Nous mettons tout en œuvre pour assurer la disponibilité continue du service "
+"24h/24 et 7j/7. Des interruptions ponctuelles pour maintenance technique, "
+"mise à niveau de sécurité ou cas de force majeure peuvent néanmoins survenir "
+"sans engager la responsabilité de la plateforme."
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:81
+msgid "Évolution des conditions"
+msgstr ""
+
+#: page/templates/page/help_policy/terms.html:82
+msgid ""
+"Ensemble 224 peut actualiser les présentes conditions générales à tout "
+"moment. Les utilisateurs seront informés de toute modification majeure. La "
+"version en vigueur est celle publiée sur cette page à la date de votre "
+"visite."
+msgstr ""
+
+#: page/templates/page/index.html:19
+msgid "Ensemble 224 : Ensemble, bâtissons l'espoir"
+msgstr ""
+
+#: page/templates/page/index.html:20
+msgid ""
+"Votre plateforme pour les alertes de perte et le soutien aux maladies graves."
+msgstr ""
+
+#: page/templates/page/index.html:23
+msgid "Signaler une Alerte"
+msgstr ""
+
+#: page/templates/page/index.html:26
+msgid "Demander un Financement"
+msgstr ""
+
+#: page/templates/page/index.html:36
+msgid "Notre Impact en Chiffres"
+msgstr ""
+
+#: page/templates/page/index.html:44
+msgid "Vies Impactées"
+msgstr ""
+
+#: page/templates/page/index.html:54
+msgid "Alertes Traitées"
+msgstr ""
+
+#: page/templates/page/index.html:64
+msgid "Cas Financés"
+msgstr ""
+
+#: page/templates/page/index.html:74
+msgid "Comment ça Marche?"
+msgstr ""
+
+#: page/templates/page/index.html:79
+msgid "1. Créez une Demande"
+msgstr ""
+
+#: page/templates/page/index.html:80
+msgid ""
+"Signalez une alerte de perte ou soumettez une demande de financement en "
+"quelques étapes simples et sécurisées."
+msgstr ""
+
+#: page/templates/page/index.html:86
+msgid "2. Partagez et Mobilisez"
+msgstr ""
+
+#: page/templates/page/index.html:87
+msgid ""
+"Votre demande est publiée sur la plateforme, atteignant une large communauté "
+"prête à aider et à partager."
+msgstr ""
+
+#: page/templates/page/index.html:93
+msgid "3. Recevez de l'Aide"
+msgstr ""
+
+#: page/templates/page/index.html:94
+msgid ""
+"Bénéficiez du soutien de la communauté, que ce soit pour retrouver un proche "
+"ou obtenir un financement vital."
+msgstr ""
+
+#: page/templates/page/index.html:99
+msgid "En savoir plus"
+msgstr ""
+
+#: page/templates/page/index.html:107
+msgid "Dernières Alertes de Perte"
+msgstr ""
+
+#: page/templates/page/index.html:112
+msgid "Voir l alerte"
+msgstr ""
+
+#: page/templates/page/index.html:130
+msgid "Voir détails de"
+msgstr ""
+
+#: page/templates/page/index.html:130
+msgid "Voir l'alerte"
+msgstr ""
+
+#: page/templates/page/index.html:132
+msgid "Contacter"
+msgstr ""
+
+#: page/templates/page/index.html:132
+msgid "Appeler"
+msgstr ""
+
+#: page/templates/page/index.html:149
+msgid "Voir toutes les alertes"
+msgstr ""
+
+#: page/templates/page/index.html:153
+msgid "Aucune alerte pour le moment"
+msgstr ""
+
+#: page/templates/page/index.html:154
+msgid "Cliquez sur Ajouter une alerte pour en créer une nouvelle."
+msgstr ""
+
+#: page/templates/page/index.html:155
+msgid "Ajouter une alerte"
+msgstr ""
+
+#: page/templates/page/index.html:164
+msgid "Demandes de Financement Récentes"
+msgstr ""
+
+#: page/templates/page/index.html:170
+msgid "Voir le projet"
+msgstr ""
+
+#: page/templates/page/index.html:177
+msgid "Collecté"
+msgstr ""
+
+#: page/templates/page/index.html:188
+msgid "collectés sur"
+msgstr ""
+
+#: page/templates/page/index.html:196
+msgid "atteint"
+msgstr ""
+
+#: page/templates/page/index.html:197
+msgid "Sans échéance"
+msgstr ""
+
+#: page/templates/page/index.html:210 page/templates/page/index.html:211
+msgid "Financer"
+msgstr ""
+
+#: page/templates/page/index.html:214 page/templates/page/index.html:215
+msgid "Voir détails"
+msgstr ""
+
+#: page/templates/page/index.html:226
+msgid "Bénéficiaire"
+msgstr ""
+
+#: page/templates/page/index.html:245
+msgid "Voir toutes les demandes"
+msgstr ""
+
+#: page/templates/page/index.html:249
+msgid "Aucune demande de financement pour le moment"
+msgstr ""
+
+#: page/templates/page/index.html:250
+msgid "Cliquez sur Ajouter une demande pour en créer une nouvelle."
+msgstr ""
+
+#: page/templates/page/index.html:251
+msgid "Ajouter une demande"
+msgstr ""
+
+#: page/templates/page/index.html:263
+msgid "Soutenez notre cause"
+msgstr ""
+
+#: page/templates/page/index.html:264
+msgid ""
+"Faites un don pour nous aider à atteindre nos objectifs et transformer plus "
+"de vies en Guinée."
+msgstr ""
+
+#: page/templates/page/index.html:267
+msgid "Faire un don"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:8
+msgid ""
+"Consultez et filtrez les alertes de perte de biens et de proches sur "
+"Ensemble 224."
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:10
+msgid ""
+"Filtrez par type, statut, nom et dates pour retrouver rapidement une alerte."
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:18
+msgid "Bannière alertes"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:19
+msgid "Alertes Guinée"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:23
+msgid "Alertes de Perte"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:24
+msgid "Filtrez et explorez les alertes de perte de biens ou proches."
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:30
+msgid "Filtrer les alertes"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:33
+msgid "Tous les types d'alerte"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:37
+msgid "Type d'alerte"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:39
+msgid "Tous les statuts"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:45
+msgid "Nom (personne ou bien)"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:48
+msgid "Date min"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:51
+msgid "Date max"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:54
+msgid "Appliquer"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:58
+msgid "Réinitialiser"
+msgstr ""
+
+#: page/templates/page/loss_alerts.html:62
+msgid "Liste des Alertes"
+msgstr ""
+
+#: templates/404.html:3 templates/404.html:9
+msgid "Page introuvable"
+msgstr ""
+
+#: templates/404.html:10
+msgid "La page demandée n'existe pas ou a été déplacée."
+msgstr ""
+
+#: templates/base.html:64
+msgid "Préférences cookies"
+msgstr ""
+
+#: templates/base.html:66
+msgid "Cookies"
+msgstr ""
+
+#: templates/base.html:67
+msgid ""
+"Nous utilisons des cookies nécessaires au fonctionnement du site. Les "
+"cookies de mesure d'audience ne seront activés qu'avec votre accord."
+msgstr ""
+
+#: templates/base.html:70
+msgid "Refuser"
+msgstr ""
+
+#: templates/base.html:71
+msgid "Accepter"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:127
+msgid "Détails de la Transaction Djomy"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:138 templates/djomy/liste_liens.html:239
+msgid "Transaction ID"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:158
+msgid "Méthode de Paiement"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:162
+msgid "Numéro Payeur"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:166
+msgid "Date de Création"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:170
+msgid "Dernière Mise à Jour"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:176
+msgid "Réponse API Complète"
+msgstr ""
+
+#: templates/djomy/detail_statut.html:183
+msgid "Aucun détail trouvé pour cette transaction."
+msgstr ""
+
+#: templates/djomy/detail_statut.html:184
+msgid ""
+"L'identifiant n'existe peut-être pas ou l'API Djomy n'est pas joignable."
+msgstr ""
+
+#: templates/djomy/detail_statut.html:189
+msgid "Retour à la liste"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:153
+msgid ""
+"Impossible de contacter l'API Djomy. Seuls les enregistrements locaux sont "
+"affichés."
+msgstr ""
+
+#: templates/djomy/liste_liens.html:161
+msgid "Liens de Paiement (API Djomy)"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:167 templates/djomy/liste_liens.html:235
+msgid "Date"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:169 templates/djomy/liste_liens.html:236
+msgid "Référence"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:171
+msgid "Lien"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:172
+msgid "Action"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:188
+msgid "Ouvrir"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:193
+msgid "Vérifier"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:202
+msgid "Aucun lien de paiement trouvé via l'API."
+msgstr ""
+
+#: templates/djomy/liste_liens.html:229
+msgid "Enregistrements Locaux"
+msgstr ""
+
+#: templates/djomy/liste_liens.html:264
+msgid "Aucun paiement enregistré localement."
+msgstr ""

@@ -150,7 +150,36 @@
 }
 
 
-/* Hero Section for Detail Page */
+
+
+/* Align password fields side‑by‑side on large screens using flex */
+@media only screen and (min-width: 992px) {
+  .auth-form .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.65rem; /* match Materialize gutter */
+    margin-right: -0.65rem;
+  }
+  .auth-form .input-field.col.l6 {
+    flex: 0 0 48%;
+    max-width: 48%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin-bottom: 0;
+  }
+  .auth-form .input-field.col.l6:last-child {
+    margin-right: 0;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .auth-form .input-field.col.l6 {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0;
+  }
+}
+
 .detail-hero-section {
     min-height: 300px;
     /* Smaller height for detail page hero */
@@ -5547,8 +5576,8 @@ body:has(.update-profile-page) .main-wrapper > main {
     position: relative;
 }
 
-.image-loading-frame[data-image-state="loading"]::after,
-.image-loading-frame[data-image-state="failed"]::after {
+.image-loading-frame[data-image-state="loading"]::after {
+    content: "Chargement de l’image…";
     position: absolute;
     inset: 0;
     z-index: 4;
@@ -5562,11 +5591,18 @@ body:has(.update-profile-page) .main-wrapper > main {
     pointer-events: none;
 }
 
-.image-loading-frame[data-image-state="loading"]::after {
-    content: "Chargement de l’image…";
-}
-
 .image-loading-frame[data-image-state="failed"]::after {
     content: "Image indisponible";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    color: #475569;
+    background: rgba(241, 245, 249, 0.92);
+    font-size: 0.9rem;
+    text-align: center;
+    pointer-events: none;
 }
 

@@ -129,8 +129,13 @@ Djomy ou le webhook signé.
 
 ```bash
 python manage.py makemessages -l en    # extraire les chaînes
+python manage.py translate_messages -l en  # générer les msgstr avec DeepL
 python manage.py compilemessages       # compiler les .po -> .mo
 ```
+
+La commande `translate_messages` utilise la variable `DEEPL_AUTH_KEY` définie
+dans le fichier `.env`. Installer les dépendances (`pip install -r requirements.txt`)
+avant de l'exécuter. Elle ne remplace pas les traductions déjà présentes.
 
 ## 5. Architecture d'exécution en production
 

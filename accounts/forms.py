@@ -142,7 +142,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.TextInput(attrs={
             'class': 'validate',
         }),
-        error_messages={'required': "Veuillez renseigner votre prénom."}
+        error_messages={'required': "Votre prénom est requis."}
     )
     last_name = forms.CharField(
         required=True,
@@ -150,7 +150,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.TextInput(attrs={
             'class': 'validate',
         }),
-        error_messages={'required': "Veuillez renseigner votre nom."}
+        error_messages={'required': "Votre nom est requis."}
     )
     email = forms.EmailField(
         required=True,
@@ -159,7 +159,7 @@ class RegisterForm(UserCreationForm):
             'class': 'validate',
         }),
         error_messages={
-            'required': "Veuillez renseigner votre email.",
+            'required': "Votre email est requis.",
             'invalid': "Format d'email invalide.",
         }
     )
@@ -174,7 +174,8 @@ class RegisterForm(UserCreationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'validate',
-            'id': 'password-field'      # <- on fixe un id simple
+            'id': 'password-field',     # <- on fixe un id simple
+            'error': "Le mot de passe est requis."
         })
     )
     password2 = forms.CharField(
@@ -182,7 +183,8 @@ class RegisterForm(UserCreationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={
             'class': 'validate',
-            'id': 'password-field2'     # <- on fixe un id simple
+            'id': 'password-field2',    # <- on fixe un id simple
+            'error': "La confirmation du mot de passe est requise."
         }),
         help_text="Entrez le même mot de passe que précédemment, pour vérification."
     )
@@ -195,7 +197,7 @@ class RegisterForm(UserCreationForm):
         }
         error_messages = {
             'username': {
-                'required': "Veuillez renseigner un nom d'utilisateur.",
+                'required': "Le nom d'utilisateur est requis.",
                 'min_length': "Au moins 3 caractères.",
                 'unique': "Ce nom d'utilisateur existe déjà."
             }
@@ -255,48 +257,48 @@ class ResendActivationForm(forms.Form):
 
 
 class _LegacyUserInfosForm(forms.ModelForm):
-    user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Veuillez renseigner votre categorie d\'utilisateur.'}) 
-    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Veuillez renseigner votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
+    user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Le nom d\'utilisateur est requis.'}) 
+    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'La civilité est requise.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
     
-    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Veuillez renseigner votre prénom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Veuillez renseigner votre Nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    birth_date = forms.DateField(widget=forms.DateInput(format="%Y-%m-%d",attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Veuillez renseigner votre date de naissance.'})
-    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Votre prénom est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Votre nom est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    birth_date = forms.DateField(widget=forms.DateInput(format="%Y-%m-%d",attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Votre date de naissance est requise.'})
+    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Votre ville de naissance est requise.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Votre pays de naissance est requis.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Votre nationalité est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     #is_actual_country_as_birth_country = forms.BooleanField(label="Definir le pays actuel et la ville", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     actual_city = forms.CharField(max_length=100, label="Ville actuelle", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,required=False, label="Pays actuel", widget=forms.Select(attrs={'class': 'form-control'}))
     zip_code = forms.CharField(max_length=10, label="Code postal", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Veuillez renseigner votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Veuillez renseigner votre téléphone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    profession_situation = forms.ChoiceField(label="Situation professionnelle", error_messages={'required': 'Veuillez renseigner votre situation professionnelle.'}, widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
-    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Veuillez renseigner votre secteur d\'activité.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, label="Profession", error_messages={'required': 'Veuillez renseigner votre profession.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Votre adresse est requise.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Votre téléphone est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    profession_situation = forms.ChoiceField(label="Situation professionnelle", error_messages={'required': 'Votre situation professionnelle est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
+    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Votre secteur d\'activité est requis.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, label="Profession", error_messages={'required': 'Votre profession est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
             model = UserDetails
             fields = ['user_category', 'civility','first_name','last_name', 'birth_date','birth_city', 'nationality', 'actual_city', 'zip_code', 'address', 'phone', 'profession_situation', 'activity_sector', 'profession', 'high_education', 'person_contact']
 
 class _LegacyUserInfosFormWithLocations(forms.ModelForm):
-    user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Veuillez renseigner votre categorie d\'utilisateur.'})
-    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Veuillez renseigner votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
+    user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, required=True, label="Catégorie d'utilisateur", error_messages={'required': 'Votre categorie d\'utilisateur est requise.'})
+    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Votre civilité est requise.'}, widget=forms.Select(attrs={'class': 'form-control; col-md-6'}))
 
-    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Veuillez renseigner votre prénom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Veuillez renseigner votre Nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    birth_date = forms.DateField(widget=forms.DateInput(format="%Y-%m-%d",attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Veuillez renseigner votre date de naissance.'})
-    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Votre prénom est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Votre nom est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    birth_date = forms.DateField(widget=forms.DateInput(format="%Y-%m-%d",attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Votre date de naissance est requise.'})
+    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Votre ville de naissance est requise.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Votre pays de naissance est requis.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Votre nationalité est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     #is_actual_country_as_birth_country = forms.BooleanField(label="Definir le pays actuel et la ville", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     actual_city = forms.CharField(max_length=100, label="Ville actuelle", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,required=False, label="Pays actuel", widget=forms.Select(attrs={'class': 'form-control'}))
     zip_code = forms.CharField(max_length=10, label="Code postal", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Veuillez renseigner votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Veuillez renseigner votre téléphone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    profession_situation = forms.ChoiceField(label="Situation professionnelle", error_messages={'required': 'Veuillez renseigner votre situation professionnelle.'}, widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
-    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Veuillez renseigner votre secteur d\'activité.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, label="Profession", error_messages={'required': 'Veuillez renseigner votre profession.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Votre adresse est requise.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Votre téléphone est requis.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    profession_situation = forms.ChoiceField(label="Situation professionnelle", error_messages={'required': 'Votre situation professionnelle est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
+    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Votre secteur d\'activité est requis.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, label="Profession", error_messages={'required': 'Votre profession est requise.'}, widget=forms.Select(attrs={'class': 'form-control'}))
 
     # Champs de localisation (Région, Préfecture, Commune)
     region = forms.ModelChoiceField(
@@ -500,21 +502,21 @@ class _LegacyProfileForm(PrivateDocumentValidationMixin, forms.ModelForm):
    
     #Model UserDetails fields
     user_category = forms.ChoiceField(choices=UserDetails.USER_CATEGORY_CHOICES, label="Catégorie d'utilisateur", widget=forms.Select(attrs={'class': 'form-control'}))
-    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Veuillez renseigner votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Veuillez renseigner votre prénom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Veuillez renseigner votre nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    birth_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Veuillez renseigner votre date de naissance.'})
-    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    civility = forms.ChoiceField(choices=UserDetails.CIVILITY_CHOICES, label="Civilité", error_messages={'required': 'Votre civilité.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=100, label="Prénom", error_messages={'required': 'Votre prénom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=100, label="Nom", error_messages={'required': 'Votre nom.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    birth_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), label="Date de naissance", error_messages={'required': 'Votre date de naissance.'})
+    birth_city = forms.CharField(max_length=100, label="Ville de naissance", error_messages={'required': 'Votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    #birth_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES,label="Pays de naissance", error_messages={'required': 'Votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    nationality = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Nationalité", error_messages={'required': 'Votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
     is_actual_country_as_birth_country = forms.BooleanField(label="Ville actuelle = Ville de naissance", required=False, widget=forms.CheckboxInput(attrs={'class': 'form-control'}))
-    actual_city = forms.CharField(max_length=100, label="Ville actuelle", error_messages={'required': 'Veuillez renseigner votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays actuel", error_messages={'required': 'Veuillez renseigner votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
-    zip_code = forms.CharField(max_length=10, label="Code postal", error_messages={'required': 'Veuillez renseigner votre code postal.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Veuillez renseigner votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Veuillez renseigner votre téléphone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    actual_city = forms.CharField(max_length=100, label="Ville actuelle", error_messages={'required': 'Votre ville.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    #actual_country = forms.ChoiceField(choices=UserDetails.COUNTRY_CHOICES, label="Pays actuel", error_messages={'required': 'Votre pays.'}, widget=forms.Select(attrs={'class': 'form-control'}))
+    zip_code = forms.CharField(max_length=10, label="Code postal", error_messages={'required': 'Votre code postal.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    address = forms.CharField(max_length=100, label="Adresse actuelle", error_messages={'required': 'Votre adresse.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=100, label="Téléphone", error_messages={'required': 'Votre téléphone.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     profession_situation = forms.ChoiceField(label="Situation professionnelle", widget=forms.Select(attrs={'class': 'form-control'}), choices=UserDetails.PROFESSION_SITUATION_CHOICES)
-    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Veuillez renseigner votre secteur d\'activité.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    activity_sector = forms.ChoiceField(choices=UserDetails.ACTIVITY_SECTOR_CHOICES, label="Secteur d'activité", error_messages={'required': 'Votre secteur d\'activité.'}, widget=forms.TextInput(attrs={'class': 'form-control'}))
     profession = forms.ChoiceField(choices=UserDetails.PROFESSION_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
     high_education = forms.ChoiceField(choices=UserDetails.HIGH_EDUCATION_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
     person_contact  = forms.CharField(max_length=100, label="Personne à contacter", widget=forms.TextInput(attrs={'class': 'form-control'}))
