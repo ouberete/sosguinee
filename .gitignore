@@ -29,6 +29,6 @@ Thumbs.db
 
 docker-compose.prod.yml
 docker-compose.yml
-dockerfile
+Dockerfile
 entrypoint.sh
 nginx.conf

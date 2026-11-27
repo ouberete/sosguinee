@@ -150,7 +150,16 @@
 }
 
 
-/* Hero Section for Detail Page */
+
+/* Align password fields side‑by‑side on large screens */
+@media only screen and (min-width: 992px) {
+  .auth-form .input-field.col.l6 {
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 0;
+  }
+}
+
 .detail-hero-section {
     min-height: 300px;
     /* Smaller height for detail page hero */

@@ -83,16 +83,16 @@
       </div>
 
       <!-- Prénom & Nom côte à côte sur écran large -->
-      {% include 'page/includes/form_field.html' with field=form.first_name field_width='m6' %}
-      {% include 'page/includes/form_field.html' with field=form.last_name field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.first_name field_width='m6 l6' %}
+      {% include 'page/includes/form_field.html' with field=form.last_name field_width='m6 l6' %}
 
       <!-- Nom d'utilisateur & Email côte à côte sur écran large -->
-      {% include 'page/includes/form_field.html' with field=form.username field_width='m6' %}
-      {% include 'page/includes/form_field.html' with field=form.email field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.username field_width='m6 l6' %}
+      {% include 'page/includes/form_field.html' with field=form.email field_width='m6 l6' %}
 
       <!-- Mots de passe côte à côte sur écran large -->
-      {% include 'page/includes/form_field.html' with field=form.password1 field_width='m6' %}
-      {% include 'page/includes/form_field.html' with field=form.password2 field_width='m6' %}
+      {% include 'page/includes/form_field.html' with field=form.password1 field_width='m6 l6' %}
+      {% include 'page/includes/form_field.html' with field=form.password2 field_width='m6 l6' %}
 
       {% if turnstile_site_key %}
         <div class="col s12 input-field center-align" style="margin: 20px 0;">
