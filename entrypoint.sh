@@ -19,6 +19,10 @@ python manage.py migrate --noinput
 echo "🎨 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput
 
+echo "🌍 Compilation des traductions..."
+find locale -name "*.mo" -delete
+python manage.py compilemessages
+
 # Démarrage de Celery dans ce conteneur (désactivé avec Docker Compose :
 # les services celery_worker et celery_beat s'en chargent séparément)
 START_CELERY_PROCESSES="${RUN_CELERY_PROCESSES:-$ASYNC_EMAIL_ENABLED}"
@@ -34,3 +38,7 @@ exec gunicorn ensemble224.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000} \
     --workers 2 \
     --access-logfile -
+
+
+
+    
